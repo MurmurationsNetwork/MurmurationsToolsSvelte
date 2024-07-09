@@ -49,13 +49,16 @@
 </script>
 
 <!-- Sync system light/dark mode -->
-<svelte:head>{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}</svelte:head>
+<svelte:head>
+	{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}
+	<title>Murmurations Tools</title>
+</svelte:head>
 
 <AppShell>
 	<svelte:fragment slot="header">
 		<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
 			<svelte:fragment slot="lead">
-				<a class="text-xl font-bold" href="/"
+				<a class="text-xl font-bold" href="/" id="site-logo"
 					><span class="md:hidden">Tools</span><span class="max-md:hidden">Murmurations Tools</span
 					></a
 				>
@@ -73,7 +76,7 @@
 				posting data to the live one.
 			</div>
 			<svelte:fragment slot="trail">
-				<a class="btn btn-sm variant-filled-primary" href="/login"> Login </a>
+				<a class="btn btn-sm variant-filled-primary" href="/login" id="login"> Login </a>
 			</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>
@@ -81,6 +84,7 @@
 	<svelte:fragment slot="sidebarLeft">
 		<AppRail slot="lead">
 			<AppRailAnchor
+				id="profile-generator"
 				href="/profile-generator"
 				selected={$page.url.pathname === '/profile-generator'}
 			>
@@ -89,26 +93,38 @@
 					<div class="mt-2">Profile Generator</div>
 				</svelte:fragment>
 			</AppRailAnchor>
-			<AppRailAnchor href="/batch-importer" selected={$page.url.pathname === '/batch-importer'}>
+			<AppRailAnchor
+				id="batch-importer"
+				href="/batch-importer"
+				selected={$page.url.pathname === '/batch-importer'}
+			>
 				<svelte:fragment>
 					<Icon data={copy} />
 					<div class="mt-2">Batch Importer</div>
 				</svelte:fragment>
 			</AppRailAnchor>
-			<AppRailAnchor href="/index-explorer" selected={$page.url.pathname === '/index-explorer'}>
+			<AppRailAnchor
+				id="index-explorer"
+				href="/index-explorer"
+				selected={$page.url.pathname === '/index-explorer'}
+			>
 				<svelte:fragment>
 					<Icon data={search} />
 					<div class="mt-2">Index Explorer</div>
 				</svelte:fragment>
 			</AppRailAnchor>
-			<AppRailAnchor href="/index-updater" selected={$page.url.pathname === '/index-updater'}>
+			<AppRailAnchor
+				id="index-updater"
+				href="/index-updater"
+				selected={$page.url.pathname === '/index-updater'}
+			>
 				<svelte:fragment>
 					<Icon data={edit} />
 					<div class="mt-2">Index Updater</div>
 				</svelte:fragment>
 			</AppRailAnchor>
 			<!-- TODO - link to test/prod based on site third-level domain -->
-			<AppRailAnchor href="https://test-map.murmurations.network/" target="_blank">
+			<AppRailAnchor id="map" href="https://test-map.murmurations.network/" target="_blank">
 				<svelte:fragment>
 					<Icon data={map0} />
 					<div class="mt-2">Map ↗</div>
