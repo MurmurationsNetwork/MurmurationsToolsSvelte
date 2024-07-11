@@ -22,6 +22,7 @@ vite.config.ts.timestamp-*
 
 #IDEs
 .vscode
+.idea
 
 # Tests
 test-results
