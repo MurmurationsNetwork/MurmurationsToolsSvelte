@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	export let title = 'title';
 	export let status = 'status';
 	export let last_updated = 'last_updated';

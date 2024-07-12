@@ -1,11 +1,11 @@
-<script lang="ts">
+<script>
 	export let schemas = ['schema1', 'schema2'];
 	import { schemasSelected } from '$lib/stores';
 
 	function selectSchemas() {
 		const schemaSelector = document.getElementById('schemaSelector');
 		const selectedSchemas = Array.from(schemaSelector?.selectedOptions).map(
-			(option: any) => option.value
+			(option) => option.value
 		);
 		schemasSelected.set(selectedSchemas);
 	}
