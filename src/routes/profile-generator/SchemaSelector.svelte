@@ -4,10 +4,12 @@
 
 	function selectSchemas() {
 		const schemaSelector = document.getElementById('schemaSelector');
-		const selectedSchemas = Array.from(schemaSelector?.selectedOptions).map(
-			(option) => option.value
-		);
-		schemasSelected.set(selectedSchemas);
+		if (schemaSelector && schemaSelector instanceof HTMLSelectElement) {
+			const selectedSchemas = Array.from(schemaSelector?.selectedOptions).map(
+				(option) => option.value
+			);
+			schemasSelected.set(selectedSchemas);
+		}
 	}
 </script>
 
