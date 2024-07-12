@@ -1,14 +1,16 @@
 <script lang="ts">
 	import ProfileCard from './ProfileCard.svelte';
+	import ProfileEditor from './ProfileEditor.svelte';
 	import SchemaSelector from './SchemaSelector.svelte';
+	import { schemasSelected } from '$lib/stores';
 
-	// TODO - fetch the schema data
+	// TODO - fetch the schema list data
 	let schemasList: any[] = [
 		'organizations_schema-v1.0.0',
 		'permaculture_schema-v0.1.0',
 		'people_schema-v0.1.0'
 	];
-	// TODO - fetch the profile data
+	// TODO - fetch the user profiles data
 	let profileCards: any[] = [
 		{
 			title: 'My First Profile',
@@ -23,6 +25,13 @@
 			schemas: ['organizations_schema-v1.0.0']
 		}
 	];
+
+	// Controls whether to display the schema selection box or the profile editor
+	let selectedSchemas: string[] = [];
+
+	schemasSelected.subscribe((value) => {
+		selectedSchemas = value;
+	});
 </script>
 
 <div class="container mx-auto flex justify-center items-top">
@@ -47,7 +56,11 @@
 		<!-- END: List of user-generated profiles -->
 		<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 		<div class="md:basis-2/3 md:order-first p-2">
-			<SchemaSelector schemas={schemasList} />
+			{#if selectedSchemas.length === 0}
+				<SchemaSelector schemas={schemasList} />
+			{:else}
+				<ProfileEditor />
+			{/if}
 		</div>
 		<!-- END: Schema selection box / Create/modify profile input / Profile preview -->
 	</div>
