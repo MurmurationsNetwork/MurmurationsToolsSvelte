@@ -25,13 +25,6 @@
 			schemas: ['organizations_schema-v1.0.0']
 		}
 	];
-
-	// Controls whether to display the schema selection box or the profile editor
-	let selectedSchemas = [];
-
-	schemasSelected.subscribe((value) => {
-		selectedSchemas = value;
-	});
 </script>
 
 <div class="container mx-auto flex justify-center items-top">
@@ -56,7 +49,7 @@
 		<!-- END: List of user-generated profiles -->
 		<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 		<div class="md:basis-2/3 md:order-first p-2">
-			{#if selectedSchemas.length === 0}
+			{#if $schemasSelected.length === 0}
 				<SchemaSelector schemas={schemasList} />
 			{:else}
 				<ProfileEditor />
