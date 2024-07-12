@@ -1,7 +1,14 @@
 <script lang="ts">
 	import ProfileCard from './ProfileCard.svelte';
+	import SchemaSelector from './SchemaSelector.svelte';
 
-	// TODO - fetch the data
+	// TODO - fetch the schema data
+	let schemasList: any[] = [
+		'organizations_schema-v1.0.0',
+		'permaculture_schema-v0.1.0',
+		'people_schema-v0.1.0'
+	];
+	// TODO - fetch the profile data
 	let profileCards: any[] = [
 		{
 			title: 'My First Profile',
@@ -40,7 +47,7 @@
 		<!-- END: List of user-generated profiles -->
 		<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 		<div class="md:basis-2/3 md:order-first p-2">
-			Schemas Selection / Profile Input / Profile Preview
+			<SchemaSelector schemas={schemasList} />
 		</div>
 		<!-- END: Schema selection box / Create/modify profile input / Profile preview -->
 	</div>

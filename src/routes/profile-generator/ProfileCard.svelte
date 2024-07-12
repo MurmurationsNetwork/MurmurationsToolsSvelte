@@ -12,7 +12,6 @@
 				: 'variant-filled-error';
 </script>
 
-<!-- BEGIN: Profile card -->
 <div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
 	<div class="font-medium">{title}</div>
 	<div class="m-4">
@@ -31,4 +30,3 @@
 		<button class="btn font-semibold md:btn-lg variant-filled-secondary">Delete</button>
 	</div>
 </div>
-<!-- END: Profile card -->
