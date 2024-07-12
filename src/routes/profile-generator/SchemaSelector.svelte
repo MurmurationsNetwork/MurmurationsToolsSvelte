@@ -5,7 +5,7 @@
 	function selectSchemas() {
 		const schemaSelector = document.getElementById('schemaSelector');
 		if (schemaSelector && schemaSelector instanceof HTMLSelectElement) {
-			const selectedSchemas = Array.from(schemaSelector?.selectedOptions).map(
+			const selectedSchemas = Array.from(schemaSelector.selectedOptions).map(
 				(option) => option.value
 			);
 			schemasSelected.set(selectedSchemas);
