@@ -1,38 +1,50 @@
-# create-svelte
+# Murmurations Tools
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+> _This project is licensed under the terms of the GNU General Public License v3.0_
 
-## Creating a project
+## To Do
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Set up environment variables
+- Add IPFS functionality
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## Development
 
-# create a new project in my-app
-npm create svelte@latest my-app
+Install dependencies:
+
+```sh
+npm install
 ```
 
-## Developing
+<!--
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Set environment variables in the `.env` file:
 
-```bash
+```sh
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+-->
 
-To create a production version of your app:
+Open up <http://localhost:5173> and you should be ready to go!
 
-```bash
-npm run build
+<!-- 
+
+## Enabling IPFS
+
+Profiles created in Murmurations Tools can also be saved to IPFS as well as to your Mongo database. You will need access to an IPFS server and will have to set the credentials in your environment variables file.
+
+You can enable IPFS functionality by changing the configuration in the `app/utils/settings.js` file:
+
+```javascript
+export const settings = {
+    ipfsEnabled: true
+};
 ```
 
-You can preview the production build with `npm run preview`.
+Then save the file and restart/redeploy the app. To disable IPFS, set `ipfsEnabled` back to false and restart/redeploy again.
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+-->
+
+## Try it out
+
+<https://test-tools.murmurations.network>
