@@ -1,22 +1,22 @@
 <script lang="ts">
 	import { currentProfile, schemasSelected } from '$lib/stores';
 
-	let profilePreview = false;
+	let profilePreview: boolean = false;
 
-	function resetSchemas() {
+	function resetSchemas(): void {
 		schemasSelected.set([]);
 		currentProfile.set({});
 	}
 
-	function handleSubmit(event: SubmitEvent) {
-		event.preventDefault(); // Prevent the default form submission behavior
+	function handleSubmit(event: SubmitEvent): void {
+		// TODO - determine if we really need to prevent the default form submission behavior
+		event.preventDefault();
 		const target = event.target as HTMLFormElement | null;
 		if (target) {
 			const formData = new FormData(target);
-			// console.log([...formData.entries()]);
-			// console.log(Object.fromEntries(formData));
 			currentProfile.set(Object.fromEntries(formData));
 			profilePreview = true;
+			// TODO - clear the form fields
 			// target.reset();
 		}
 	}

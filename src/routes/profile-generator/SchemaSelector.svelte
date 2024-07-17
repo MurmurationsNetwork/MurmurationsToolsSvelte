@@ -2,7 +2,7 @@
 	export let schemas: string[] = ['schema1', 'schema2'];
 	import { schemasSelected } from '$lib/stores';
 
-	function selectSchemas() {
+	function selectSchemas(): void {
 		const schemaSelector = document.getElementById('schemaSelector') as HTMLSelectElement;
 		const selectedSchemas = Array.from(schemaSelector?.selectedOptions || []).map(
 			(option) => option.value
