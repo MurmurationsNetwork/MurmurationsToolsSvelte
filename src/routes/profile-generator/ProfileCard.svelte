@@ -1,15 +1,23 @@
 <script lang="ts">
-	export let title = 'title';
-	export let status = 'status';
-	export let last_updated = 'last_updated';
-	export let schemas = ['schema1', 'schema2'];
+	export let title: string = 'title';
+	export let status: string = 'status';
+	export let last_updated: string = 'last_updated';
+	export let schemas: string[] = ['schema1', 'schema2'];
 
-	let statusColor =
-		status === 'posted'
-			? 'variant-filled-success'
-			: status === 'received' || status === 'validated'
-				? 'variant-filled-warning'
-				: 'variant-filled-error';
+	let statusColor: string;
+
+	switch (status) {
+		case 'posted':
+			statusColor = 'variant-filled-success';
+			break;
+		case 'received':
+		case 'validated':
+			statusColor = 'variant-filled-warning';
+			break;
+		default:
+			statusColor = 'variant-filled-error';
+			break;
+	}
 </script>
 
 <div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
