@@ -3,13 +3,11 @@
 	import { schemasSelected } from '$lib/stores';
 
 	function selectSchemas() {
-		const schemaSelector = document.getElementById('schemaSelector');
-		if (schemaSelector && schemaSelector instanceof HTMLSelectElement) {
-			const selectedSchemas = Array.from(schemaSelector.selectedOptions).map(
-				(option) => option.value
-			);
-			schemasSelected.set(selectedSchemas);
-		}
+		const schemaSelector = document.getElementById('schemaSelector') as HTMLSelectElement;
+		const selectedSchemas = Array.from(schemaSelector?.selectedOptions || null).map(
+			(option) => option.value
+		);
+		schemasSelected.set(selectedSchemas);
 	}
 </script>
 
