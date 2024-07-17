@@ -5,13 +5,21 @@
 	import { schemasSelected } from '$lib/stores';
 
 	// TODO - fetch the schema list data
-	let schemasList = [
+	let schemasList: string[] = [
 		'organizations_schema-v1.0.0',
 		'permaculture_schema-v0.1.0',
 		'people_schema-v0.1.0'
 	];
+
+	interface ProfileCard {
+		title: string;
+		status: 'posted' | 'received' | 'validated' | 'deleted' | 'validation_failed' | 'post_failed';
+		last_updated: string; // TODO - change to Unix timestamp (number) and convert into local date string
+		schemas: string[];
+	}
+
 	// TODO - fetch the user profiles data
-	let profileCards = [
+	let profileCards: ProfileCard[] = [
 		{
 			title: 'My First Profile',
 			status: 'posted',
