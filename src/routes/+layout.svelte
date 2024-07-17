@@ -23,11 +23,6 @@
 	hljs.registerLanguage('typescript', typescript);
 	storeHighlightJs.set(hljs);
 
-	// Floating UI for popups
-	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
-	import { storePopup } from '@skeletonlabs/skeleton';
-	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
-
 	// Icons for AppRail
 	import Icon from 'svelte-awesome';
 	import fileO from 'svelte-awesome/icons/fileO';
@@ -38,9 +33,14 @@
 
 	// Page store
 	import { page } from '$app/stores';
-	import type { PopupSettings } from '@skeletonlabs/skeleton';
+
+	// Floating UI for popups
+	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
+	import { storePopup } from '@skeletonlabs/skeleton';
+	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
 	// Popup for site environment
+	import type { PopupSettings } from '@skeletonlabs/skeleton';
 	const hoverSiteEnv: PopupSettings = {
 		event: 'hover',
 		target: 'hoverSiteEnv',
