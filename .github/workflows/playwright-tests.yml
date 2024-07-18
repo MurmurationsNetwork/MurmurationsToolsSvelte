@@ -24,9 +24,7 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install
 
-      - name: Set up environment variables
-        run: |
-            echo "PUBLIC_LIBRARY_URL=$PUBLIC_LIBRARY_URL" >> $GITHUB_ENV
-
       - name: Run Playwright tests
         run: npx playwright test
+        env:
+          PUBLIC_LIBRARY_URL: ${{ secrets.$PUBLIC_LIBRARY_URL }}
