@@ -27,7 +27,7 @@ npm run dev
 
 Open up <http://localhost:5173> and you should be ready to go!
 
-<!-- 
+<!--
 
 ## Enabling IPFS
 
