@@ -13,8 +13,8 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test:integration": "playwright test",
-		"test:unit": "vitest",
-		"test:unit:run": "vitest run",
+		"test:unit": "vitest run",
+		"test:unit:watch": "vitest",
 		"prepare": "husky"
 	},
 	"dependencies": {
