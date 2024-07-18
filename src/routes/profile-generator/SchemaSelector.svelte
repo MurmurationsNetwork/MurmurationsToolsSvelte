@@ -1,5 +1,4 @@
 <script lang="ts">
-	export let schemas: string[] = ['schema1', 'schema2'];
 	import { schemasSelected } from '$lib/stores';
 
 	function selectSchemas(): void {
@@ -9,6 +8,8 @@
 		);
 		schemasSelected.set(selectedSchemas);
 	}
+
+	export let schemas: string[];
 </script>
 
 <div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
