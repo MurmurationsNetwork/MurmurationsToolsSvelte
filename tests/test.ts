@@ -39,3 +39,11 @@ test('clicking links loads correct pages', async ({ page }) => {
 	await page.locator('#site-logo').click();
 	await expect(page).toHaveURL(/\//);
 });
+
+test('schema selector list is not empty and has expected schema', async ({ page }) => {
+	await page.goto('/profile-generator');
+	const optionsCount = await page.locator('#schemaSelector').count();
+	expect(optionsCount).toBeGreaterThan(0);
+	await page.locator('select').selectOption('organizations_schema-v1.0.0');
+	await expect(page.locator('select')).toHaveValue('organizations_schema-v1.0.0');
+});
