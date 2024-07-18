@@ -12,7 +12,7 @@ export const load: PageLoad = async ({ fetch }) => {
 	const data = await getSchemas(fetch);
 
 	return {
-			schemasList: data
+		schemasList: data
 	};
 };
 
@@ -29,5 +29,4 @@ const getSchemas = async (fetch: (input: RequestInfo, init?: RequestInit) => Pro
 		console.error(error);
 		return [];
 	}
-}
-
+};
