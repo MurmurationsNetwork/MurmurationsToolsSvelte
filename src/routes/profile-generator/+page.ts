@@ -9,10 +9,10 @@ interface Schema {
 }
 
 export const load: PageLoad = async ({ fetch }) => {
-	const data = await getSchemas(fetch);
+	const schemasList = await getSchemas(fetch);
 
 	return {
-		schemasList: data
+		schemasList: schemasList
 	};
 };
 

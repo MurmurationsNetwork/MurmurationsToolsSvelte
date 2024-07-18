@@ -9,7 +9,7 @@
 		schemasSelected.set(selectedSchemas);
 	}
 
-	export let schemas: string[];
+	export let schemasList: string[];
 </script>
 
 <div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
@@ -17,7 +17,7 @@
 		<div class="font-medium">Select one or more schemas to create a new profile</div>
 		<div class="m-4">
 			<select multiple required size="3" class="select text-sm" id="schemaSelector">
-				{#each schemas as schema}
+				{#each schemasList as schema}
 					<option value={schema}>{schema}</option>
 				{/each}
 			</select>

@@ -57,7 +57,7 @@
 		<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 		<div class="md:basis-2/3 md:order-first p-2">
 			{#if $schemasSelected.length === 0}
-				<SchemaSelector schemas={schemasList} />
+				<SchemaSelector {schemasList} />
 			{:else}
 				<ProfileEditor />
 			{/if}
