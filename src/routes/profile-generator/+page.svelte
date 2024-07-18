@@ -4,13 +4,6 @@
 	import SchemaSelector from './SchemaSelector.svelte';
 	import { schemasSelected } from '$lib/stores';
 
-	// TODO - fetch the schema list data
-	let schemasList: string[] = [
-		'organizations_schema-v1.0.0',
-		'permaculture_schema-v0.1.0',
-		'people_schema-v0.1.0'
-	];
-
 	interface ProfileCard {
 		title: string;
 		status: 'posted' | 'received' | 'validated' | 'deleted' | 'validation_failed' | 'post_failed';
@@ -33,6 +26,12 @@
 			schemas: ['organizations_schema-v1.0.0']
 		}
 	];
+
+	type Data = {
+		schemasList: string[];
+	};
+	export let data: Data;
+	$: ({ schemasList } = data);
 </script>
 
 <div class="container mx-auto flex justify-center items-top">
@@ -58,7 +57,7 @@
 		<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 		<div class="md:basis-2/3 md:order-first p-2">
 			{#if $schemasSelected.length === 0}
-				<SchemaSelector schemas={schemasList} />
+				<SchemaSelector {schemasList} />
 			{:else}
 				<ProfileEditor />
 			{/if}

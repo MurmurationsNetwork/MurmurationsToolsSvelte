@@ -26,3 +26,5 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
+        env:
+          PUBLIC_LIBRARY_URL: ${{ secrets.PUBLIC_LIBRARY_URL }}
