@@ -30,6 +30,7 @@
 	type Data = {
 		schemasList: string[];
 	};
+
 	export let data: Data;
 	$: ({ schemasList } = data);
 </script>

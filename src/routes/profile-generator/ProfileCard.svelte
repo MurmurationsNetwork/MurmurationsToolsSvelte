@@ -1,8 +1,8 @@
 <script lang="ts">
-	export let title: string = 'title';
-	export let status: string = 'status';
-	export let last_updated: string = 'last_updated';
-	export let schemas: string[] = ['schema1', 'schema2'];
+	export let title: string;
+	export let status: string;
+	export let last_updated: string;
+	export let schemas: string[];
 
 	let statusColor: string;
 
