@@ -24,7 +24,7 @@
 	<div class="font-medium">{title}</div>
 	<div class="m-4">
 		<span class="badge {statusColor} font-bold text-sm mx-4">{status}</span>
-		<span class="badge variant-ghost-primary font-bold text-sm mx-4">{last_updated}</span>
+		<span class="badge variant-ghost-primary font-bold text-sm mx-4 mt-2">{last_updated}</span>
 	</div>
 	<div class="flex justify-center">
 		<ul class="list text-xs">
