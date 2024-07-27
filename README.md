@@ -7,6 +7,24 @@
 - Set up environment variables
 - Add IPFS functionality
 
+## Local Development with Murmurations Services and Frontend Mongo
+
+1. Run Murmurations Services and Frontend Mongo.
+2. Ensure Local `.env` is Set Up. The following is the default `.env` setup.
+
+   ```bash
+   PUBLIC_LIBRARY_URL=http://library-app:8080
+   ```
+
+3. Modify `/etc/hosts` to point tools.murmurations.developers to 127.0.0.1.
+
+   ```bash
+   127.0.0.1       tools.murmurations.developers
+   ```
+
+4. Execute `make dev`.
+5. Open <http://tools.murmurations.developers> in your browser.
+
 ## Development
 
 Install dependencies:
