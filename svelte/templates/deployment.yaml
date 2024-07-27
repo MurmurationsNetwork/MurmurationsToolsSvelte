@@ -36,7 +36,7 @@ spec:
           command: [ "sh", "-c" ]
           args:
             - |
-              npm run dev
+              npm run dev:local
       volumes:
         - name: node-modules-storage
           hostPath:

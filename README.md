@@ -4,7 +4,6 @@
 
 ## To Do
 
-- Set up environment variables
 - Add IPFS functionality
 
 ## Local Development with Murmurations Services and Frontend Mongo
