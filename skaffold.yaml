@@ -1,0 +1,23 @@
+apiVersion: skaffold/v4beta5
+kind: Config
+
+build:
+  local:
+    push: false
+  artifacts:
+    - image: murmurations/tools
+      context: .
+      docker:
+        dockerfile: Dockerfile
+
+deploy:
+  helm:
+    releases:
+      - name: murmurations-tools
+        chartPath: svelte
+        namespace: default
+        valuesFiles:
+          - svelte/values.yaml
+        setValueTemplates:
+          image: '{{.IMAGE_FULLY_QUALIFIED_murmurations_tools}}'
+          sourcepath: '{{.SOURCEPATH}}'
