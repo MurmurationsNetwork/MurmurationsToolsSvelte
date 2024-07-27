@@ -12,7 +12,7 @@
 2. Ensure Local `.env` is Set Up. The following is the default `.env` setup.
 
    ```bash
-   PUBLIC_LIBRARY_URL=http://library-app:8080
+   PUBLIC_LIBRARY_URL=http://library.murmurations.developers
    ```
 
 3. Modify `/etc/hosts` to point tools.murmurations.developers to 127.0.0.1.
