@@ -2,7 +2,25 @@
 	import ProfileCard from './ProfileCard.svelte';
 	import ProfileEditor from './ProfileEditor.svelte';
 	import SchemaSelector from './SchemaSelector.svelte';
-	import { schemasSelected } from '$lib/stores';
+
+	// Fetch the list of schemas
+	type Data = {
+		schemasList: string[];
+	};
+
+	export let data: Data;
+	$: ({ schemasList } = data);
+
+	// Set selected schema in the parent component
+	let schemasSelected: string[] = [];
+
+	function handleSchemaSelected(event: CustomEvent<string[]>) {
+		schemasSelected = event.detail;
+	}
+
+	function handleSchemasReset() {
+		schemasSelected = [];
+	}
 
 	interface ProfileCard {
 		title: string;
@@ -26,13 +44,6 @@
 			schemas: ['organizations_schema-v1.0.0']
 		}
 	];
-
-	type Data = {
-		schemasList: string[];
-	};
-
-	export let data: Data;
-	$: ({ schemasList } = data);
 </script>
 
 <div class="container mx-auto flex justify-center items-top">
@@ -57,10 +68,10 @@
 		<!-- END: List of user-generated profiles -->
 		<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 		<div class="md:basis-2/3 md:order-first p-2">
-			{#if $schemasSelected.length === 0}
-				<SchemaSelector {schemasList} />
+			{#if schemasSelected.length === 0}
+				<SchemaSelector {schemasList} on:schemaSelected={handleSchemaSelected} />
 			{:else}
-				<ProfileEditor />
+				<ProfileEditor {schemasSelected} on:schemasReset={handleSchemasReset} />
 			{/if}
 		</div>
 		<!-- END: Schema selection box / Create/modify profile input / Profile preview -->

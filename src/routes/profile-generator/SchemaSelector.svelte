@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { schemasSelected } from '$lib/stores';
+	import { createEventDispatcher } from 'svelte';
 
-	function selectSchemas(): void {
-		const schemaSelector = document.getElementById('schemaSelector') as HTMLSelectElement;
-		const selectedSchemas = Array.from(schemaSelector?.selectedOptions || []).map(
-			(option) => option.value
-		);
-		schemasSelected.set(selectedSchemas);
+	const dispatch = createEventDispatcher();
+	let schemasSelected: string[] = [];
+
+	function selectSchemas() {
+		dispatch('schemaSelected', schemasSelected);
 	}
 
 	export let schemasList: string[];
@@ -16,7 +15,14 @@
 	<form on:submit|preventDefault={selectSchemas}>
 		<div class="font-medium">Select one or more schemas to create a new profile</div>
 		<div class="m-4">
-			<select multiple required size="3" class="select text-sm" id="schemaSelector">
+			<select
+				bind:value={schemasSelected}
+				multiple
+				required
+				size="3"
+				class="select text-sm"
+				id="schemaSelector"
+			>
 				{#each schemasList as schema}
 					<option value={schema}>{schema}</option>
 				{/each}
