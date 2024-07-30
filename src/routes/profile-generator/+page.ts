@@ -14,6 +14,11 @@ export const load: PageLoad = async ({ fetch }) => {
 };
 
 const getSchemas = async (fetch: (input: RequestInfo, init?: RequestInit) => Promise<Response>) => {
+	if (!PUBLIC_LIBRARY_URL) {
+		console.error('PUBLIC_LIBRARY_URL is not defined');
+		return [];
+	}
+
 	try {
 		const response = await fetch(`${PUBLIC_LIBRARY_URL}/v2/schemas`);
 		if (!response.ok) {

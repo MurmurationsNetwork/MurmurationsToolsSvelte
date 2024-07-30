@@ -1,11 +1,15 @@
 <script lang="ts">
-	import { currentProfile, schemasSelected } from '$lib/stores';
+	import { currentProfile } from '$lib/stores';
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
 
 	let profilePreview: boolean = false;
+	export let schemasSelected: string[] = [];
 
 	function resetSchemas(): void {
-		schemasSelected.set([]);
 		currentProfile.set({});
+		dispatch('schemasReset');
 	}
 
 	function handleSubmit(event: SubmitEvent): void {
@@ -26,7 +30,7 @@
 	{#if !profilePreview}
 		<div class="font-medium mb-4">Editing profile with the following schemas</div>
 
-		{#each $schemasSelected as schema}
+		{#each schemasSelected as schema}
 			<span class="badge variant-ghost-primary font-medium text-sm mx-4 mb-2">{schema}</span>
 		{/each}
 
@@ -59,8 +63,10 @@
 				<button type="submit" class="btn font-semibold md:btn-lg variant-filled-primary"
 					>Validate</button
 				>
-				<button on:click={resetSchemas} class="btn font-semibold md:btn-lg variant-filled-secondary"
-					>Reset</button
+				<button
+					type="button"
+					on:click={resetSchemas}
+					class="btn font-semibold md:btn-lg variant-filled-secondary">Reset</button
 				>
 			</div>
 		</form>
@@ -71,7 +77,7 @@
 
 		<div class="m-4 bg-primary-300 dark:bg-primary-900 rounded-xl px-4 py-2">
 			<code class="text-sm text-left"
-				>{JSON.stringify({ linked_schemas: $schemasSelected, ...$currentProfile })}</code
+				>{JSON.stringify({ linked_schemas: schemasSelected, ...$currentProfile })}</code
 			>
 		</div>
 		<div class="flex justify-around mt-4 md:mt-8">
