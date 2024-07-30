@@ -14,7 +14,7 @@
 	// Set selected schema in the parent component
 	let schemasSelected: string[] = [];
 
-	function handleSchemaSelected(event: CustomEvent<string[]>) {
+	function handleSchemasSelected(event: CustomEvent<string[]>) {
 		schemasSelected = event.detail;
 	}
 
@@ -69,7 +69,7 @@
 		<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 		<div class="md:basis-2/3 md:order-first p-2">
 			{#if schemasSelected.length === 0}
-				<SchemaSelector {schemasList} on:schemaSelected={handleSchemaSelected} />
+				<SchemaSelector {schemasList} on:schemaSelected={handleSchemasSelected} />
 			{:else}
 				<ProfileEditor {schemasSelected} on:schemasReset={handleSchemasReset} />
 			{/if}
