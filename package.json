@@ -19,7 +19,7 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
-		"@floating-ui/dom": "1.6.7",
+		"@floating-ui/dom": "1.6.8",
 		"highlight.js": "11.10.0",
 		"svelte-awesome": "^3.3.1"
 	},
@@ -37,9 +37,11 @@
 		"autoprefixer": "10.4.19",
 		"eslint": "^9.0.0",
 		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-svelte": "^2.36.0",
+		"eslint-plugin-svelte": "^2.43.0",
 		"globals": "^15.0.0",
 		"husky": "^9.1.1",
+		"postcss": "8.4.40",
+		"husky": "^9.1.4",
 		"postcss": "8.4.40",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.2.6",
@@ -49,7 +51,7 @@
 		"tslib": "^2.4.1",
 		"typescript": "^5.5.4",
 		"typescript-eslint": "^8.0.0-alpha.51",
-		"vite": "^5.0.3",
+		"vite": "^5.3.5",
 		"vite-plugin-tailwind-purgecss": "0.3.3",
 		"vitest": "^1.2.0"
 	}
