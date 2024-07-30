@@ -19,7 +19,7 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
-		"@floating-ui/dom": "1.6.7",
+		"@floating-ui/dom": "1.6.8",
 		"highlight.js": "11.10.0",
 		"svelte-awesome": "^3.3.1"
 	},
