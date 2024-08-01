@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { currentProfile } from '$lib/stores';
 	import { createEventDispatcher } from 'svelte';
+	import { ParseRef } from '$lib/parser';
+	import { onMount } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -24,6 +26,12 @@
 			// target.reset();
 		}
 	}
+
+	// Use parseRef to retrieve the schema based on schemasSelected
+	onMount(async () => {
+		const schemas = await ParseRef(schemasSelected);
+		console.log(schemas);
+	});
 </script>
 
 <div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
