@@ -6,16 +6,21 @@
 	export let field: Field;
 	export let hideTitle: boolean = false;
 
-	const items = writable<(Field | string | number)[]>([]);
+	const items = writable<(Field | string | number)[]>([getInitialItem()]);
+
+	function getInitialItem(): Field | string | number {
+		if (field.items?.type === 'object') {
+			return { type: 'object', properties: {} };
+		} else if (field.items?.type === 'string') {
+			return '';
+		} else {
+			return 0;
+		}
+	}
 
 	function addItem() {
 		items.update((currentItems) => {
-			const newItem =
-				field.items?.type === 'object'
-					? { type: 'object', properties: {} }
-					: field.items?.type === 'string'
-						? ''
-						: 0;
+			const newItem = getInitialItem();
 			return [...currentItems, newItem as string | number | Field];
 		});
 	}
