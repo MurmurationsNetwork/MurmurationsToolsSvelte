@@ -27,7 +27,18 @@
 	}
 </script>
 
-{#if field.type === 'string'}
+{#if field.type === 'string' && field.enum}
+	<label for={name}>
+		{#if !hideTitle}
+			<div class="my-2">{field.title}:</div>
+		{/if}
+		<select class="w-full" id={name} {name}>
+			{#each field.enum as option}
+				<option value={option}>{option}</option>
+			{/each}
+		</select>
+	</label>
+{:else if field.type === 'string'}
 	<label for={name}>
 		{#if !hideTitle}
 			<div class="my-2">{field.title}:</div>
