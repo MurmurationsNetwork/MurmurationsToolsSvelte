@@ -3,6 +3,8 @@
 	import { createEventDispatcher } from 'svelte';
 	import { ParseRef } from '$lib/parser';
 	import { onMount } from 'svelte';
+	import DynamicForm from './DynamicForm.svelte';
+	import type { Schema } from '$lib/types/schema';
 
 	const dispatch = createEventDispatcher();
 
@@ -27,10 +29,11 @@
 		}
 	}
 
+	let schemas: Schema | null = null;
+
 	// Use parseRef to retrieve the schema based on schemasSelected
 	onMount(async () => {
-		const schemas = await ParseRef(schemasSelected);
-		console.log(schemas);
+		schemas = await ParseRef(schemasSelected);
 	});
 </script>
 
@@ -44,28 +47,9 @@
 
 		<form on:submit|preventDefault={handleSubmit}>
 			<div class="m-4 flex flex-col text-left">
-				<label>
-					<div class="my-2">Name:</div>
-					<input
-						class="w-full"
-						name="name"
-						id="name"
-						type="text"
-						required
-						value={$currentProfile.name || ''}
-					/>
-				</label>
-				<label>
-					<div class="my-2">Primary URL:</div>
-					<input
-						class="w-full"
-						name="primary_url"
-						id="primary_url"
-						type="text"
-						required
-						value={$currentProfile.primary_url || ''}
-					/>
-				</label>
+				{#if schemas !== null}
+					<DynamicForm {schemas} />
+				{/if}
 			</div>
 			<div class="flex justify-around mt-4 md:mt-8">
 				<button type="submit" class="btn font-semibold md:btn-lg variant-filled-primary"

@@ -1,22 +1,5 @@
 import { PUBLIC_LIBRARY_URL } from '$env/static/public';
-
-interface Schema {
-	$schema: string;
-	type: string;
-	properties: { [key: string]: never };
-	required: string[];
-	metadata: {
-		schema: string[];
-	};
-}
-
-interface RetrievedSchema extends Omit<Schema, 'metadata'> {
-	metadata: {
-		schema: {
-			name: string;
-		};
-	};
-}
+import type { RetrievedSchema, Schema } from '$lib/types/schema';
 
 export const ParseRef = async (schemaName: string | string[]): Promise<Schema | null> => {
 	if (!PUBLIC_LIBRARY_URL) {
