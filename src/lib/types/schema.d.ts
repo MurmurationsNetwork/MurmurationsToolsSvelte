@@ -24,7 +24,3 @@ export interface Field {
 	properties?: Record<string, Field>;
 	items?: Field;
 }
-
-type FormData = {
-	[key: string]: string | number | string[] | number[] | FormData | FormData[];
-};
