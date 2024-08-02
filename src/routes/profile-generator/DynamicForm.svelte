@@ -8,7 +8,7 @@
 	let formData: FormData = {};
 
 	onMount(() => {
-			initializeFormData(schemas);
+		initializeFormData(schemas);
 	});
 
 	// console.log('dynamic form schema: ', schemas)
@@ -31,13 +31,9 @@
 <div class="m-4 flex flex-col text-left">
 	{#each Object.entries(schemas.properties) as [name, field]}
 		{#if name === 'linked_schemas'}
-			<input
-				type="hidden"
-				name="linked_schemas"
-				value={schemas?.metadata?.schema}
-			/>
+			<input type="hidden" name="linked_schemas" value={schemas?.metadata?.schema} />
 		{:else}
-		<FormField {name} {field} />
+			<FormField {name} {field} />
 		{/if}
 	{/each}
 </div>

@@ -8,17 +8,17 @@
 {#if field.type === 'string'}
 	<label for={name}>
 		<div class="my-2">{field.title}:</div>
-		<input class="w-full" type="text" id={name} name={name} />
+		<input class="w-full" type="text" id={name} {name} />
 	</label>
 {:else if field.type === 'number'}
 	<label for={name}>
 		<div class="my-2">{field.title}:</div>
-		<input class="w-full" type="number" id={name} name={name} />
+		<input class="w-full" type="number" id={name} {name} />
 	</label>
 {:else if field.type === 'array' && field.items}
 	<label for={name}>
 		<div class="my-2">{field.title}:</div>
-		<input class="w-full" type="text" id={name} name={name} />
+		<input class="w-full" type="text" id={name} {name} />
 	</label>
 {:else if field.type === 'object' && field.properties}
 	<fieldset>
