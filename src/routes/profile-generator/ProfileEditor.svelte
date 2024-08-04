@@ -69,7 +69,7 @@
 
 		<div class="m-4 bg-primary-300 dark:bg-primary-900 rounded-xl px-4 py-2">
 			<code class="text-sm text-left"
-				>{JSON.stringify({ linked_schemas: schemasSelected, ...$currentProfile })}</code
+				>{JSON.stringify({ linked_schemas: schemasSelected, ...$currentProfile }, null, 2)}</code
 			>
 		</div>
 		<div class="flex justify-around mt-4 md:mt-8">
