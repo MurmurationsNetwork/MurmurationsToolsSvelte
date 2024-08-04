@@ -48,7 +48,8 @@
 	<label for={name}>
 		{#if !hideTitle}
 			<div class="my-2 font-bold">
-				{field.title}:{#if requiredFields.includes(fieldName)}*{/if}
+				{field.title}:{#if requiredFields.includes(fieldName)}
+					<span class="ml-1 text-red-500">*</span>{/if}
 			</div>
 		{/if}
 		<select
@@ -70,7 +71,8 @@
 	<label for={name}>
 		{#if !hideTitle}
 			<div class="my-2 font-bold">
-				{field.title}:{#if requiredFields.includes(fieldName)}*{/if}
+				{field.title}:{#if requiredFields.includes(fieldName)}
+					<span class="ml-1 text-red-500">*</span>{/if}
 			</div>
 		{/if}
 		<input
@@ -88,7 +90,8 @@
 	<label for={name}>
 		{#if !hideTitle}
 			<div class="my-2 font-bold">
-				{field.title}:{#if requiredFields.includes(fieldName)}*{/if}
+				{field.title}:{#if requiredFields.includes(fieldName)}
+					<span class="ml-1 text-red-500">*</span>{/if}
 			</div>
 		{/if}
 		<input
@@ -114,7 +117,8 @@
 	{:else}
 		<label for={name}>
 			<div class="my-2 font-bold">
-				{field.title}{#if requiredFields.includes(fieldName)}*{/if}
+				{field.title}{#if requiredFields.includes(fieldName)}
+					<span class="ml-1 text-red-500">*</span>{/if}
 			</div>
 			<div class="text-sm text-gray-500">{field.description}</div>
 			{#each $items as _, index}
