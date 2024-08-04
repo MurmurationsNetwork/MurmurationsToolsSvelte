@@ -60,6 +60,7 @@
 				required={requiredFields.includes(fieldName)}
 				multiple={isParentArray}
 			>
+				<option value="">Select an option</option>
 				{#each field.enum as option, index}
 					<option value={option}>{field.enumNames ? field.enumNames[index] : option}</option>
 				{/each}
