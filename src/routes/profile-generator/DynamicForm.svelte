@@ -10,7 +10,7 @@
 		{#if name === 'linked_schemas'}
 			<input type="hidden" name="linked_schemas" value={schemas?.metadata?.schema} />
 		{:else}
-			<FormField {name} {field} />
+			<FormField {name} fieldName={name} {field} requiredFields={schemas.required} />
 		{/if}
 	{/each}
 </div>

@@ -24,4 +24,5 @@ export interface Field {
 	enumNames?: string[];
 	properties?: Record<string, Field>;
 	items?: Field;
+	required?: string[];
 }

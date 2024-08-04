@@ -3,9 +3,11 @@
 	import type { Field } from '$lib/types/schema';
 
 	export let name: string;
+	export let fieldName: string;
 	export let field: Field;
 	export let hideTitle: boolean = false;
 	export let hideDescription: boolean = false;
+	export let requiredFields: string[] = [];
 
 	const items = writable<(Field | string | number)[]>([getInitialItem()]);
 
@@ -36,9 +38,11 @@
 {#if field.type === 'string' && field.enum}
 	<label for={name}>
 		{#if !hideTitle}
-			<div class="my-2 font-bold">{field.title}:</div>
+			<div class="my-2 font-bold">
+				{field.title}:{#if requiredFields.includes(fieldName)}*{/if}
+			</div>
 		{/if}
-		<select class="w-full" id={name} {name}>
+		<select class="w-full" id={name} {name} required={requiredFields.includes(fieldName)}>
 			{#each field.enum as option}
 				<option value={option}>{option}</option>
 			{/each}
@@ -50,9 +54,17 @@
 {:else if field.type === 'string'}
 	<label for={name}>
 		{#if !hideTitle}
-			<div class="my-2 font-bold">{field.title}:</div>
+			<div class="my-2 font-bold">
+				{field.title}:{#if requiredFields.includes(fieldName)}*{/if}
+			</div>
 		{/if}
-		<input class="w-full" type="text" id={name} {name} />
+		<input
+			class="w-full"
+			type="text"
+			id={name}
+			{name}
+			required={requiredFields.includes(fieldName)}
+		/>
 		{#if !hideDescription}
 			<div class="text-sm text-gray-500">{field.description}</div>
 		{/if}
@@ -60,16 +72,26 @@
 {:else if field.type === 'number'}
 	<label for={name}>
 		{#if !hideTitle}
-			<div class="my-2 font-bold">{field.title}:</div>
+			<div class="my-2 font-bold">
+				{field.title}:{#if requiredFields.includes(fieldName)}*{/if}
+			</div>
 		{/if}
-		<input class="w-full" type="number" id={name} {name} />
+		<input
+			class="w-full"
+			type="number"
+			id={name}
+			{name}
+			required={requiredFields.includes(fieldName)}
+		/>
 		{#if !hideDescription}
 			<div class="text-sm text-gray-500">{field.description}</div>
 		{/if}
 	</label>
 {:else if field.type === 'array' && field.items}
 	<label for={name}>
-		<div class="my-2 font-bold">{field.title}</div>
+		<div class="my-2 font-bold">
+			{field.title}{#if requiredFields.includes(fieldName)}*{/if}
+		</div>
 		<div class="text-sm text-gray-500">{field.description}</div>
 		{#if field.items.type === 'string' && field.items.enum}
 			<div class="my-2 font-bold">{field.title}:</div>
@@ -84,9 +106,11 @@
 				<div>
 					<svelte:self
 						name={`${name}[${index}]`}
+						{fieldName}
 						field={field.items}
 						hideTitle={true}
 						hideDescription={field.items.type !== 'object'}
+						requiredFields={field.required}
 					/>
 					<button
 						type="button"
@@ -109,7 +133,12 @@
 		{/if}
 		<div class="text-sm text-gray-500">{field.description}</div>
 		{#each Object.entries(field.properties) as [key, value]}
-			<svelte:self name={name + '.' + key} field={value} />
+			<svelte:self
+				name={name + '.' + key}
+				fieldName={key}
+				field={value}
+				requiredFields={field.required}
+			/>
 		{/each}
 	</fieldset>
 {/if}
