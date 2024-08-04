@@ -117,27 +117,25 @@
 			/>
 		{:else}
 			<fieldset class="px-4 py-0 border-4 border-dotted border-gray-500">
-				<legend class="my-2 font-bold">
+				<legend class="my-2 px-1 font-bold">
 					{field.title}{#if requiredFields.includes(fieldName)}
 						<span class="ml-1 text-red-500">*</span>{/if}
 				</legend>
 				<div class="text-sm text-gray-500">{field.description}</div>
 				{#each $items as _, index}
-					<div>
-						<svelte:self
-							name={`${name}[${index}]`}
-							{fieldName}
-							field={field.items}
-							hideTitle={true}
-							hideDescription={field.items.type !== 'object'}
-							requiredFields={field.required}
-						/>
-						<button
-							type="button"
-							class="btn font-semibold md:btn-lg variant-filled-secondary"
-							on:click={() => removeItem(index)}>Remove</button
-						>
-					</div>
+					<svelte:self
+						name={`${name}[${index}]`}
+						{fieldName}
+						field={field.items}
+						hideTitle={true}
+						hideDescription={field.items.type !== 'object'}
+						requiredFields={field.required}
+					/>
+					<button
+						type="button"
+						class="btn font-semibold md:btn-lg variant-filled-secondary mt-2 mb-4"
+						on:click={() => removeItem(index)}>Remove</button
+					>
 				{/each}
 				<button
 					type="button"
@@ -149,7 +147,7 @@
 	{:else if field.type === 'object' && field.properties}
 		<fieldset class="px-4 py-0 border-4 border-dotted border-gray-500">
 			{#if !hideTitle}
-				<legend class="my-2 font-bold">{field.title}</legend>
+				<legend class="my-2 px-1 font-bold">{field.title}</legend>
 			{/if}
 			{#if !hideDescription && field.description}
 				<div class="text-sm text-gray-500">{field.description}</div>
