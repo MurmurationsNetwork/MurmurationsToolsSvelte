@@ -51,7 +51,7 @@
 					<DynamicForm {schemas} />
 				{/if}
 			</div>
-			<div class="flex justify-around mt-4 md:mt-8">
+			<div class="flex justify-around mt-0">
 				<button type="submit" class="btn font-semibold md:btn-lg variant-filled-primary"
 					>Validate</button
 				>

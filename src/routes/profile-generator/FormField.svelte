@@ -133,14 +133,14 @@
 					/>
 					<button
 						type="button"
-						class="btn font-semibold md:btn-lg variant-filled-secondary mt-2 mb-4"
-						on:click={() => removeItem(index)}>Remove</button
+						class="btn-xs rounded-md text-xs font-bold md:btn-sm md:text-sm variant-filled-secondary mt-2 mb-4 py-1 px-2"
+						on:click={() => removeItem(index)}>-</button
 					>
 				{/each}
 				<button
 					type="button"
-					class="btn font-semibold md:btn-lg variant-filled-primary"
-					on:click={addItem}>Add</button
+					class="btn-xs rounded-md text-xs font-bold md:btn-sm md:text-sm variant-filled-primary ml-2 py-1 px-2"
+					on:click={addItem}>+</button
 				>
 			</fieldset>
 		{/if}
