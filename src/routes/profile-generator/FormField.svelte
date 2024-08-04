@@ -35,7 +35,7 @@
 {#if field.type === 'string' && field.enum}
 	<label for={name}>
 		{#if !hideTitle}
-			<div class="my-2">{field.title}:</div>
+			<div class="my-2 font-bold">{field.title}:</div>
 		{/if}
 		<select class="w-full" id={name} {name}>
 			{#each field.enum as option}
@@ -46,20 +46,20 @@
 {:else if field.type === 'string'}
 	<label for={name}>
 		{#if !hideTitle}
-			<div class="my-2">{field.title}:</div>
+			<div class="my-2 font-bold">{field.title}:</div>
 		{/if}
 		<input class="w-full" type="text" id={name} {name} />
 	</label>
 {:else if field.type === 'number'}
 	<label for={name}>
 		{#if !hideTitle}
-			<div class="my-2">{field.title}:</div>
+			<div class="my-2 font-bold">{field.title}:</div>
 		{/if}
 		<input class="w-full" type="number" id={name} {name} />
 	</label>
 {:else if field.type === 'array' && field.items}
 	<label for={name}>
-		<div class="my-2">{field.title}:</div>
+		<div class="my-2 font-bold">{field.title}</div>
 		{#each $items as _, index}
 			<div>
 				<svelte:self name={`${name}[${index}]`} field={field.items} hideTitle={true} />
@@ -79,7 +79,7 @@
 {:else if field.type === 'object' && field.properties}
 	<fieldset>
 		{#if !hideTitle}
-			<legend>{field.title}</legend>
+			<legend class="my-2 font-bold">{field.title}</legend>
 		{/if}
 		{#each Object.entries(field.properties) as [key, value]}
 			<svelte:self name={name + '.' + key} field={value} />
