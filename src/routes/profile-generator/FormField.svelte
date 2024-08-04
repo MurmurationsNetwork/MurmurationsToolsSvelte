@@ -8,6 +8,7 @@
 	export let hideTitle: boolean = false;
 	export let hideDescription: boolean = false;
 	export let requiredFields: string[] = [];
+	export let isParentArray: boolean = false;
 
 	const items = writable<(Field | string | number)[]>([getInitialItem()]);
 
@@ -33,6 +34,14 @@
 			return currentItems.filter((_, i) => i !== index);
 		});
 	}
+
+	function integrateFieldsToItems(items: Field, name?: string, description?: string): Field {
+		return {
+			...items,
+			title: name,
+			description: description
+		};
+	}
 </script>
 
 {#if field.type === 'string' && field.enum}
@@ -42,9 +51,15 @@
 				{field.title}:{#if requiredFields.includes(fieldName)}*{/if}
 			</div>
 		{/if}
-		<select class="w-full" id={name} {name} required={requiredFields.includes(fieldName)}>
-			{#each field.enum as option}
-				<option value={option}>{option}</option>
+		<select
+			class="w-full"
+			id={name}
+			{name}
+			required={requiredFields.includes(fieldName)}
+			multiple={isParentArray}
+		>
+			{#each field.enum as option, index}
+				<option value={option}>{field.enumNames ? field.enumNames[index] : option}</option>
 			{/each}
 		</select>
 		{#if !hideDescription}
@@ -88,20 +103,20 @@
 		{/if}
 	</label>
 {:else if field.type === 'array' && field.items}
-	<label for={name}>
-		<div class="my-2 font-bold">
-			{field.title}{#if requiredFields.includes(fieldName)}*{/if}
-		</div>
-		<div class="text-sm text-gray-500">{field.description}</div>
-		{#if field.items.type === 'string' && field.items.enum}
-			<div class="my-2 font-bold">{field.title}:</div>
-			<select class="w-full" id={name} {name} multiple>
-				{#each field.items.enum as option}
-					<option value={option}>{option}</option>
-				{/each}
-			</select>
+	{#if field.items.type === 'string' && field.items.enum}
+		<svelte:self
+			{name}
+			{fieldName}
+			field={integrateFieldsToItems(field.items, field.title, field.description)}
+			requiredFields={field.required}
+			isParentArray={true}
+		/>
+	{:else}
+		<label for={name}>
+			<div class="my-2 font-bold">
+				{field.title}{#if requiredFields.includes(fieldName)}*{/if}
+			</div>
 			<div class="text-sm text-gray-500">{field.description}</div>
-		{:else}
 			{#each $items as _, index}
 				<div>
 					<svelte:self
@@ -124,8 +139,8 @@
 				class="btn font-semibold md:btn-lg variant-filled-primary"
 				on:click={addItem}>Add</button
 			>
-		{/if}
-	</label>
+		</label>
+	{/if}
 {:else if field.type === 'object' && field.properties}
 	<fieldset>
 		{#if !hideTitle}
