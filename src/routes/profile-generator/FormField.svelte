@@ -8,6 +8,7 @@
 	export let hideTitle: boolean = false;
 	export let hideDescription: boolean = false;
 	export let requiredFields: string[] = [];
+	export let isParentRequired: boolean = false;
 	export let isParentArray: boolean = false;
 
 	const items = writable<(Field | string | number)[]>([getInitialItem()]);
@@ -57,7 +58,7 @@
 				class="w-full"
 				id={name}
 				{name}
-				required={requiredFields.includes(fieldName)}
+				required={isParentRequired && requiredFields.includes(fieldName)}
 				multiple={isParentArray}
 			>
 				<option value="">Select an option</option>
@@ -82,7 +83,7 @@
 				type="text"
 				id={name}
 				{name}
-				required={requiredFields.includes(fieldName)}
+				required={isParentRequired && requiredFields.includes(fieldName)}
 			/>
 			{#if !hideDescription}
 				<div class="text-sm text-gray-500">{field.description}</div>
@@ -101,7 +102,7 @@
 				type="number"
 				id={name}
 				{name}
-				required={requiredFields.includes(fieldName)}
+				required={isParentRequired && requiredFields.includes(fieldName)}
 			/>
 			{#if !hideDescription}
 				<div class="text-sm text-gray-500">{field.description}</div>
@@ -114,6 +115,7 @@
 				{fieldName}
 				field={integrateFieldsToItems(field.items, field.title, field.description)}
 				requiredFields={field.required}
+				isParentRequired={requiredFields.includes(fieldName)}
 				isParentArray={true}
 			/>
 		{:else}
@@ -131,6 +133,7 @@
 						hideTitle={true}
 						hideDescription={field.items.type !== 'object'}
 						requiredFields={field.required}
+						isParentRequired={requiredFields.includes(fieldName)}
 					/>
 					<button
 						type="button"
@@ -159,6 +162,7 @@
 					fieldName={key}
 					field={value}
 					requiredFields={field.required}
+					isParentRequired={requiredFields.includes(fieldName)}
 				/>
 			{/each}
 		</fieldset>
