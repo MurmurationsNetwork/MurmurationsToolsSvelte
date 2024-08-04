@@ -5,6 +5,7 @@
 	export let name: string;
 	export let field: Field;
 	export let hideTitle: boolean = false;
+	export let hideDescription: boolean = false;
 
 	const items = writable<(Field | string | number)[]>([getInitialItem()]);
 
@@ -42,6 +43,9 @@
 				<option value={option}>{option}</option>
 			{/each}
 		</select>
+		{#if !hideDescription}
+			<div class="text-sm text-gray-500">{field.description}</div>
+		{/if}
 	</label>
 {:else if field.type === 'string'}
 	<label for={name}>
@@ -49,6 +53,9 @@
 			<div class="my-2 font-bold">{field.title}:</div>
 		{/if}
 		<input class="w-full" type="text" id={name} {name} />
+		{#if !hideDescription}
+			<div class="text-sm text-gray-500">{field.description}</div>
+		{/if}
 	</label>
 {:else if field.type === 'number'}
 	<label for={name}>
@@ -56,13 +63,22 @@
 			<div class="my-2 font-bold">{field.title}:</div>
 		{/if}
 		<input class="w-full" type="number" id={name} {name} />
+		{#if !hideDescription}
+			<div class="text-sm text-gray-500">{field.description}</div>
+		{/if}
 	</label>
 {:else if field.type === 'array' && field.items}
 	<label for={name}>
 		<div class="my-2 font-bold">{field.title}</div>
+		<div class="text-sm text-gray-500">{field.description}</div>
 		{#each $items as _, index}
 			<div>
-				<svelte:self name={`${name}[${index}]`} field={field.items} hideTitle={true} />
+				<svelte:self
+					name={`${name}[${index}]`}
+					field={field.items}
+					hideTitle={true}
+					hideDescription={field.items.type !== 'object'}
+				/>
 				<button
 					type="button"
 					class="btn font-semibold md:btn-lg variant-filled-secondary"
@@ -81,6 +97,7 @@
 		{#if !hideTitle}
 			<legend class="my-2 font-bold">{field.title}</legend>
 		{/if}
+		<div class="text-sm text-gray-500">{field.description}</div>
 		{#each Object.entries(field.properties) as [key, value]}
 			<svelte:self name={name + '.' + key} field={value} />
 		{/each}

@@ -19,6 +19,7 @@ export interface RetrievedSchema extends Omit<Schema, 'metadata'> {
 export interface Field {
 	type: 'string' | 'number' | 'array' | 'object' | 'boolean';
 	title?: string;
+	description?: string;
 	enum?: string[];
 	enumNames?: string[];
 	properties?: Record<string, Field>;
