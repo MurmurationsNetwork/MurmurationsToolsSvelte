@@ -22,7 +22,18 @@
 		const target = event.target as HTMLFormElement | null;
 		if (target) {
 			const formData = new FormData(target);
-			currentProfile.set(Object.fromEntries(formData));
+			currentProfile.set(
+				Object.fromEntries(
+					Array.from(formData).filter(
+						([key, value]) =>
+							value !== '' &&
+							value !== null &&
+							value !== undefined &&
+							!(Array.isArray(value) && value.length === 0) &&
+							!(typeof value === 'object' && value !== null && Object.keys(value).length === 0)
+					)
+				)
+			);
 			profilePreview = true;
 			// TODO - clear the form fields
 			// target.reset();
