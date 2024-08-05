@@ -132,7 +132,7 @@
 						field={field.items}
 						hideTitle={true}
 						hideDescription={field.items.type !== 'object'}
-						requiredFields={requiredFields}
+						{requiredFields}
 						isParentRequired={requiredFields.includes(fieldName)}
 					/>
 					<button
