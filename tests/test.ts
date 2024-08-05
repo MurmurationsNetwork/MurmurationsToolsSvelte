@@ -47,3 +47,20 @@ test('schema selector list is not empty and has expected schema', async ({ page 
 	await page.locator('#schemaSelector').selectOption('organizations_schema-v1.0.0');
 	await expect(page.locator('#schemaSelector')).toHaveValue('organizations_schema-v1.0.0');
 });
+
+test('can create a profile preview with the organizations schema', async ({ page }) => {
+	await page.goto('/profile-generator');
+	await page.locator('#schemaSelector').selectOption('organizations_schema-v1.0.0');
+	await page.getByRole('button', { name: 'Select' }).click();
+	await page.getByLabel('Group/Project/Organization').fill('Some Org');
+	await page.getByLabel('Nickname').fill('SO');
+	await page.getByLabel('Primary URL: The unique').fill('https://some.org');
+	await page.locator('input[name="tags\\[0\\]"]').fill('test1');
+	await page.getByRole('button', { name: '+' }).first().click();
+	await page.locator('input[name="tags\\[1\\]"]').fill('test2');
+	await page.getByRole('button', { name: 'Validate' }).click();
+	await page.locator('#page-content div').filter({
+		hasText:
+			'{ "linked_schemas": "organizations_schema-v1.0.0", "name": "Some Org", "nickname": "SO", "primary_url": "https://some.org", "tags[0]": "test1", "tags[1]": "test2" }'
+	});
+});
