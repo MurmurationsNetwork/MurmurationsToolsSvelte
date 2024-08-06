@@ -10,23 +10,13 @@
 	export let requiredFields: string[] = [];
 	export let isParentRequired: boolean = false;
 	export let isParentArray: boolean = false;
+	export let fieldValue: { [key: string]: never } = {};
 
-	const items = writable<(Field | string | number)[]>([getInitialItem()]);
-
-	function getInitialItem(): Field | string | number {
-		if (field.items?.type === 'object') {
-			return { type: 'object', properties: {} };
-		} else if (field.items?.type === 'string') {
-			return '';
-		} else {
-			return 0;
-		}
-	}
+	const items = writable<object[]>([{}]);
 
 	function addItem() {
 		items.update((currentItems) => {
-			const newItem = getInitialItem();
-			return [...currentItems, newItem as string | number | Field];
+			return [...currentItems, {}];
 		});
 	}
 
@@ -84,6 +74,7 @@
 				id={name}
 				{name}
 				required={isParentRequired && requiredFields.includes(fieldName)}
+				bind:value={fieldValue[fieldName]}
 			/>
 			{#if !hideDescription}
 				<div class="text-sm text-gray-500">{field.description}</div>
@@ -117,6 +108,7 @@
 				requiredFields={field.required}
 				isParentRequired={requiredFields.includes(fieldName)}
 				isParentArray={true}
+				bind:fieldValue
 			/>
 		{:else}
 			<fieldset class="px-4 py-0 border-4 border-dotted border-gray-500">
@@ -134,6 +126,7 @@
 						hideDescription={field.items.type !== 'object'}
 						{requiredFields}
 						isParentRequired={requiredFields.includes(fieldName)}
+						bind:fieldValue={$items[index]}
 					/>
 					<button
 						type="button"
@@ -163,6 +156,7 @@
 					field={value}
 					requiredFields={field.required}
 					isParentRequired={requiredFields.includes(fieldName)}
+					bind:fieldValue
 				/>
 			{/each}
 		</fieldset>
