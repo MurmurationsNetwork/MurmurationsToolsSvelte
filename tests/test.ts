@@ -59,8 +59,7 @@ test('can create a profile preview with the organizations schema', async ({ page
 	await page.getByRole('button', { name: '+' }).first().click();
 	await page.locator('input[name="tags\\[1\\]"]').fill('test2');
 	await page.getByRole('button', { name: 'Validate' }).click();
-	await page.locator('#page-content div').filter({
-		hasText:
-			'{ "linked_schemas": "organizations_schema-v1.0.0", "name": "Some Org", "nickname": "SO", "primary_url": "https://some.org", "tags[0]": "test1", "tags[1]": "test2" }'
-	});
+	await expect(page.locator('code')).toHaveText(
+		'{ "linked_schemas": [ "organizations_schema-v1.0.0" ], "name": "Some Org", "nickname": "SO", "primary_url": "https://some.org", "tags[0]": "test1", "tags[1]": "test2" }'
+	);
 });
