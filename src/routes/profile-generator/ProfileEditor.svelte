@@ -22,9 +22,21 @@
 		const target = event.target as HTMLFormElement | null;
 		if (target) {
 			const formData = new FormData(target);
+
+			const formDataObject: Record<string, string | File | string[]> = {};
+
+			formData.forEach((value, key) => {
+				formDataObject[key] = value;
+			});
+
+			// Handling the linked_schemas field
+			if (formDataObject['linked_schemas']) {
+				formDataObject['linked_schemas'] = (formDataObject['linked_schemas'] as string).split(',');
+			}
+
 			currentProfile.set(
 				Object.fromEntries(
-					Array.from(formData).filter(
+					Object.entries(formDataObject).filter(
 						([key, value]) =>
 							value !== '' &&
 							value !== null &&
