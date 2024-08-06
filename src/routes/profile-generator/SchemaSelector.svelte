@@ -19,7 +19,7 @@
 				bind:value={schemasSelected}
 				multiple
 				required
-				size="3"
+				size="6"
 				class="select text-sm"
 				id="schemaSelector"
 			>

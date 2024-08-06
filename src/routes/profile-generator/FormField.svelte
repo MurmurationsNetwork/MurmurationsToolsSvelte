@@ -1,0 +1,164 @@
+<script lang="ts">
+	import { writable } from 'svelte/store';
+	import type { Field } from '$lib/types/schema';
+
+	export let name: string;
+	export let fieldName: string;
+	export let field: Field;
+	export let hideTitle: boolean = false;
+	export let hideDescription: boolean = false;
+	export let requiredFields: string[] = [];
+	export let isParentRequired: boolean = false;
+	export let isParentArray: boolean = false;
+	export let fieldValue: { [key: string]: never } = {};
+
+	const items = writable<object[]>([{}]);
+
+	function addItem() {
+		items.update((currentItems) => {
+			return [...currentItems, {}];
+		});
+	}
+
+	function removeItem(index: number) {
+		items.update((currentItems) => {
+			return currentItems.filter((_, i) => i !== index);
+		});
+	}
+
+	function integrateFieldsToItems(items: Field, name?: string, description?: string): Field {
+		return {
+			...items,
+			title: name,
+			description: description
+		};
+	}
+</script>
+
+<div class="my-2">
+	{#if field.type === 'string' && field.enum}
+		<label for={name}>
+			{#if !hideTitle}
+				<div class="my-2 font-bold">
+					{field.title}:{#if requiredFields.includes(fieldName)}
+						<span class="ml-1 text-red-500">*</span>{/if}
+				</div>
+			{/if}
+			<select
+				class="w-full"
+				id={name}
+				{name}
+				required={isParentRequired && requiredFields.includes(fieldName)}
+				multiple={isParentArray}
+			>
+				<option value="">Select an option</option>
+				{#each field.enum as option, index}
+					<option value={option}>{field.enumNames ? field.enumNames[index] : option}</option>
+				{/each}
+			</select>
+			{#if !hideDescription}
+				<div class="text-sm text-gray-500">{field.description}</div>
+			{/if}
+		</label>
+	{:else if field.type === 'string'}
+		<label for={name}>
+			{#if !hideTitle}
+				<div class="my-2 font-bold">
+					{field.title}:{#if requiredFields.includes(fieldName)}
+						<span class="ml-1 text-red-500">*</span>{/if}
+				</div>
+			{/if}
+			<input
+				class="w-full"
+				type="text"
+				id={name}
+				{name}
+				required={isParentRequired && requiredFields.includes(fieldName)}
+				bind:value={fieldValue[fieldName]}
+			/>
+			{#if !hideDescription}
+				<div class="text-sm text-gray-500">{field.description}</div>
+			{/if}
+		</label>
+	{:else if field.type === 'number'}
+		<label for={name}>
+			{#if !hideTitle}
+				<div class="my-2 font-bold">
+					{field.title}:{#if requiredFields.includes(fieldName)}
+						<span class="ml-1 text-red-500">*</span>{/if}
+				</div>
+			{/if}
+			<input
+				class="w-full"
+				type="number"
+				id={name}
+				{name}
+				required={isParentRequired && requiredFields.includes(fieldName)}
+			/>
+			{#if !hideDescription}
+				<div class="text-sm text-gray-500">{field.description}</div>
+			{/if}
+		</label>
+	{:else if field.type === 'array' && field.items}
+		{#if field.items.type === 'string' && field.items.enum}
+			<svelte:self
+				{name}
+				{fieldName}
+				field={integrateFieldsToItems(field.items, field.title, field.description)}
+				requiredFields={field.required}
+				isParentRequired={requiredFields.includes(fieldName)}
+				isParentArray={true}
+				bind:fieldValue
+			/>
+		{:else}
+			<fieldset class="px-4 py-0 border-4 border-dotted border-gray-500">
+				<legend class="my-2 px-1 font-bold">
+					{field.title}{#if requiredFields.includes(fieldName)}
+						<span class="ml-1 text-red-500">*</span>{/if}
+				</legend>
+				<div class="text-sm text-gray-500">{field.description}</div>
+				{#each $items as _, index}
+					<svelte:self
+						name={`${name}[${index}]`}
+						{fieldName}
+						field={field.items}
+						hideTitle={true}
+						hideDescription={field.items.type !== 'object'}
+						{requiredFields}
+						isParentRequired={requiredFields.includes(fieldName)}
+						bind:fieldValue={$items[index]}
+					/>
+					<button
+						type="button"
+						class="btn-xs rounded-md text-xs font-bold md:btn-sm md:text-sm variant-filled-secondary mt-2 mb-4 py-1 px-2"
+						on:click={() => removeItem(index)}>-</button
+					>
+				{/each}
+				<button
+					type="button"
+					class="btn-xs rounded-md text-xs font-bold md:btn-sm md:text-sm variant-filled-primary ml-2 py-1 px-2"
+					on:click={addItem}>+</button
+				>
+			</fieldset>
+		{/if}
+	{:else if field.type === 'object' && field.properties}
+		<fieldset class="px-4 py-0 border-4 border-dotted border-gray-500">
+			{#if !hideTitle}
+				<legend class="my-2 px-1 font-bold">{field.title}</legend>
+			{/if}
+			{#if !hideDescription && field.description}
+				<div class="text-sm text-gray-500">{field.description}</div>
+			{/if}
+			{#each Object.entries(field.properties) as [key, value]}
+				<svelte:self
+					name={name + '.' + key}
+					fieldName={key}
+					field={value}
+					requiredFields={field.required}
+					isParentRequired={requiredFields.includes(fieldName)}
+					bind:fieldValue
+				/>
+			{/each}
+		</fieldset>
+	{/if}
+</div>

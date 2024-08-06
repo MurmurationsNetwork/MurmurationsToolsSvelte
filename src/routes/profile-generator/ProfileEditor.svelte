@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { currentProfile } from '$lib/stores';
 	import { createEventDispatcher } from 'svelte';
+	import { ParseRef } from '$lib/parser';
+	import { onMount } from 'svelte';
+	import DynamicForm from './DynamicForm.svelte';
+	import type { Schema } from '$lib/types/schema';
 
 	const dispatch = createEventDispatcher();
 
@@ -18,12 +22,42 @@
 		const target = event.target as HTMLFormElement | null;
 		if (target) {
 			const formData = new FormData(target);
-			currentProfile.set(Object.fromEntries(formData));
+
+			const formDataObject: Record<string, string | File | string[]> = {};
+
+			formData.forEach((value, key) => {
+				formDataObject[key] = value;
+			});
+
+			// Handling the linked_schemas field
+			if (formDataObject['linked_schemas']) {
+				formDataObject['linked_schemas'] = (formDataObject['linked_schemas'] as string).split(',');
+			}
+
+			currentProfile.set(
+				Object.fromEntries(
+					Object.entries(formDataObject).filter(
+						([key, value]) =>
+							value !== '' &&
+							value !== null &&
+							value !== undefined &&
+							!(Array.isArray(value) && value.length === 0) &&
+							!(typeof value === 'object' && value !== null && Object.keys(value).length === 0)
+					)
+				)
+			);
 			profilePreview = true;
 			// TODO - clear the form fields
 			// target.reset();
 		}
 	}
+
+	let schemas: Schema | null = null;
+
+	// Use parseRef to retrieve the schema based on schemasSelected
+	onMount(async () => {
+		schemas = await ParseRef(schemasSelected);
+	});
 </script>
 
 <div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
@@ -36,30 +70,11 @@
 
 		<form on:submit|preventDefault={handleSubmit}>
 			<div class="m-4 flex flex-col text-left">
-				<label>
-					<div class="my-2">Name:</div>
-					<input
-						class="w-full"
-						name="name"
-						id="name"
-						type="text"
-						required
-						value={$currentProfile.name || ''}
-					/>
-				</label>
-				<label>
-					<div class="my-2">Primary URL:</div>
-					<input
-						class="w-full"
-						name="primary_url"
-						id="primary_url"
-						type="text"
-						required
-						value={$currentProfile.primary_url || ''}
-					/>
-				</label>
+				{#if schemas !== null}
+					<DynamicForm {schemas} />
+				{/if}
 			</div>
-			<div class="flex justify-around mt-4 md:mt-8">
+			<div class="flex justify-around mt-0">
 				<button type="submit" class="btn font-semibold md:btn-lg variant-filled-primary"
 					>Validate</button
 				>
@@ -77,7 +92,7 @@
 
 		<div class="m-4 bg-primary-300 dark:bg-primary-900 rounded-xl px-4 py-2">
 			<code class="text-sm text-left"
-				>{JSON.stringify({ linked_schemas: schemasSelected, ...$currentProfile })}</code
+				>{JSON.stringify({ linked_schemas: schemasSelected, ...$currentProfile }, null, 2)}</code
 			>
 		</div>
 		<div class="flex justify-around mt-4 md:mt-8">

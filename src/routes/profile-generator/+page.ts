@@ -9,7 +9,15 @@ interface Schema {
 }
 
 export const load: PageLoad = async ({ fetch }) => {
-	const schemasList = await getSchemas(fetch);
+	const allSchemas = await getSchemas(fetch);
+	const schemasList = allSchemas
+		.filter((s: string) => {
+			return !s.startsWith('default-v');
+		})
+		.filter((s: string) => {
+			return !s.startsWith('test_schema-v');
+		});
+
 	return { schemasList };
 };
 
