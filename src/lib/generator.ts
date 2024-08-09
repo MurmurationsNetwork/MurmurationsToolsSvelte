@@ -103,7 +103,7 @@ function parseArrayObject(
 function parseArrayData(
 	data: Record<string, string | string[]>
 ): Record<string, string | string[]> {
-	// deal with multiple values submitted as an array
+	// Deal with multiple values submitted as an array
 	for (const key in data) {
 		if (key.endsWith('[]')) {
 			const keyWithoutBrackets = key.slice(0, -2);
