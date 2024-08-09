@@ -12,6 +12,8 @@ export function GenerateSchemaInstance(
 	let profile: ProfileObject = {};
 	const parsedData = parseArrayData(data);
 
+	console.log('parsedData', parsedData);
+
 	Object.keys(parsedData)
 		.filter((fieldName) => parsedData[fieldName] !== '')
 		.forEach((fieldName) => {
@@ -49,6 +51,8 @@ function parseArrayObject(
 		const prop = props[i];
 		const matches = prop.match(/(.+)\[(\d+)]/);
 
+		// If has matches, it means it's an array
+		// Otherwise, it's an object
 		if (matches) {
 			const name = matches[1];
 			const index = parseInt(matches[2]);
@@ -62,6 +66,11 @@ function parseArrayObject(
 			}
 
 			if (i === props.length - 1) {
+				// If the property is a number, parse it as a number
+				if (currSchema?.properties && currSchema.properties[name].type === 'number') {
+					fieldData = parseFloat(fieldData as string);
+				}
+
 				(curr[name] as ProfileArray)[index] = fieldData;
 			} else {
 				curr = (curr[name] as ProfileArray)[index] as ProfileObject;
@@ -80,12 +89,17 @@ function parseArrayObject(
 					currSchema.properties &&
 					Object.prototype.hasOwnProperty.call(currSchema.properties, prop)
 				) {
-					curr[prop] = fieldData;
+					// If the property is a number, parse it as a number
+					if (currSchema.properties[prop].type === 'number') {
+						curr[prop] = parseFloat(fieldData as string);
+					} else {
+						curr[prop] = fieldData;
+					}
 				}
 			} else {
 				curr = curr[prop] as ProfileObject;
 				if (currSchema?.properties) {
-					currSchema = currSchema?.properties[prop];
+					currSchema = currSchema?.properties[prop] || null;
 				}
 			}
 		}
