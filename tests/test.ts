@@ -68,5 +68,5 @@ test('can create a profile preview with the organizations schema', async ({ page
 		tags: ['test1', 'test2']
 	};
 
-	await expect(page.locator('code')).toHaveText(JSON.stringify(expectedData, null, 2));
+	await expect(page.locator('pre')).toHaveText(JSON.stringify(expectedData, null, 2));
 });
