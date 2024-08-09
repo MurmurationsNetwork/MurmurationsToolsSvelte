@@ -12,8 +12,6 @@ export function GenerateSchemaInstance(
 	let profile: ProfileObject = {};
 	const parsedData = parseArrayData(data);
 
-	console.log('parsedData', parsedData);
-
 	Object.keys(parsedData)
 		.filter((fieldName) => parsedData[fieldName] !== '')
 		.forEach((fieldName) => {
