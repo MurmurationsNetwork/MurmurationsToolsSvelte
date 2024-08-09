@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import DynamicForm from './DynamicForm.svelte';
 	import type { Schema } from '$lib/types/schema';
+	import { GenerateSchemaInstance } from '$lib/generator';
 
 	const dispatch = createEventDispatcher();
 
@@ -23,29 +24,18 @@
 		if (target) {
 			const formData = new FormData(target);
 
-			const formDataObject: Record<string, string | File | string[]> = {};
+			const formDataObject: Record<string, string> = {};
 
 			formData.forEach((value, key) => {
-				formDataObject[key] = value;
+				// Only retain string values
+				if (typeof value === 'string') {
+					formDataObject[key] = value;
+				}
 			});
 
-			// Handling the linked_schemas field
-			if (formDataObject['linked_schemas']) {
-				formDataObject['linked_schemas'] = (formDataObject['linked_schemas'] as string).split(',');
-			}
+			const profileJson = GenerateSchemaInstance(schemas, formDataObject);
+			currentProfile.set(profileJson);
 
-			currentProfile.set(
-				Object.fromEntries(
-					Object.entries(formDataObject).filter(
-						([key, value]) =>
-							value !== '' &&
-							value !== null &&
-							value !== undefined &&
-							!(Array.isArray(value) && value.length === 0) &&
-							!(typeof value === 'object' && value !== null && Object.keys(value).length === 0)
-					)
-				)
-			);
 			profilePreview = true;
 			// TODO - clear the form fields
 			// target.reset();
