@@ -1,11 +1,5 @@
 import type { Field, Schema } from '$lib/types/schema';
-
-type ProfileValue = string | number | boolean | ProfileArray | ProfileObject;
-type ProfileArray = Array<ProfileValue>;
-
-interface ProfileObject {
-	[key: string]: ProfileValue;
-}
+import type { ProfileArray, ProfileObject } from '$lib/types/profile';
 
 export function GenerateSchemaInstance(
 	schema: Schema | null,

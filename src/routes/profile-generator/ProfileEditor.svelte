@@ -1,19 +1,21 @@
 <script lang="ts">
-	import { currentProfile } from '$lib/stores';
 	import { createEventDispatcher } from 'svelte';
 	import { ParseRef } from '$lib/parser';
 	import { onMount } from 'svelte';
 	import DynamicForm from './DynamicForm.svelte';
-	import type { Schema } from '$lib/types/schema';
 	import { GenerateSchemaInstance } from '$lib/generator';
+	import type { Schema } from '$lib/types/schema';
+	import type { ProfileObject } from '$lib/types/profile';
 
 	const dispatch = createEventDispatcher();
 
-	let profilePreview: boolean = false;
 	export let schemasSelected: string[] = [];
 
+	let currentProfile: ProfileObject = {};
+	let profilePreview: boolean = false;
+
 	function resetSchemas(): void {
-		currentProfile.set({});
+		currentProfile = {};
 		dispatch('schemasReset');
 	}
 
@@ -33,8 +35,7 @@
 				}
 			});
 
-			const profileJson = GenerateSchemaInstance(schemas, formDataObject);
-			currentProfile.set(profileJson);
+			currentProfile = GenerateSchemaInstance(schemas, formDataObject);
 
 			profilePreview = true;
 			// TODO - clear the form fields
@@ -82,7 +83,7 @@
 
 		<div class="m-4 bg-primary-300 dark:bg-primary-900 rounded-xl px-4 py-2">
 			<pre class="text-sm text-left">{JSON.stringify(
-					{ linked_schemas: schemasSelected, ...$currentProfile },
+					{ linked_schemas: schemasSelected, ...currentProfile },
 					null,
 					2
 				)}</pre>
