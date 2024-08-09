@@ -58,6 +58,8 @@ test('can create a profile preview with the organizations schema', async ({ page
 	await page.locator('input[name="tags\\[0\\]"]').fill('test1');
 	await page.getByRole('button', { name: '+' }).first().click();
 	await page.locator('input[name="tags\\[1\\]"]').fill('test2');
+	await page.getByLabel('Latitude').fill('51.5074');
+	await page.getByLabel('Longitude').fill('0.1278');
 	await page.getByRole('button', { name: 'Validate' }).click();
 
 	const expectedData = {
@@ -65,7 +67,11 @@ test('can create a profile preview with the organizations schema', async ({ page
 		name: 'Some Org',
 		nickname: 'SO',
 		primary_url: 'https://some.org',
-		tags: ['test1', 'test2']
+		tags: ['test1', 'test2'],
+		geolocation: {
+			lat: 51.5074,
+			lon: 0.1278
+		}
 	};
 
 	await expect(page.locator('pre')).toHaveText(JSON.stringify(expectedData, null, 2));
