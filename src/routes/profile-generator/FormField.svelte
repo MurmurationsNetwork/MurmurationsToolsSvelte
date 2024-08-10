@@ -91,6 +91,7 @@
 			<input
 				class="w-full"
 				type="number"
+				step="any"
 				id={name}
 				{name}
 				required={isParentRequired && requiredFields.includes(fieldName)}

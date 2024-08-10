@@ -1,18 +1,21 @@
 <script lang="ts">
-	import { currentProfile } from '$lib/stores';
 	import { createEventDispatcher } from 'svelte';
 	import { ParseRef } from '$lib/parser';
 	import { onMount } from 'svelte';
 	import DynamicForm from './DynamicForm.svelte';
+	import { GenerateSchemaInstance } from '$lib/generator';
 	import type { Schema } from '$lib/types/schema';
+	import type { ProfileObject } from '$lib/types/profile';
 
 	const dispatch = createEventDispatcher();
 
-	let profilePreview: boolean = false;
 	export let schemasSelected: string[] = [];
 
+	let currentProfile: ProfileObject = {};
+	let profilePreview: boolean = false;
+
 	function resetSchemas(): void {
-		currentProfile.set({});
+		currentProfile = {};
 		dispatch('schemasReset');
 	}
 
@@ -23,29 +26,17 @@
 		if (target) {
 			const formData = new FormData(target);
 
-			const formDataObject: Record<string, string | File | string[]> = {};
+			const formDataObject: Record<string, string> = {};
 
 			formData.forEach((value, key) => {
-				formDataObject[key] = value;
+				// Only retain string values
+				if (typeof value === 'string') {
+					formDataObject[key] = value;
+				}
 			});
 
-			// Handling the linked_schemas field
-			if (formDataObject['linked_schemas']) {
-				formDataObject['linked_schemas'] = (formDataObject['linked_schemas'] as string).split(',');
-			}
+			currentProfile = GenerateSchemaInstance(schemas, formDataObject);
 
-			currentProfile.set(
-				Object.fromEntries(
-					Object.entries(formDataObject).filter(
-						([key, value]) =>
-							value !== '' &&
-							value !== null &&
-							value !== undefined &&
-							!(Array.isArray(value) && value.length === 0) &&
-							!(typeof value === 'object' && value !== null && Object.keys(value).length === 0)
-					)
-				)
-			);
 			profilePreview = true;
 			// TODO - clear the form fields
 			// target.reset();
@@ -91,9 +82,11 @@
 		<div class="font-medium text-lg mb-4 mx-4 variant-filled-success">The profile is valid</div>
 
 		<div class="m-4 bg-primary-300 dark:bg-primary-900 rounded-xl px-4 py-2">
-			<code class="text-sm text-left"
-				>{JSON.stringify({ linked_schemas: schemasSelected, ...$currentProfile }, null, 2)}</code
-			>
+			<pre class="text-sm text-left whitespace-pre-wrap break-all">{JSON.stringify(
+					{ linked_schemas: schemasSelected, ...currentProfile },
+					null,
+					2
+				)}</pre>
 		</div>
 		<div class="flex justify-around mt-4 md:mt-8">
 			<button
