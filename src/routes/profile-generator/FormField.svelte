@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 	import type { Field } from '$lib/types/schema';
+	import type { ProfileArray, ProfileObject, ProfileValue } from '$lib/types/profile';
 
 	export let name: string;
 	export let fieldName: string;
@@ -10,9 +11,24 @@
 	export let requiredFields: string[] = [];
 	export let isParentRequired: boolean = false;
 	export let isParentArray: boolean = false;
-	export let fieldValue: { [key: string]: never } = {};
+	export let fieldValue: {
+		[key: string]: string | number | boolean | ProfileArray | ProfileObject;
+	} = {};
+	export let currentProfile: ProfileObject | ProfileArray | ProfileValue | undefined = undefined;
 
 	const items = writable<object[]>([{}]);
+
+	if (currentProfile && Array.isArray(currentProfile)) {
+		if (typeof currentProfile[0] === 'object' && !Array.isArray(currentProfile[0])) {
+			items.set(currentProfile as ProfileObject[]);
+		} else {
+			items.set(currentProfile.map((value) => ({ [fieldName]: value })));
+		}
+	} else if (currentProfile && typeof currentProfile === 'object') {
+		fieldValue = { ...currentProfile };
+	} else if (currentProfile !== undefined) {
+		fieldValue[fieldName] = currentProfile;
+	}
 
 	function addItem() {
 		items.update((currentItems) => {
@@ -44,18 +60,33 @@
 						<span class="ml-1 text-red-500">*</span>{/if}
 				</div>
 			{/if}
-			<select
-				class="w-full"
-				id={name}
-				{name}
-				required={isParentRequired && requiredFields.includes(fieldName)}
-				multiple={isParentArray}
-			>
-				<option value="">Select an option</option>
-				{#each field.enum as option, index}
-					<option value={option}>{field.enumNames ? field.enumNames[index] : option}</option>
-				{/each}
-			</select>
+			{#if isParentArray}
+				<select
+					class="w-full"
+					id={name}
+					{name}
+					required={isParentRequired && requiredFields.includes(fieldName)}
+					multiple={isParentArray}
+				>
+					<option value="">Select an option</option>
+					{#each field.enum as option, index}
+						<option value={option}>{field.enumNames ? field.enumNames[index] : option}</option>
+					{/each}
+				</select>
+			{:else}
+				<select
+					class="w-full"
+					id={name}
+					{name}
+					required={isParentRequired && requiredFields.includes(fieldName)}
+					bind:value={fieldValue[fieldName]}
+				>
+					<option value="">Select an option</option>
+					{#each field.enum as option, index}
+						<option value={option}>{field.enumNames ? field.enumNames[index] : option}</option>
+					{/each}
+				</select>
+			{/if}
 			{#if !hideDescription}
 				<div class="text-sm text-gray-500">{field.description}</div>
 			{/if}
@@ -95,6 +126,7 @@
 				id={name}
 				{name}
 				required={isParentRequired && requiredFields.includes(fieldName)}
+				bind:value={fieldValue[fieldName]}
 			/>
 			{#if !hideDescription}
 				<div class="text-sm text-gray-500">{field.description}</div>

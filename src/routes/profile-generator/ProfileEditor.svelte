@@ -62,7 +62,7 @@
 		<form on:submit|preventDefault={handleSubmit}>
 			<div class="m-4 flex flex-col text-left">
 				{#if schemas !== null}
-					<DynamicForm {schemas} />
+					<DynamicForm {schemas} bind:currentProfile />
 				{/if}
 			</div>
 			<div class="flex justify-around mt-0">
