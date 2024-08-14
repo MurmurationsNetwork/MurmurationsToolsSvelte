@@ -105,6 +105,8 @@
 				id={name}
 				{name}
 				required={isParentRequired && requiredFields.includes(fieldName)}
+				maxlength={field.maxLength}
+				pattern={field.pattern}
 				bind:value={fieldValue[fieldName]}
 			/>
 			{#if !hideDescription}
@@ -126,6 +128,8 @@
 				id={name}
 				{name}
 				required={isParentRequired && requiredFields.includes(fieldName)}
+				min={field.minimum}
+				max={field.maximum}
 				bind:value={fieldValue[fieldName]}
 			/>
 			{#if !hideDescription}
