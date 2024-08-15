@@ -27,18 +27,23 @@
 			const formData = new FormData(target);
 			const formDataObject: Record<string, string | string[]> = {};
 
+			// Find all the fields that have multiple select
+			const multipleSelects: Set<string> = new Set();
+			const selects = target.querySelectorAll('select[multiple]');
+			selects.forEach((select) => {
+				const selectElement = select as HTMLSelectElement;
+				multipleSelects.add(selectElement.name);
+			});
+
 			formData.forEach((value, key) => {
-				// Only retain string values
-				if (typeof value === 'string') {
-					if (formDataObject[key]) {
-						// Convert to array if key already exists
-						if (!Array.isArray(formDataObject[key])) {
-							formDataObject[key] = [formDataObject[key]];
-						}
-						formDataObject[key].push(value);
-					} else {
-						formDataObject[key] = value;
+				if (multipleSelects.has(key)) {
+					if (!formDataObject[key]) {
+						formDataObject[key] = [];
 					}
+					(formDataObject[key] as string[]).push(value as string);
+				} else if (typeof value === 'string') {
+					// Only retain string values
+					formDataObject[key] = value;
 				}
 			});
 

@@ -126,7 +126,7 @@ function parseArrayData(
 			if (typeof data[key] === 'string') {
 				data[key] = (data[key] as string).trim();
 			}
-			if (data[key].length === 1) {
+			if (typeof data[key] !== 'object' && data[key].length === 1) {
 				data[key] = data[key][0];
 			}
 		}
