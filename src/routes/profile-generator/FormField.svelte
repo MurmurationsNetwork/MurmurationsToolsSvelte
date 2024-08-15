@@ -12,7 +12,7 @@
 	export let isParentRequired: boolean = false;
 	export let isParentArray: boolean = false;
 	export let fieldValue: {
-		[key: string]: string | number | boolean | ProfileArray | ProfileObject;
+		[key: string]: ProfileObject | ProfileArray | ProfileValue;
 	} = {};
 	export let currentProfile: ProfileObject | ProfileArray | ProfileValue | undefined = undefined;
 
@@ -23,11 +23,16 @@
 			items.set(currentProfile as ProfileObject[]);
 		} else {
 			items.set(currentProfile.map((value) => ({ [fieldName]: value })));
+			fieldValue[fieldName] = currentProfile;
 		}
 	} else if (currentProfile && typeof currentProfile === 'object') {
 		fieldValue = { ...currentProfile };
 	} else if (currentProfile !== undefined) {
 		fieldValue[fieldName] = currentProfile;
+	}
+
+	if (isParentArray) {
+		fieldValue[fieldName] = fieldValue[fieldName] || [];
 	}
 
 	function addItem() {
@@ -66,9 +71,9 @@
 					id={name}
 					{name}
 					required={isParentRequired && requiredFields.includes(fieldName)}
-					multiple={isParentArray}
+					bind:value={fieldValue[fieldName]}
+					multiple
 				>
-					<option value="">Select an option</option>
 					{#each field.enum as option, index}
 						<option value={option}>{field.enumNames ? field.enumNames[index] : option}</option>
 					{/each}

@@ -3,7 +3,7 @@ import type { ProfileArray, ProfileObject } from '$lib/types/profile';
 
 export function GenerateSchemaInstance(
 	schema: Schema | null,
-	data: Record<string, string>
+	data: Record<string, string | string[]>
 ): ProfileObject {
 	if (!schema) {
 		return {};

@@ -25,13 +25,20 @@
 		const target = event.target as HTMLFormElement | null;
 		if (target) {
 			const formData = new FormData(target);
-
-			const formDataObject: Record<string, string> = {};
+			const formDataObject: Record<string, string | string[]> = {};
 
 			formData.forEach((value, key) => {
 				// Only retain string values
 				if (typeof value === 'string') {
-					formDataObject[key] = value;
+					if (formDataObject[key]) {
+						// Convert to array if key already exists
+						if (!Array.isArray(formDataObject[key])) {
+							formDataObject[key] = [formDataObject[key]];
+						}
+						formDataObject[key].push(value);
+					} else {
+						formDataObject[key] = value;
+					}
 				}
 			});
 
