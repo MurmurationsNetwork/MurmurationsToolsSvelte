@@ -25,4 +25,8 @@ export interface Field {
 	properties?: Record<string, Field>;
 	items?: Field;
 	required?: string[];
+	maxLength?: number;
+	pattern?: string;
+	minimum?: number;
+	maximum?: number;
 }

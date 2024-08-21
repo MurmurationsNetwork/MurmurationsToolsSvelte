@@ -25,12 +25,24 @@
 		const target = event.target as HTMLFormElement | null;
 		if (target) {
 			const formData = new FormData(target);
+			const formDataObject: Record<string, string | string[]> = {};
 
-			const formDataObject: Record<string, string> = {};
+			// Find all the fields that have multiple select
+			const multipleSelects: Set<string> = new Set();
+			const selects = target.querySelectorAll('select[multiple]');
+			selects.forEach((select) => {
+				const selectElement = select as HTMLSelectElement;
+				multipleSelects.add(selectElement.name);
+			});
 
 			formData.forEach((value, key) => {
-				// Only retain string values
-				if (typeof value === 'string') {
+				if (multipleSelects.has(key)) {
+					if (!formDataObject[key]) {
+						formDataObject[key] = [];
+					}
+					(formDataObject[key] as string[]).push(value as string);
+				} else if (typeof value === 'string') {
+					// Only retain string values
 					formDataObject[key] = value;
 				}
 			});
@@ -62,7 +74,7 @@
 		<form on:submit|preventDefault={handleSubmit}>
 			<div class="m-4 flex flex-col text-left">
 				{#if schemas !== null}
-					<DynamicForm {schemas} />
+					<DynamicForm {schemas} bind:currentProfile />
 				{/if}
 			</div>
 			<div class="flex justify-around mt-0">

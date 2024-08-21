@@ -3,7 +3,7 @@ import type { ProfileArray, ProfileObject } from '$lib/types/profile';
 
 export function GenerateSchemaInstance(
 	schema: Schema | null,
-	data: Record<string, string>
+	data: Record<string, string | string[]>
 ): ProfileObject {
 	if (!schema) {
 		return {};
@@ -126,7 +126,7 @@ function parseArrayData(
 			if (typeof data[key] === 'string') {
 				data[key] = (data[key] as string).trim();
 			}
-			if (data[key].length === 1) {
+			if (typeof data[key] !== 'object' && data[key].length === 1) {
 				data[key] = data[key][0];
 			}
 		}
