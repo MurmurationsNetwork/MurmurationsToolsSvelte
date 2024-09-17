@@ -1,16 +1,22 @@
 import { MongoClient, Db } from 'mongodb';
 import { env } from '$env/dynamic/private';
+import { PUBLIC_ENV } from '$env/static/public';
 
 const host = env.PRIVATE_MONGO_HOST;
-const user = env.PRIVATE_MONGO_USER;
-const pass = env.PRIVATE_MONGO_PASS;
+const user = encodeURIComponent(env.PRIVATE_MONGO_USER);
+const pass = encodeURIComponent(env.PRIVATE_MONGO_PASS);
 const dbName = env.PRIVATE_MONGO_DB_NAME;
+const e = PUBLIC_ENV;
 
-if (!host || !user || !pass || !dbName) {
+if (!host || !user || !pass || !dbName || !e) {
 	throw new Error('Missing environment variables for MongoDB connection');
 }
 
-const uri = `mongodb://${user}:${pass}@${host}/${dbName}?authSource=admin`;
+let uri = `mongodb://${user}:${pass}@${host}`;
+
+if (e !== 'local') {
+	uri += '?tls=true';
+}
 
 let db: Db;
 

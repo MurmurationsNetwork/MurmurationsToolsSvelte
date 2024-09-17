@@ -3,12 +3,33 @@
 	import { backInOut } from 'svelte/easing';
 
 	let loginType = 'login';
+
+	let email = '';
+	let password = '';
+
+	async function login() {
+		const res = await fetch('/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ email, password })
+		});
+
+		const data = await res.json();
+
+		if (data.success) {
+			alert('Login successful');
+		} else {
+			alert('Login failed: ' + data.error);
+		}
+	}
 </script>
 
 <div class="container mx-auto flex justify-center items-center md:p-4">
 	<div class="flex flex-col grow items-center md:p-4">
 		<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 w-3/4 md:w-1/2">
-			<form>
+			<form on:submit|preventDefault={login}>
 				<fieldset class="flex my-3 justify-center">
 					<label class="mr-3">
 						<input
@@ -34,12 +55,19 @@
 				</fieldset>
 				<div class="m-4 flex flex-col text-left">
 					<label>
-						<div class="my-2">Username:</div>
-						<input class="w-full" name="username" id="username" type="text" required value="" />
+						<div class="my-2">Email:</div>
+						<input class="w-full" name="email" id="email" type="text" bind:value={email} required />
 					</label>
 					<label>
 						<div class="my-2">Password:</div>
-						<input class="w-full" name="password" id="password" type="password" required value="" />
+						<input
+							class="w-full"
+							name="password"
+							id="password"
+							type="password"
+							bind:value={password}
+							required
+						/>
 					</label>
 				</div>
 				<div class="flex justify-around mt-4 md:mt-8">
