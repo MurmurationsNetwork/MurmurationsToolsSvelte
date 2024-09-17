@@ -1,35 +1,39 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
 	import { backInOut } from 'svelte/easing';
+	import { goto } from '$app/navigation';
 
 	let loginType = 'login';
-
 	let email = '';
 	let password = '';
 
-	async function login() {
+	async function handleSubmit() {
 		const res = await fetch('/login', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ email, password })
+			body: JSON.stringify({ email, password, loginType })
 		});
 
 		const data = await res.json();
 
 		if (data.success) {
 			alert('Login successful');
+			await goto('/');
 		} else {
 			alert('Login failed: ' + data.error);
 		}
+
+		// Clear the password (security)
+		password = '';
 	}
 </script>
 
 <div class="container mx-auto flex justify-center items-center md:p-4">
 	<div class="flex flex-col grow items-center md:p-4">
 		<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 w-3/4 md:w-1/2">
-			<form on:submit|preventDefault={login}>
+			<form on:submit|preventDefault={handleSubmit}>
 				<fieldset class="flex my-3 justify-center">
 					<label class="mr-3">
 						<input

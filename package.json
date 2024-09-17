@@ -20,7 +20,9 @@
 	},
 	"dependencies": {
 		"@floating-ui/dom": "1.6.8",
+		"@paralleldrive/cuid2": "^2.2.2",
 		"bcryptjs": "^2.4.3",
+		"cuid": "^3.0.0",
 		"highlight.js": "11.10.0",
 		"mongodb": "^6.9.0",
 		"svelte-awesome": "^3.3.4",
