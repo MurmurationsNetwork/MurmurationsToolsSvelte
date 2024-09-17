@@ -27,5 +27,9 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
         env:
+          PRIVATE_MONGO_HOST: ${{ secrets.PRIVATE_MONGO_HOST }}
+          PRIVATE_MONGO_USER: ${{ secrets.PRIVATE_MONGO_USER }}
+          PRIVATE_MONGO_PASS: ${{ secrets.PRIVATE_MONGO_PASS }}
+          PRIVATE_MONGO_DB_NAME: ${{ secrets.PRIVATE_MONGO_DB_NAME }}
           PUBLIC_ENV: ${{ secrets.PUBLIC_ENV }}
           PUBLIC_LIBRARY_URL: ${{ secrets.PUBLIC_LIBRARY_URL }}
