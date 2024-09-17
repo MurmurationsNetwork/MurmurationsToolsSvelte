@@ -1,4 +1,5 @@
-import { MongoClient, Db } from 'mongodb';
+import { MongoClient } from 'mongodb';
+import type { Db } from 'mongodb';
 import { env } from '$env/dynamic/private';
 import { PUBLIC_ENV } from '$env/static/public';
 
