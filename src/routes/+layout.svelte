@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
 	import '../app.postcss';
 	import {
 		AppRail,
@@ -46,6 +48,35 @@
 		target: 'hoverSiteEnv',
 		placement: 'bottom'
 	};
+
+	export let data;
+	if (data?.userData) {
+		isAuthenticatedStore.set(true);
+	}
+
+	// Logout
+	async function logout() {
+		try {
+			const response = await fetch('/logout', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				credentials: 'include'
+			});
+
+			if (response.ok) {
+				localStorage.removeItem('murmurations_tools_session');
+				isAuthenticatedStore.set(false);
+				await goto('/login');
+			} else {
+				const result = await response.json();
+				console.error('Failed to logout: ' + result.error);
+			}
+		} catch (error) {
+			console.error('Failed to logout:', error);
+		}
+	}
 </script>
 
 <!-- Sync system light/dark mode -->
@@ -76,7 +107,13 @@
 				posting data to the live one.
 			</div>
 			<svelte:fragment slot="trail">
-				<a class="btn btn-sm variant-filled-primary" href="/login" id="login"> Login </a>
+				{#if $isAuthenticatedStore}
+					<button on:click={logout} class="btn btn-sm variant-filled-primary" id="logout">
+						Logout
+					</button>
+				{:else}
+					<a class="btn btn-sm variant-filled-primary" href="/login" id="login"> Login </a>
+				{/if}
 			</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>

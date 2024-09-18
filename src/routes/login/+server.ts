@@ -1,4 +1,4 @@
-import { connectToDatabase } from '$lib/db';
+import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
@@ -55,13 +55,15 @@ export const POST: RequestHandler = async ({ request }) => {
 				created_at: new Date()
 			});
 
+			await closeDatabaseConnection();
+
 			// Set the session cookie
 			return new Response(
 				JSON.stringify({ success: true, message: 'Registration successful', userEmail: email }),
 				{
 					status: 200,
 					headers: {
-						'Set-Cookie': serialize('session', sessionToken, {
+						'Set-Cookie': serialize('murmurations_tools_session', sessionToken, {
 							httpOnly: true,
 							path: '/',
 							secure: PUBLIC_ENV === 'production',
@@ -96,12 +98,14 @@ export const POST: RequestHandler = async ({ request }) => {
 				.collection('users')
 				.updateOne({ email_hash: emailHash }, { $set: { last_login: Date.now() } });
 
+			await closeDatabaseConnection();
+
 			return json(
 				{ success: true, message: 'Login successful', userEmail: email },
 				{
 					status: 200,
 					headers: {
-						'Set-Cookie': serialize('session', sessionToken, {
+						'Set-Cookie': serialize('murmurations_tools_session', sessionToken, {
 							httpOnly: true,
 							path: '/',
 							secure: PUBLIC_ENV === 'production',

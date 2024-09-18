@@ -20,6 +20,7 @@ if (e !== 'local') {
 }
 
 let db: Db;
+let client: MongoClient;
 
 export async function connectToDatabase(): Promise<Db> {
 	if (!db) {
@@ -34,4 +35,15 @@ export async function connectToDatabase(): Promise<Db> {
 		}
 	}
 	return db;
+}
+
+export async function closeDatabaseConnection(): Promise<void> {
+	if (client) {
+		try {
+			await client.close();
+			console.log('MongoDB connection closed');
+		} catch (error) {
+			console.error('Failed to close MongoDB connection', error);
+		}
+	}
 }

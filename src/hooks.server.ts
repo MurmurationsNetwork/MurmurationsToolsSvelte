@@ -1,11 +1,12 @@
 import type { Handle } from '@sveltejs/kit';
 import { parse } from 'cookie';
-import { connectToDatabase } from '$lib/db';
+import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
+import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const cookieHeader = event.request.headers.get('cookie') || '';
 	const cookies = parse(cookieHeader);
-	const sessionToken = cookies.session;
+	const sessionToken = cookies['murmurations_tools_session'];
 
 	if (sessionToken) {
 		const db = await connectToDatabase();
@@ -19,7 +20,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 					{ projection: { _id: 0, cuid: 1, email_hash: 1, profiles: 1 } }
 				);
 			event.locals.user = user as { cuid: string; email_hash: string; profiles: string[] } | null;
+			isAuthenticatedStore.set(true);
+		} else {
+			event.locals.user = null;
+			isAuthenticatedStore.set(false);
 		}
+
+		await closeDatabaseConnection();
 	}
 
 	return resolve(event);

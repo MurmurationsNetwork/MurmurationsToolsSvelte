@@ -2,6 +2,7 @@
 	import { slide } from 'svelte/transition';
 	import { backInOut } from 'svelte/easing';
 	import { goto } from '$app/navigation';
+	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
 
 	let loginType = 'login';
 	let email = '';
@@ -19,10 +20,10 @@
 		const data = await res.json();
 
 		if (data.success) {
-			alert('Login successful');
+			isAuthenticatedStore.set(true);
 			await goto('/');
 		} else {
-			alert('Login failed: ' + data.error);
+			console.log('Login failed: ' + data.error);
 		}
 
 		// Clear the password (security)
