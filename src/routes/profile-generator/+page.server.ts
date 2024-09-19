@@ -1,4 +1,4 @@
-import type { PageLoad } from './$types';
+import type { PageServerLoad } from './$types';
 import { PUBLIC_LIBRARY_URL } from '$env/static/public';
 
 interface Schema {
@@ -8,7 +8,7 @@ interface Schema {
 	url: string;
 }
 
-export const load: PageLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async ({ fetch }) => {
 	const allSchemas = await getSchemas(fetch);
 	const schemasList = allSchemas
 		.filter((s: string) => {
