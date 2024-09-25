@@ -10,6 +10,7 @@
 	import type { Profile } from '$lib/types/profile';
 	import { get } from 'svelte/store';
 	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
+	import { PUBLIC_INDEX_URL, PUBLIC_TOOLS_URL } from '$env/static/public';
 
 	const dispatch = createEventDispatcher();
 
@@ -132,16 +133,57 @@
 			}
 
 			// Post profile URL to index and get node_id
-			// const node_id = await postProfileToIndex(cuid);
+			const node_id = await postProfileToIndex(cuid);
 
-			// Update profile with node_id
-			// await updateProfileWithNodeId(cuid, node_id);
+			// Update profile with node_id in MongoDB
+			const updateNodeIdResponse = await fetch('/profile-generator', {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ profile_cuid: cuid, node_id })
+			});
+
+			if (!updateNodeIdResponse.ok) {
+				const updateNodeIdErrorData = await updateNodeIdResponse.json();
+				throw new Error(updateNodeIdErrorData.error || 'Error updating node_id');
+			}
+
+			const updateNodeIdResult = await updateNodeIdResponse.json();
+			if (updateNodeIdResult.success) {
+				console.log('Profile updated with node_id successfully');
+			} else {
+				throw new Error('Unknown error occurred while updating node_id');
+			}
 
 			// Reset to initial state
 			profilePreview = false;
 			resetSchemas();
 		} catch (error) {
 			console.error('Error saving and posting profile:', error);
+		}
+	}
+
+	async function postProfileToIndex(cuid: string): Promise<string> {
+		try {
+			const response = await fetch('/profile-generator/index', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ cuid })
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.error || 'Error posting profile to index');
+			}
+
+			const result = await response.json();
+			return result.node_id;
+		} catch (error) {
+			console.error('Error posting profile to index:', error);
+			throw error;
 		}
 	}
 </script>

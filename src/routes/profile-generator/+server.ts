@@ -19,22 +19,6 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 };
 
-async function saveProfile(profile: Profile): Promise<void> {
-	const db = await connectToDatabase();
-
-	try {
-		await db.collection('profiles').insertOne({
-			...profile,
-			last_updated: Date.now()
-		});
-	} catch (error) {
-		console.error('Error saving profile:', error);
-		throw error;
-	} finally {
-		await closeDatabaseConnection();
-	}
-}
-
 export const PUT: RequestHandler = async ({ request, locals }) => {
 	try {
 		const { profileCuid } = await request.json();
@@ -55,6 +39,49 @@ export const PUT: RequestHandler = async ({ request, locals }) => {
 		return jsonError('Internal server error', 500);
 	}
 };
+
+export const PATCH: RequestHandler = async ({ request }) => {
+	try {
+		const { profile_cuid, node_id } = await request.json();
+
+		if (!profile_cuid || !node_id) {
+			return jsonError('Missing required fields', 400);
+		}
+
+		const db = await connectToDatabase();
+
+		const result = await db
+			.collection('profiles')
+			.updateOne({ cuid: profile_cuid }, { $set: { node_id } });
+
+		if (result.matchedCount === 0) {
+			return jsonError('Profile not found', 404);
+		}
+
+		return json({ success: true, message: 'Node ID updated successfully' });
+	} catch (err) {
+		console.error(`Profile update failed: ${err}`);
+		return jsonError('Internal server error', 500);
+	} finally {
+		await closeDatabaseConnection();
+	}
+};
+
+async function saveProfile(profile: Profile): Promise<void> {
+	const db = await connectToDatabase();
+
+	try {
+		await db.collection('profiles').insertOne({
+			...profile,
+			last_updated: Date.now()
+		});
+	} catch (error) {
+		console.error('Error saving profile:', error);
+		throw error;
+	} finally {
+		await closeDatabaseConnection();
+	}
+}
 
 async function updateUserProfiles(emailHash: string, profileCuid: string): Promise<void> {
 	const db = await connectToDatabase();
