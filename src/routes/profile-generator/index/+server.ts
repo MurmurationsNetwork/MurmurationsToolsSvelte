@@ -56,3 +56,30 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ error: 'Internal server error' }, { status: 500 });
 	}
 };
+
+export const DELETE: RequestHandler = async ({ request }) => {
+	try {
+		const { node_id } = await request.json();
+
+		if (!node_id) {
+			return json({ error: 'Missing node_id' }, { status: 400 });
+		}
+
+		const response = await fetch(`${PUBLIC_INDEX_URL}/v2/nodes/${node_id}`, {
+			method: 'DELETE'
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			return json(
+				{ error: errorData.error || 'Error deleting profile from index' },
+				{ status: response.status }
+			);
+		}
+
+		return json({ success: true, message: 'Profile successfully deleted from index' });
+	} catch (error) {
+		console.error('Error deleting profile from index:', error);
+		return json({ error: 'Internal server error' }, { status: 500 });
+	}
+};

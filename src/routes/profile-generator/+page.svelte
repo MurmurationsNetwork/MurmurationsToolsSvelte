@@ -4,7 +4,6 @@
 	import ProfileEditor from './ProfileEditor.svelte';
 	import SchemaSelector from './SchemaSelector.svelte';
 	import type { Profile } from '$lib/types/profile';
-	import { PUBLIC_INDEX_URL } from '$env/static/public';
 
 	// Fetch the list of schemas
 	type Data = {
@@ -26,6 +25,8 @@
 	}
 
 	interface ProfileCard {
+		cuid: string;
+		node_id: string;
 		title: string;
 		status: 'posted' | 'received' | 'validated' | 'deleted' | 'validation_failed' | 'post_failed';
 		last_updated: string; // TODO - change to Unix timestamp (number) and convert into local date string
@@ -45,13 +46,17 @@
 					data.profiles.map(async (profile: Profile) => {
 						const status = await fetchStatus(profile.node_id);
 						return {
+							cuid: profile.cuid,
 							title: profile.title,
+							node_id: profile.node_id,
 							status: status,
 							last_updated: new Date(profile.last_updated).toLocaleString(),
 							schemas: profile.linked_schemas
 						};
 					})
 				);
+
+				console.log('profileCards', profileCards);
 			} else {
 				console.error('Failed to fetch profiles:', response.statusText);
 			}
@@ -94,10 +99,13 @@
 			{/if}
 			{#each profileCards as profileCard}
 				<ProfileCard
+					cuid={profileCard.cuid}
 					title={profileCard.title}
+					node_id={profileCard.node_id}
 					status={profileCard.status}
 					last_updated={profileCard.last_updated}
 					schemas={profileCard.schemas}
+					on:profileUpdated={handleProfileUpdated}
 				/>
 			{/each}
 		</div>
