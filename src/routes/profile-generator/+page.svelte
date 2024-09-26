@@ -3,6 +3,8 @@
 	import ProfileCard from './ProfileCard.svelte';
 	import ProfileEditor from './ProfileEditor.svelte';
 	import SchemaSelector from './SchemaSelector.svelte';
+	import type { Profile } from '$lib/types/profile';
+	import { PUBLIC_INDEX_URL } from '$env/static/public';
 
 	// Fetch the list of schemas
 	type Data = {
@@ -39,17 +41,40 @@
 			const response = await fetch('/profile-generator');
 			if (response.ok) {
 				const data = await response.json();
-				profileCards = data.profiles.map((profile: any) => ({
-					title: profile.title,
-					status: 'received',
-					last_updated: new Date(profile.last_updated).toLocaleString(),
-					schemas: profile.linked_schemas
-				}));
+				profileCards = await Promise.all(
+					data.profiles.map(async (profile: Profile) => {
+						const status = await fetchStatus(profile.node_id);
+						return {
+							title: profile.title,
+							status: status,
+							last_updated: new Date(profile.last_updated).toLocaleString(),
+							schemas: profile.linked_schemas
+						};
+					})
+				);
 			} else {
 				console.error('Failed to fetch profiles:', response.statusText);
 			}
 		} catch (error) {
 			console.error('Error fetching profiles:', error);
+		}
+	}
+
+	async function fetchStatus(node_id: string): Promise<string> {
+		try {
+			const response = await fetch(`/profile-generator/index?node_id=${node_id}`);
+
+			if (response.ok) {
+				const data = await response.json();
+				return data.status ?? 'unknown';
+			} else {
+				console.error('Failed to fetch status:', response.statusText);
+				return 'unknown';
+			}
+		} catch (error) {
+			console.log('error', error);
+			console.error('Error fetching status:', error);
+			return 'unknown';
 		}
 	}
 

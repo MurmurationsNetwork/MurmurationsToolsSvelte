@@ -10,7 +10,6 @@
 	import type { Profile } from '$lib/types/profile';
 	import { get } from 'svelte/store';
 	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
-	import { PUBLIC_INDEX_URL, PUBLIC_TOOLS_URL } from '$env/static/public';
 
 	const dispatch = createEventDispatcher();
 
@@ -106,7 +105,7 @@
 
 			const result = await response.json();
 			if (result.success) {
-				alert('Profile saved successfully!');
+				console.log('Profile saved successfully!');
 			} else {
 				throw new Error('Unknown error occurred while saving profile');
 			}
