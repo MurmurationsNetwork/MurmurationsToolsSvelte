@@ -162,6 +162,8 @@
 		} catch (error) {
 			console.error('Error saving and posting profile:', error);
 		}
+
+		dispatch('profileUpdated');
 	}
 
 	async function postProfileToIndex(cuid: string): Promise<string> {

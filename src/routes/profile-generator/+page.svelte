@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import ProfileCard from './ProfileCard.svelte';
 	import ProfileEditor from './ProfileEditor.svelte';
 	import SchemaSelector from './SchemaSelector.svelte';
@@ -29,21 +30,31 @@
 		schemas: string[];
 	}
 
-	// TODO - fetch the user profiles data
-	let profileCards: ProfileCard[] = [
-		{
-			title: 'My First Profile',
-			status: 'posted',
-			last_updated: 'Thu 11 Jul 2024',
-			schemas: ['organizations_schema-v1.0.0', 'permaculture_schema-v0.1.0']
-		},
-		{
-			title: 'My Second Profile',
-			status: 'received',
-			last_updated: 'Fri 12 Jul 2024',
-			schemas: ['organizations_schema-v1.0.0']
+	function handleProfileUpdated() {
+		fetchProfiles();
+	}
+
+	async function fetchProfiles() {
+		try {
+			const response = await fetch('/profile-generator');
+			if (response.ok) {
+				const data = await response.json();
+				profileCards = data.profiles.map((profile: any) => ({
+					title: profile.title,
+					status: 'received',
+					last_updated: new Date(profile.last_updated).toLocaleString(),
+					schemas: profile.linked_schemas
+				}));
+			} else {
+				console.error('Failed to fetch profiles:', response.statusText);
+			}
+		} catch (error) {
+			console.error('Error fetching profiles:', error);
 		}
-	];
+	}
+
+	let profileCards: ProfileCard[] = [];
+	onMount(fetchProfiles);
 </script>
 
 <div class="container mx-auto flex justify-center items-top">
@@ -71,7 +82,11 @@
 			{#if schemasSelected.length === 0}
 				<SchemaSelector {schemasList} on:schemaSelected={handleSchemasSelected} />
 			{:else}
-				<ProfileEditor {schemasSelected} on:schemasReset={handleSchemasReset} />
+				<ProfileEditor
+					{schemasSelected}
+					on:schemasReset={handleSchemasReset}
+					on:profileUpdated={handleProfileUpdated}
+				/>
 			{/if}
 		</div>
 		<!-- END: Schema selection box / Create/modify profile input / Profile preview -->
