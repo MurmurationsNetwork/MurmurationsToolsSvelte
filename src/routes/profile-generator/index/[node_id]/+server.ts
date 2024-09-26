@@ -1,9 +1,10 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { PUBLIC_INDEX_URL, PUBLIC_TOOLS_URL } from '$env/static/public';
 
-export const GET: RequestHandler = async ({ url }) => {
+// Get the status of a profile in the index
+export const GET: RequestHandler = async ({ params }) => {
 	try {
-		const node_id = url.searchParams.get('node_id');
+		const { node_id } = params;
 		if (!node_id) {
 			return json({ error: 'Missing node_id' }, { status: 400 });
 		}
@@ -23,9 +24,10 @@ export const GET: RequestHandler = async ({ url }) => {
 	}
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+// Post a profile to the index
+export const POST: RequestHandler = async ({ params }) => {
 	try {
-		const { cuid } = await request.json();
+		const { cuid } = params;
 
 		if (!cuid) {
 			return json({ error: 'Missing cuid' }, { status: 400 });
@@ -57,9 +59,10 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 };
 
-export const DELETE: RequestHandler = async ({ request }) => {
+// Delete a profile from the index
+export const DELETE: RequestHandler = async ({ params }) => {
 	try {
-		const { node_id } = await request.json();
+		const { node_id } = params;
 
 		if (!node_id) {
 			return json({ error: 'Missing node_id' }, { status: 400 });

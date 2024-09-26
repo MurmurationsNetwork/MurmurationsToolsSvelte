@@ -67,7 +67,7 @@
 
 	async function fetchStatus(node_id: string): Promise<string> {
 		try {
-			const response = await fetch(`/profile-generator/index?node_id=${node_id}`);
+			const response = await fetch(`/profile-generator/index/${node_id}`);
 
 			if (response.ok) {
 				const data = await response.json();

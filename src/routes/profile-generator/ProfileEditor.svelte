@@ -111,12 +111,11 @@
 			}
 
 			// Update user's profiles list
-			const updateResponse = await fetch('/profile-generator', {
+			const updateResponse = await fetch(`/profile-generator/${cuid}`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ profileCuid: cuid })
+				}
 			});
 
 			if (!updateResponse.ok) {
@@ -135,8 +134,8 @@
 			const node_id = await postProfileToIndex(cuid);
 
 			// Update profile with node_id in MongoDB
-			const updateNodeIdResponse = await fetch('/profile-generator', {
-				method: 'PATCH',
+			const updateNodeIdResponse = await fetch(`/profile-generator/${cuid}/update-node-id`, {
+				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json'
 				},
@@ -167,12 +166,11 @@
 
 	async function postProfileToIndex(cuid: string): Promise<string> {
 		try {
-			const response = await fetch('/profile-generator/index', {
+			const response = await fetch(`/profile-generator/index/${cuid}`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ cuid })
+				}
 			});
 
 			if (!response.ok) {

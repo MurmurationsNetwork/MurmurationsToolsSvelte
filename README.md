@@ -65,3 +65,18 @@ Then save the file and restart/redeploy the app. To disable IPFS, set `ipfsEnabl
 ## Try it out
 
 <https://test-tools.murmurations.network>
+
+## Server APIs
+
+| Method | Endpoint                                | Description                                     |
+| ------ | --------------------------------------- | ----------------------------------------------- |
+| GET    | /profile-generator                      | Retrieve all profiles                           |
+| POST   | /profile-generator                      | Save a single profile                           |
+| GET    | /profile-generator/:cuid                | Retrieve a single profile by its CUID           |
+| PUT    | /profile-generator/:cuid                | Update a specific profile by its CUID           |
+| PATCH  | /profile-generator/:cuid                | Partially update a specific profile by its CUID |
+| PATCH  | /profile-generator/:cuid/update-node-id | Update the `node_id` of a specific profile      |
+| DELETE | /profile-generator/:cuid                | Delete a specific profile by its CUID           |
+| GET    | /profile-generator/index/:node_id       | Retrieve profiles from the Index server         |
+| POST   | /profile-generator/index/:node_id       | Save a profile to the Index server              |
+| DELETE | /profile-generator/index/:node_id       | Delete a profile from the Index server          |
