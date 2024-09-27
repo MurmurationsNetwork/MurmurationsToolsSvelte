@@ -33,10 +33,9 @@
 	async function deleteProfile() {
 		try {
 			// Delete profile
-			const response = await fetch('/profile-generator', {
+			const response = await fetch(`/profile-generator/${cuid}`, {
 				method: 'DELETE',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ cuid })
+				headers: { 'Content-Type': 'application/json' }
 			});
 
 			const result = await response.json();
