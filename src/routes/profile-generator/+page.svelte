@@ -55,8 +55,6 @@
 						};
 					})
 				);
-
-				console.log('profileCards', profileCards);
 			} else {
 				console.error('Failed to fetch profiles:', response.statusText);
 			}
@@ -66,6 +64,8 @@
 	}
 
 	async function fetchStatus(node_id: string): Promise<string> {
+		if (node_id === '') return 'unknown';
+
 		try {
 			const response = await fetch(`/profile-generator/index/${node_id}`);
 

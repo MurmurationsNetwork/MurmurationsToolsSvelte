@@ -27,13 +27,13 @@ export const GET: RequestHandler = async ({ params }) => {
 // Post a profile to the index
 export const POST: RequestHandler = async ({ params }) => {
 	try {
-		const { cuid } = params;
+		const { node_id } = params;
 
-		if (!cuid) {
+		if (!node_id) {
 			return json({ error: 'Missing cuid' }, { status: 400 });
 		}
 
-		const profileUrl = `${PUBLIC_TOOLS_URL}/profiles/${cuid}`;
+		const profileUrl = `${PUBLIC_TOOLS_URL}/profiles/${node_id}`;
 
 		const response = await fetch(`${PUBLIC_INDEX_URL}/v2/nodes`, {
 			method: 'POST',
