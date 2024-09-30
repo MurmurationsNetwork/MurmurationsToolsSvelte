@@ -19,7 +19,7 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
-		"@floating-ui/dom": "1.6.8",
+		"@floating-ui/dom": "1.6.11",
 		"bcryptjs": "^2.4.3",
 		"cuid": "^3.0.0",
 		"highlight.js": "11.10.0",
