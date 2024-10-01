@@ -234,8 +234,14 @@
 			<div class="mt-4 md:mt-8">
 				<div class="m-4 flex flex-col text-left">
 					<label>
-						<div class="my-2">Title:</div>
-						<input class="w-full" name="title" id="title" type="text" required />
+						<div class="my-2 dark:text-white">Title:</div>
+						<input
+							class="w-full dark:bg-gray-700 dark:text-white"
+							name="title"
+							id="title"
+							type="text"
+							required
+						/>
 					</label>
 				</div>
 			</div>

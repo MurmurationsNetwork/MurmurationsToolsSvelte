@@ -90,11 +90,13 @@
 <div class="container mx-auto flex justify-center items-top">
 	<div class="text-center md:flex flex-row grow items-top">
 		<!-- BEGIN: List of user-generated profiles -->
-		<div class="bg-blue-50 md:basis-1/3 m-2 px-2">
+		<div class="bg-blue-50 dark:bg-gray-800 md:basis-1/3 m-2 px-2">
 			{#if profileCards.length === 0}
-				<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
-					<p class="font-medium">No saved profiles found</p>
-					<p class="mt-4 text-left">Login and then select a schema to create and save a profile.</p>
+				<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 dark:border-gray-600">
+					<p class="font-medium dark:text-white">No saved profiles found</p>
+					<p class="mt-4 text-left dark:text-gray-300">
+						Login and then select a schema to create and save a profile.
+					</p>
 				</div>
 			{/if}
 			{#each profileCards as profileCard}
