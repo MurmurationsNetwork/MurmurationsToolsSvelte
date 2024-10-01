@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 	import type { Field } from '$lib/types/schema';
-	import type { ProfileArray, ProfileObject, ProfileValue } from '$lib/types/profile';
+	import type { ProfileArray, ProfileObject, ProfileValue } from '$lib/types/profileObject';
 
 	export let name: string;
 	export let fieldName: string;
