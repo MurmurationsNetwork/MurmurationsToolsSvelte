@@ -18,12 +18,8 @@ spec:
           command: [ "sh", "-c" ]
           args:
             - |
-              if [ "$(ls -A /app/node_modules)" ]; then
-                echo "node_modules is not empty"
-              else
-                echo "node_modules is empty, running npm install"
-                cd /app && npm install
-              fi
+              echo "Running npm install"
+              cd /app && npm install
           volumeMounts:
             - name: node-modules-storage
               mountPath: /app/node_modules
