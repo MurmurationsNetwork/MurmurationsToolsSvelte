@@ -15,11 +15,12 @@
 
 	export let schemasSelected: string[] = [];
 
-	let currentProfile: ProfileObject = {};
+	export let currentProfile: ProfileObject = {};
+	export let currentTitle: string = '';
+	export let currentCuid: string = '';
 	let profilePreview: boolean = false;
 
 	function resetSchemas(): void {
-		currentProfile = {};
 		dispatch('schemasReset');
 	}
 
@@ -79,7 +80,7 @@
 		const title = formData.get('title') as string;
 
 		try {
-			const cuid = GenerateCuid();
+			const cuid = currentCuid || GenerateCuid();
 			const profileToSave: Profile = {
 				cuid,
 				linked_schemas: schemasSelected,
@@ -90,8 +91,10 @@
 				node_id: ''
 			};
 
-			const response = await fetch('/profile-generator', {
-				method: 'POST',
+			const method = currentCuid ? 'PATCH' : 'POST';
+
+			const response = await fetch(`/profile-generator${currentCuid ? `/${cuid}` : ''}`, {
+				method,
 				headers: {
 					'Content-Type': 'application/json'
 				},
@@ -110,48 +113,53 @@
 				throw new Error('Unknown error occurred while saving profile');
 			}
 
-			// Update user's profiles list
-			const updateResponse = await fetch(`/profile-generator/${cuid}`, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json'
+			if (currentCuid) {
+				const node_id = await postProfileToIndex(cuid);
+				console.log('Profile updated to index with node_id:', node_id);
+			} else {
+				// Update user's profiles list
+				const updateResponse = await fetch(`/profile-generator/${cuid}`, {
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				});
+
+				if (!updateResponse.ok) {
+					const updateErrorData = await updateResponse.json();
+					throw new Error(updateErrorData.error || 'Error updating user profiles list');
 				}
-			});
 
-			if (!updateResponse.ok) {
-				const updateErrorData = await updateResponse.json();
-				throw new Error(updateErrorData.error || 'Error updating user profiles list');
-			}
+				const updateResult = await updateResponse.json();
+				if (updateResult.success) {
+					console.log('User profiles list updated successfully');
+				} else {
+					throw new Error('Unknown error occurred while updating user profiles list');
+				}
 
-			const updateResult = await updateResponse.json();
-			if (updateResult.success) {
-				console.log('User profiles list updated successfully');
-			} else {
-				throw new Error('Unknown error occurred while updating user profiles list');
-			}
+				// Post profile URL to index and get node_id
+				const node_id = await postProfileToIndex(cuid);
 
-			// Post profile URL to index and get node_id
-			const node_id = await postProfileToIndex(cuid);
+				// Update profile with node_id in MongoDB
+				const updateNodeIdResponse = await fetch(`/profile-generator/${cuid}/update-node-id`, {
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ profile_cuid: cuid, node_id })
+				});
 
-			// Update profile with node_id in MongoDB
-			const updateNodeIdResponse = await fetch(`/profile-generator/${cuid}/update-node-id`, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ profile_cuid: cuid, node_id })
-			});
+				if (!updateNodeIdResponse.ok) {
+					const updateNodeIdErrorData = await updateNodeIdResponse.json();
+					throw new Error(updateNodeIdErrorData.error || 'Error updating node_id');
+				}
 
-			if (!updateNodeIdResponse.ok) {
-				const updateNodeIdErrorData = await updateNodeIdResponse.json();
-				throw new Error(updateNodeIdErrorData.error || 'Error updating node_id');
-			}
-
-			const updateNodeIdResult = await updateNodeIdResponse.json();
-			if (updateNodeIdResult.success) {
-				console.log('Profile updated with node_id successfully');
-			} else {
-				throw new Error('Unknown error occurred while updating node_id');
+				const updateNodeIdResult = await updateNodeIdResponse.json();
+				if (updateNodeIdResult.success) {
+					console.log('Profile updated with node_id successfully');
+				} else {
+					throw new Error('Unknown error occurred while updating node_id');
+				}
 			}
 
 			// Reset to initial state
@@ -240,6 +248,7 @@
 							name="title"
 							id="title"
 							type="text"
+							value={currentTitle}
 							required
 						/>
 					</label>

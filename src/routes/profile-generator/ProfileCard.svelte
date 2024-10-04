@@ -96,6 +96,10 @@
 			console.error('Error deleting profile:', error);
 		}
 	}
+
+	function handleModify() {
+		dispatch('profileModify', { cuid });
+	}
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -113,7 +117,9 @@
 			</ul>
 		</div>
 		<div class="flex justify-around mt-4 md:mt-8">
-			<button class="btn font-semibold md:btn-lg variant-filled-primary">Modify</button>
+			<button on:click={handleModify} class="btn font-semibold md:btn-lg variant-filled-primary"
+				>Modify</button
+			>
 			<button on:click={handleDelete} class="btn font-semibold md:btn-lg variant-filled-secondary"
 				>Delete</button
 			>

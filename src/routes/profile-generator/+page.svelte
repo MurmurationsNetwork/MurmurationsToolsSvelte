@@ -5,6 +5,7 @@
 	import SchemaSelector from './SchemaSelector.svelte';
 	import type { Profile } from '$lib/types/profile';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	import type { ProfileObject } from '$lib/types/profileObject';
 
 	const queryClient = new QueryClient();
 
@@ -25,6 +26,9 @@
 
 	function handleSchemasReset() {
 		schemasSelected = [];
+		currentProfile = {};
+		currentTitle = '';
+		currentCuid = '';
 	}
 
 	interface ProfileCard {
@@ -63,6 +67,36 @@
 
 	let profileCards: ProfileCard[] = [];
 	onMount(fetchProfiles);
+
+	let currentProfile: ProfileObject = {};
+	let currentTitle: string = '';
+	let currentCuid: string = '';
+
+	async function handleProfileModify(event: CustomEvent<ProfileCard>) {
+		const { cuid } = event.detail;
+
+		try {
+			const response = await fetch(`/profile-generator/${cuid}`);
+			if (!response.ok) {
+				throw new Error(`Failed to fetch profile details: ${response.statusText}`);
+			}
+
+			const data = await response.json();
+			if (!data.success) {
+				console.log(data);
+				throw new Error('Profile fetch was not successful');
+			}
+
+			const profileData = data.profile;
+
+			currentProfile = JSON.parse(profileData.profile);
+			schemasSelected = profileData.linked_schemas;
+			currentTitle = profileData.title;
+			currentCuid = cuid;
+		} catch (error) {
+			console.error('Error fetching profile details:', error);
+		}
+	}
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -87,6 +121,7 @@
 						last_updated={profileCard.last_updated}
 						schemas={profileCard.schemas}
 						on:profileUpdated={handleProfileUpdated}
+						on:profileModify={handleProfileModify}
 					/>
 				{/each}
 			</div>
@@ -98,6 +133,9 @@
 				{:else}
 					<ProfileEditor
 						{schemasSelected}
+						{currentProfile}
+						{currentTitle}
+						{currentCuid}
 						on:schemasReset={handleSchemasReset}
 						on:profileUpdated={handleProfileUpdated}
 					/>
