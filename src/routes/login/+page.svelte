@@ -33,12 +33,14 @@
 
 <div class="container mx-auto flex justify-center items-center md:p-4">
 	<div class="flex flex-col grow items-center md:p-4">
-		<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 w-3/4 md:w-1/2">
+		<div
+			class="card variant-ghost-primary border-2 mx-2 my-4 p-4 w-3/4 md:w-1/2 dark:border-gray-700 dark:text-white"
+		>
 			<form on:submit|preventDefault={handleSubmit}>
 				<fieldset class="flex my-3 justify-center">
 					<label class="mr-3">
 						<input
-							class="variant-ghost-primary"
+							class="variant-ghost-primary dark:bg-gray-700 dark:text-white"
 							type="radio"
 							name="login-type"
 							value="login"
@@ -49,7 +51,7 @@
 					</label>
 					<label>
 						<input
-							class="variant-ghost-primary"
+							class="variant-ghost-primary dark:bg-gray-700 dark:text-white"
 							type="radio"
 							name="login-type"
 							value="register"
@@ -61,12 +63,19 @@
 				<div class="m-4 flex flex-col text-left">
 					<label>
 						<div class="my-2">Email:</div>
-						<input class="w-full" name="email" id="email" type="text" bind:value={email} required />
+						<input
+							class="w-full dark:bg-gray-700 dark:text-white"
+							name="email"
+							id="email"
+							type="text"
+							bind:value={email}
+							required
+						/>
 					</label>
 					<label>
 						<div class="my-2">Password:</div>
 						<input
-							class="w-full"
+							class="w-full dark:bg-gray-700 dark:text-white"
 							name="password"
 							id="password"
 							type="password"
@@ -78,7 +87,7 @@
 				<div class="flex justify-around mt-4 md:mt-8">
 					<button
 						type="submit"
-						class="btn font-semibold md:btn-lg w-32 md:w-36 variant-filled-primary"
+						class="btn font-semibold md:btn-lg w-32 md:w-36 variant-filled-primary dark:bg-blue-700 dark:text-white"
 					>
 						{#if loginType === 'login'}
 							<span transition:slide={{ delay: 50, duration: 100, easing: backInOut, axis: 'x' }}
@@ -90,7 +99,8 @@
 							>
 						{/if}
 					</button>
-					<button class="btn font-semibold md:btn-lg w-32 md:w-36 variant-filled-secondary"
+					<button
+						class="btn font-semibold md:btn-lg w-32 md:w-36 variant-filled-secondary dark:bg-gray-600 dark:text-white"
 						>Cancel</button
 					>
 				</div>

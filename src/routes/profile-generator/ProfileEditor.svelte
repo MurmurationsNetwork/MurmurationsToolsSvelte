@@ -5,7 +5,11 @@
 	import DynamicForm from './DynamicForm.svelte';
 	import { GenerateSchemaInstance } from '$lib/generator';
 	import type { Schema } from '$lib/types/schema';
-	import type { ProfileObject } from '$lib/types/profile';
+	import type { ProfileObject } from '$lib/types/profileObject';
+	import { GenerateCuid } from '$lib/utils';
+	import type { Profile } from '$lib/types/profile';
+	import { get } from 'svelte/store';
+	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
 
 	const dispatch = createEventDispatcher();
 
@@ -61,6 +65,126 @@
 	onMount(async () => {
 		schemas = await ParseRef(schemasSelected);
 	});
+
+	async function saveAndPostProfile(event: SubmitEvent) {
+		event.preventDefault();
+
+		if (!get(isAuthenticatedStore)) {
+			alert('Please log in first.');
+			return;
+		}
+
+		const form = event.target as HTMLFormElement;
+		const formData = new FormData(form);
+		const title = formData.get('title') as string;
+
+		try {
+			const cuid = GenerateCuid();
+			const profileToSave: Profile = {
+				cuid,
+				linked_schemas: schemasSelected,
+				profile: JSON.stringify(currentProfile),
+				title,
+				ipfs: [],
+				last_updated: Date.now(),
+				node_id: ''
+			};
+
+			const response = await fetch('/profile-generator', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(profileToSave)
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.error || 'Error saving profile');
+			}
+
+			const result = await response.json();
+			if (result.success) {
+				console.log('Profile saved successfully!');
+			} else {
+				throw new Error('Unknown error occurred while saving profile');
+			}
+
+			// Update user's profiles list
+			const updateResponse = await fetch(`/profile-generator/${cuid}`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+
+			if (!updateResponse.ok) {
+				const updateErrorData = await updateResponse.json();
+				throw new Error(updateErrorData.error || 'Error updating user profiles list');
+			}
+
+			const updateResult = await updateResponse.json();
+			if (updateResult.success) {
+				console.log('User profiles list updated successfully');
+			} else {
+				throw new Error('Unknown error occurred while updating user profiles list');
+			}
+
+			// Post profile URL to index and get node_id
+			const node_id = await postProfileToIndex(cuid);
+
+			// Update profile with node_id in MongoDB
+			const updateNodeIdResponse = await fetch(`/profile-generator/${cuid}/update-node-id`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ profile_cuid: cuid, node_id })
+			});
+
+			if (!updateNodeIdResponse.ok) {
+				const updateNodeIdErrorData = await updateNodeIdResponse.json();
+				throw new Error(updateNodeIdErrorData.error || 'Error updating node_id');
+			}
+
+			const updateNodeIdResult = await updateNodeIdResponse.json();
+			if (updateNodeIdResult.success) {
+				console.log('Profile updated with node_id successfully');
+			} else {
+				throw new Error('Unknown error occurred while updating node_id');
+			}
+
+			// Reset to initial state
+			profilePreview = false;
+			resetSchemas();
+		} catch (error) {
+			console.error('Error saving and posting profile:', error);
+		}
+
+		dispatch('profileUpdated');
+	}
+
+	async function postProfileToIndex(cuid: string): Promise<string> {
+		try {
+			const response = await fetch(`/profile-generator/index/${cuid}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.error || 'Error posting profile to index');
+			}
+
+			const result = await response.json();
+			return result.node_id;
+		} catch (error) {
+			console.error('Error posting profile to index:', error);
+			throw error;
+		}
+	}
 </script>
 
 <div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
@@ -106,17 +230,22 @@
 				class="btn font-semibold md:btn-lg variant-filled-primary">Continue Editing</button
 			>
 		</div>
-		<div class="mt-4 md:mt-8">
-			<div class="m-4 flex flex-col text-left">
-				<label>
-					<div class="my-2">Title:</div>
-					<input class="w-full" name="title" id="title" type="text" required />
-				</label>
+		<form on:submit|preventDefault={saveAndPostProfile}>
+			<div class="mt-4 md:mt-8">
+				<div class="m-4 flex flex-col text-left">
+					<label>
+						<div class="my-2 dark:text-white">Title:</div>
+						<input
+							class="w-full dark:bg-gray-700 dark:text-white"
+							name="title"
+							id="title"
+							type="text"
+							required
+						/>
+					</label>
+				</div>
 			</div>
-		</div>
-		<button
-			on:click={() => (profilePreview = false)}
-			class="btn font-semibold md:btn-lg variant-filled-primary">Save & Post</button
-		>
+			<button class="btn font-semibold md:btn-lg variant-filled-primary">Save & Post</button>
+		</form>
 	{/if}
 </div>

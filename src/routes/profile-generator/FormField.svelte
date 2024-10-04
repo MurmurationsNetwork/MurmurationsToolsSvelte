@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 	import type { Field } from '$lib/types/schema';
-	import type { ProfileArray, ProfileObject, ProfileValue } from '$lib/types/profile';
+	import type { ProfileArray, ProfileObject, ProfileValue } from '$lib/types/profileObject';
 
 	export let name: string;
 	export let fieldName: string;
@@ -67,7 +67,7 @@
 			{/if}
 			{#if isParentArray}
 				<select
-					class="w-full"
+					class="w-full bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
 					id={name}
 					{name}
 					required={isParentRequired && requiredFields.includes(fieldName)}
@@ -80,7 +80,7 @@
 				</select>
 			{:else}
 				<select
-					class="w-full"
+					class="w-full bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
 					id={name}
 					{name}
 					required={isParentRequired && requiredFields.includes(fieldName)}
@@ -93,7 +93,7 @@
 				</select>
 			{/if}
 			{#if !hideDescription}
-				<div class="text-sm text-gray-500">{field.description}</div>
+				<div class="text-sm text-gray-500 dark:text-gray-400">{field.description}</div>
 			{/if}
 		</label>
 	{:else if field.type === 'string'}
@@ -105,7 +105,7 @@
 				</div>
 			{/if}
 			<input
-				class="w-full"
+				class="w-full bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
 				type="text"
 				id={name}
 				{name}
@@ -115,7 +115,7 @@
 				bind:value={fieldValue[fieldName]}
 			/>
 			{#if !hideDescription}
-				<div class="text-sm text-gray-500">{field.description}</div>
+				<div class="text-sm text-gray-500 dark:text-gray-400">{field.description}</div>
 			{/if}
 		</label>
 	{:else if field.type === 'number'}
@@ -127,7 +127,7 @@
 				</div>
 			{/if}
 			<input
-				class="w-full"
+				class="w-full bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
 				type="number"
 				step="any"
 				id={name}
@@ -138,7 +138,7 @@
 				bind:value={fieldValue[fieldName]}
 			/>
 			{#if !hideDescription}
-				<div class="text-sm text-gray-500">{field.description}</div>
+				<div class="text-sm text-gray-500 dark:text-gray-400">{field.description}</div>
 			{/if}
 		</label>
 	{:else if field.type === 'array' && field.items}
@@ -158,7 +158,7 @@
 					{field.title}{#if requiredFields.includes(fieldName)}
 						<span class="ml-1 text-red-500">*</span>{/if}
 				</legend>
-				<div class="text-sm text-gray-500">{field.description}</div>
+				<div class="text-sm text-gray-500 dark:text-gray-400">{field.description}</div>
 				{#each $items as _, index}
 					<svelte:self
 						name={`${name}[${index}]`}
@@ -189,7 +189,7 @@
 				<legend class="my-2 px-1 font-bold">{field.title}</legend>
 			{/if}
 			{#if !hideDescription && field.description}
-				<div class="text-sm text-gray-500">{field.description}</div>
+				<div class="text-sm text-gray-500 dark:text-gray-400">{field.description}</div>
 			{/if}
 			{#each Object.entries(field.properties) as [key, value]}
 				<svelte:self
