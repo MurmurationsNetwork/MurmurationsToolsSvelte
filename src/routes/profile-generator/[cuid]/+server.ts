@@ -1,5 +1,60 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
+import type { Profile } from '$lib/types/profile';
+
+export const GET: RequestHandler = async ({ params, locals }) => {
+	try {
+		const { cuid } = params;
+
+		if (!locals.user) {
+			return jsonError('Authentication required', 401);
+		}
+
+		if (!cuid) {
+			return jsonError('Missing required fields or user not authenticated', 400);
+		}
+
+		const profile = await getProfileByCuid(cuid);
+
+		if (!profile) {
+			return jsonError('Profile not found', 404);
+		}
+
+		return json({ success: true, profile });
+	} catch (err) {
+		console.error(`Failed to get profile: ${err}`);
+		return jsonError('Internal server error', 500);
+	}
+};
+
+async function getProfileByCuid(cuid: string): Promise<Profile | null> {
+	const db = await connectToDatabase();
+
+	try {
+		const profile = await db.collection('profiles').findOne({ cuid });
+
+		if (!profile) {
+			return null;
+		}
+
+		return {
+			cuid: profile.cuid,
+			ipfs: profile.ipfs,
+			last_updated: profile.last_updated,
+			linked_schemas: profile.linked_schemas,
+			created_at: profile.created_at,
+			updated_at: profile.updated_at,
+			node_id: profile.node_id,
+			profile: profile.profile,
+			title: profile.title
+		} as Profile;
+	} catch (error) {
+		console.error('Error fetching profile:', error);
+		throw error;
+	} finally {
+		await closeDatabaseConnection();
+	}
+}
 
 // Update profile to user's profiles
 export const PUT: RequestHandler = async ({ params, locals }) => {
@@ -36,6 +91,67 @@ async function updateUserProfiles(emailHash: string, profileCuid: string): Promi
 		}
 	} catch (error) {
 		console.error('Error updating user profiles:', error);
+		throw error;
+	} finally {
+		await closeDatabaseConnection();
+	}
+}
+
+// Update profile data
+export const PATCH: RequestHandler = async ({ params, request, locals }) => {
+	try {
+		const { cuid } = params;
+		const { title, last_updated, profile } = await request.json();
+
+		if (!locals.user) {
+			return jsonError('Authentication required', 401);
+		}
+
+		if (!cuid || !title || !last_updated || !profile) {
+			return jsonError('Missing required fields', 400);
+		}
+
+		const isUpdated = await updateProfile(cuid, title, last_updated, profile);
+
+		if (!isUpdated) {
+			return jsonError('Failed to update profile', 404);
+		}
+
+		return json({ success: true, message: 'Profile updated successfully' });
+	} catch (err) {
+		console.error(`Profile update failed: ${err}`);
+		return jsonError('Internal server error', 500);
+	}
+};
+
+async function updateProfile(
+	cuid: string,
+	title: string,
+	lastUpdated: number,
+	profile: string
+): Promise<boolean> {
+	const db = await connectToDatabase();
+
+	try {
+		const updateResult = await db.collection('profiles').updateOne(
+			{ cuid },
+			{
+				$set: {
+					title,
+					last_updated: lastUpdated,
+					profile
+				}
+			}
+		);
+
+		if (updateResult.modifiedCount === 0) {
+			console.log('Failed to update profile');
+			return false;
+		}
+
+		return true;
+	} catch (error) {
+		console.error('Error updating profile:', error);
 		throw error;
 	} finally {
 		await closeDatabaseConnection();

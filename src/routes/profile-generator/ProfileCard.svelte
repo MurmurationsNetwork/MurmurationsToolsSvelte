@@ -80,10 +80,9 @@
 
 			// Delete index if node_id exists
 			if (node_id) {
-				const indexResponse = await fetch('/profile-generator/index', {
+				const indexResponse = await fetch(`/profile-generator/index/${node_id}`, {
 					method: 'DELETE',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ node_id })
+					headers: { 'Content-Type': 'application/json' }
 				});
 
 				if (!indexResponse.ok) {
@@ -95,6 +94,10 @@
 		} catch (error) {
 			console.error('Error deleting profile:', error);
 		}
+	}
+
+	function handleModify() {
+		dispatch('profileModify', { cuid });
 	}
 </script>
 
@@ -113,7 +116,9 @@
 			</ul>
 		</div>
 		<div class="flex justify-around mt-4 md:mt-8">
-			<button class="btn font-semibold md:btn-lg variant-filled-primary">Modify</button>
+			<button on:click={handleModify} class="btn font-semibold md:btn-lg variant-filled-primary"
+				>Modify</button
+			>
 			<button on:click={handleDelete} class="btn font-semibold md:btn-lg variant-filled-secondary"
 				>Delete</button
 			>
