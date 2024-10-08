@@ -80,10 +80,9 @@
 
 			// Delete index if node_id exists
 			if (node_id) {
-				const indexResponse = await fetch('/profile-generator/index', {
+				const indexResponse = await fetch(`/profile-generator/index/${node_id}`, {
 					method: 'DELETE',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ node_id })
+					headers: { 'Content-Type': 'application/json' }
 				});
 
 				if (!indexResponse.ok) {
