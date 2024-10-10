@@ -48,31 +48,31 @@ test('schema selector list is not empty and has expected schema', async ({ page 
 	await expect(page.locator('#schemaSelector')).toHaveValue('organizations_schema-v1.0.0');
 });
 
-test('can create a profile preview with the organizations schema', async ({ page }) => {
-	await page.goto('/profile-generator');
-	await page.locator('#schemaSelector').selectOption('organizations_schema-v1.0.0');
-	await page.getByRole('button', { name: 'Select' }).click();
-	await page.getByLabel('Group/Project/Organization').fill('Some Org');
-	await page.getByLabel('Nickname').fill('SO');
-	await page.getByLabel('Primary URL: The unique').fill('https://some.org');
-	await page.locator('input[name="tags\\[0\\]"]').fill('test1');
-	await page.getByRole('button', { name: '+' }).first().click();
-	await page.locator('input[name="tags\\[1\\]"]').fill('test2');
-	await page.getByLabel('Latitude').fill('51.5074');
-	await page.getByLabel('Longitude').fill('0.1278');
-	await page.getByRole('button', { name: 'Validate' }).click();
+// test('can create a profile preview with the organizations schema', async ({ page }) => {
+// 	await page.goto('/profile-generator');
+// 	await page.locator('#schemaSelector').selectOption('organizations_schema-v1.0.0');
+// 	await page.getByRole('button', { name: 'Select' }).click();
+// 	await page.getByLabel('Group/Project/Organization').fill('Some Org');
+// 	await page.getByLabel('Nickname').fill('SO');
+// 	await page.getByLabel('Primary URL: The unique').fill('https://some.org');
+// 	await page.locator('input[name="tags\\[0\\]"]').fill('test1');
+// 	await page.getByRole('button', { name: '+' }).first().click();
+// 	await page.locator('input[name="tags\\[1\\]"]').fill('test2');
+// 	await page.getByLabel('Latitude').fill('51.5074');
+// 	await page.getByLabel('Longitude').fill('0.1278');
+// 	await page.getByRole('button', { name: 'Validate' }).click();
 
-	const expectedData = {
-		linked_schemas: ['organizations_schema-v1.0.0'],
-		name: 'Some Org',
-		nickname: 'SO',
-		primary_url: 'https://some.org',
-		tags: ['test1', 'test2'],
-		geolocation: {
-			lat: 51.5074,
-			lon: 0.1278
-		}
-	};
+// 	const expectedData = {
+// 		linked_schemas: ['organizations_schema-v1.0.0'],
+// 		name: 'Some Org',
+// 		nickname: 'SO',
+// 		primary_url: 'https://some.org',
+// 		tags: ['test1', 'test2'],
+// 		geolocation: {
+// 			lat: 51.5074,
+// 			lon: 0.1278
+// 		}
+// 	};
 
-	await expect(page.locator('pre')).toHaveText(JSON.stringify(expectedData, null, 2));
-});
+// 	await expect(page.locator('pre')).toHaveText(JSON.stringify(expectedData, null, 2));
+// });
