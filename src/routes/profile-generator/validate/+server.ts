@@ -1,27 +1,17 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { PUBLIC_INDEX_URL } from '$env/static/public';
+import { validateProfile } from '$lib/server/server-utils';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
 
-		const response = await fetch(`${PUBLIC_INDEX_URL}/v2/validate`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(body)
-		});
+		const validationResult = await validateProfile(body);
 
-		if (response.status === 400) {
-			const errorData = await response.json();
-			return json({ success: false, errors: errorData.errors }, { status: response.status });
-		} else if (!response.ok) {
-			const errorData = await response.json();
-			return json({ success: false, errors: errorData }, { status: response.status });
+		if (!validationResult.success) {
+			return json({ success: false, errors: validationResult.errors }, { status: 422 });
 		}
 
-		return json({ success: true, status: response.status });
+		return json({ success: true });
 	} catch (error) {
 		console.error('Error validating profile:', error);
 		return json({ error: 'Internal server error' }, { status: 500 });

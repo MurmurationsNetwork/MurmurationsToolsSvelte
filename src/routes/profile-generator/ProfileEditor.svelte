@@ -70,7 +70,7 @@
 					body: JSON.stringify(currentProfile)
 				});
 
-				if (response.status === 400) {
+				if (response.status === 422) {
 					const data = await response.json();
 					validationErrors = data?.errors.map((error: any) => {
 						const pointer = error.source?.pointer || 'Unknown source';
@@ -135,6 +135,20 @@
 				},
 				body: JSON.stringify(profileToSave)
 			});
+
+			if (response.status === 422) {
+				const data = await response.json();
+				validationErrors = data?.errors.map((error: any) => {
+					const pointer = error.source?.pointer || 'Unknown source';
+					return `${error.title}: ${error.detail} (Source: ${pointer})`;
+				});
+				// Scroll to the top of the page if there are validation errors
+				if (validationErrors.length > 0) {
+					scrollToTop();
+				}
+				profilePreview = false;
+				return;
+			}
 
 			if (!response.ok) {
 				const errorData = await response.json();
