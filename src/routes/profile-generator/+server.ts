@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		// Validate the profile before saving
-		const validationResponse = await validateProfile(JSON.parse(profile?.profile));
+		const validationResponse = await validateProfile(profile?.profile);
 		if (!validationResponse.success) {
 			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}

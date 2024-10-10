@@ -5,10 +5,10 @@ export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
 
-		const validationResult = await validateProfile(body);
+		const validationResponse = await validateProfile(JSON.stringify(body));
 
-		if (!validationResult.success) {
-			return json({ success: false, errors: validationResult.errors }, { status: 422 });
+		if (!validationResponse.success) {
+			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}
 
 		return json({ success: true });

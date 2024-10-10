@@ -113,7 +113,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 		}
 
 		// Validate the profile before updating
-		const validationResponse = await validateProfile(JSON.parse(profile));
+		const validationResponse = await validateProfile(profile);
 		if (!validationResponse.success) {
 			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}
