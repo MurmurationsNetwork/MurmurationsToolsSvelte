@@ -19,6 +19,7 @@
 
 	// Set selected schema in the parent component
 	let schemasSelected: string[] = [];
+	let isLoggedIn: boolean = false;
 
 	function handleSchemasSelected(event: CustomEvent<string[]>) {
 		schemasSelected = event.detail;
@@ -57,7 +58,11 @@
 					last_updated: new Date(profile.last_updated).toLocaleString(),
 					schemas: profile.linked_schemas
 				}));
+				isLoggedIn = true;
+			} else if (response.status === 401) {
+				isLoggedIn = false;
 			} else {
+				isLoggedIn = true;
 				console.error('Failed to fetch profiles:', response.statusText);
 			}
 		} catch (error) {
@@ -106,9 +111,20 @@
 			<div class="bg-blue-50 dark:bg-gray-800 md:basis-1/3 m-2 px-2">
 				{#if profileCards.length === 0}
 					<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 dark:border-gray-600">
-						<p class="font-medium dark:text-white">No saved profiles found</p>
+						{#if !isLoggedIn}
+							<p class="font-medium dark:text-white">
+								Login first if you want to save your profile here. Or just create a profile by
+								selecting a schema from the list.
+							</p>
+						{:else}
+							<p class="font-medium dark:text-white">No saved profiles found</p>
+						{/if}
 						<p class="mt-4 text-left dark:text-gray-300">
-							Login and then select a schema to create and save a profile.
+							Login and then select a schema to create and save a profile. <a
+								href="https://docs.murmurations.network/guides/create-a-profile.html#_2-hosted-by-our-profile-generator"
+								target="_blank"
+								class="text-blue-500 dark:text-blue-300">See our documentation for details</a
+							>.
 						</p>
 					</div>
 				{/if}
