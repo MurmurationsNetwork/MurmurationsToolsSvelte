@@ -246,10 +246,12 @@
 
 <div class="card variant-ghost-primary border-2 mx-2 my-4 p-4" bind:this={top}>
 	{#if validationErrors.length > 0}
-		<div class="bg-red-100 text-red-700 p-4 rounded mb-4">
-			{#each validationErrors as error}
-				<div>{error}</div>
-			{/each}
+		<div class="bg-red-100 text-red-700 dark:bg-red-500 dark:text-white p-4 rounded mb-4">
+			<ul class="list-disc list-inside text-left">
+				{#each validationErrors as error}
+					<li>{error}</li>
+				{/each}
+			</ul>
 		</div>
 	{/if}
 
