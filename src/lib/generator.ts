@@ -1,5 +1,5 @@
 import type { Field, Schema } from '$lib/types/Schema';
-import type { ProfileArray, ProfileObject } from '$lib/types/Profile';
+import type { ProfileArray, ProfileObject } from '$lib/types/ProfileObject';
 
 export function GenerateSchemaInstance(
 	schema: Schema | null,
