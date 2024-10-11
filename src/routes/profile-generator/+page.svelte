@@ -112,20 +112,20 @@
 				{#if profileCards.length === 0}
 					<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 dark:border-gray-600">
 						{#if !isLoggedIn}
-							<p class="font-medium dark:text-white">
-								Login first if you want to save your profile here. Or just create a profile by
+							<p class="font-medium dark:text-white text-left">
+								Login first if you want to save your profile here, or just create a profile by
 								selecting a schema from the list.
+							</p>
+							<p class="font-medium dark:text-white pt-4">
+								<a
+									href="https://docs.murmurations.network/guides/create-a-profile.html#_2-hosted-by-our-profile-generator"
+									target="_blank"
+									class="text-blue-500 dark:text-blue-300">See our documentation for details</a
+								>
 							</p>
 						{:else}
 							<p class="font-medium dark:text-white">No saved profiles found</p>
 						{/if}
-						<p class="mt-4 text-left dark:text-gray-300">
-							Login and then select a schema to create and save a profile. <a
-								href="https://docs.murmurations.network/guides/create-a-profile.html#_2-hosted-by-our-profile-generator"
-								target="_blank"
-								class="text-blue-500 dark:text-blue-300">See our documentation for details</a
-							>.
-						</p>
 					</div>
 				{/if}
 				{#each profileCards as profileCard}
