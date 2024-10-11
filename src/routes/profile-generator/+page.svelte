@@ -3,9 +3,9 @@
 	import ProfileCard from './ProfileCard.svelte';
 	import ProfileEditor from './ProfileEditor.svelte';
 	import SchemaSelector from './SchemaSelector.svelte';
-	import type { Profile } from '$lib/types/profile';
+	import type { Profile } from '$lib/types/Profile';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
-	import type { ProfileObject } from '$lib/types/profileObject';
+	import type { ProfileObject } from '$lib/types/ProfileObject';
 
 	const queryClient = new QueryClient();
 

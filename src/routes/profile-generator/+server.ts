@@ -1,6 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
-import type { Profile } from '$lib/types/profile';
+import type { Profile } from '$lib/types/Profile';
 import { validateProfile } from '$lib/server/server-utils';
 
 // Get all profiles

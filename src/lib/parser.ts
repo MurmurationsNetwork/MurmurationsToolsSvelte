@@ -1,4 +1,4 @@
-import type { RetrievedSchema, Schema } from '$lib/types/schema';
+import type { RetrievedSchema, Schema } from '$lib/types/Schema';
 
 export const ParseRef = async (schemaName: string | string[]): Promise<Schema | null> => {
 	const url = `profile-generator/schemas`;
