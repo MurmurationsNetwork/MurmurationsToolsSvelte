@@ -1,6 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
-import type { Profile } from '$lib/types/profile';
+import type { Profile } from '$lib/types/Profile';
+import { validateProfile } from '$lib/server/server-utils';
 
 // Get all profiles
 export const GET: RequestHandler = async ({ locals }) => {
@@ -50,6 +51,12 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		if (!profile) {
 			return jsonError('Missing required fields', 400);
+		}
+
+		// Validate the profile before saving
+		const validationResponse = await validateProfile(profile?.profile);
+		if (!validationResponse.success) {
+			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}
 
 		await saveProfile(profile);

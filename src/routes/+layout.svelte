@@ -43,6 +43,8 @@
 
 	// Popup for site environment
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
+	import { onMount } from 'svelte';
+
 	const hoverSiteEnv: PopupSettings = {
 		event: 'hover',
 		target: 'hoverSiteEnv',
@@ -77,6 +79,23 @@
 			console.error('Failed to logout:', error);
 		}
 	}
+
+	let isOnline = true;
+
+	onMount(() => {
+		isOnline = navigator.onLine;
+
+		// Add event listeners for online/offline events
+		const updateOnlineStatus = () => (isOnline = navigator.onLine);
+		window.addEventListener('online', updateOnlineStatus);
+		window.addEventListener('offline', updateOnlineStatus);
+
+		// Cleanup event listeners on component unmount
+		return () => {
+			window.removeEventListener('online', updateOnlineStatus);
+			window.removeEventListener('offline', updateOnlineStatus);
+		};
+	});
 </script>
 
 <!-- Sync system light/dark mode -->
@@ -87,6 +106,11 @@
 
 <AppShell>
 	<svelte:fragment slot="header">
+		{#if !isOnline}
+			<div class="bg-red-500 text-white text-center p-2">
+				O F F L I N E -- Check your network connection
+			</div>
+		{/if}
 		<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
 			<svelte:fragment slot="lead">
 				<a class="text-xl font-bold" href="/" id="site-logo"

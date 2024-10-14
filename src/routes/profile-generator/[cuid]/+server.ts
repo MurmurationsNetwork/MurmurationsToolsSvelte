@@ -1,6 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
-import type { Profile } from '$lib/types/profile';
+import type { Profile } from '$lib/types/Profile';
+import { validateProfile } from '$lib/server/server-utils';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	try {
@@ -109,6 +110,12 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 
 		if (!cuid || !title || !last_updated || !profile) {
 			return jsonError('Missing required fields', 400);
+		}
+
+		// Validate the profile before updating
+		const validationResponse = await validateProfile(profile);
+		if (!validationResponse.success) {
+			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}
 
 		const isUpdated = await updateProfile(cuid, title, last_updated, profile);

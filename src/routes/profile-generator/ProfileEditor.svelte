@@ -4,10 +4,10 @@
 	import { onMount } from 'svelte';
 	import DynamicForm from './DynamicForm.svelte';
 	import { GenerateSchemaInstance } from '$lib/generator';
-	import type { Schema } from '$lib/types/schema';
-	import type { ProfileObject } from '$lib/types/profileObject';
+	import type { Schema } from '$lib/types/Schema';
+	import type { ProfileObject } from '$lib/types/ProfileObject';
 	import { GenerateCuid } from '$lib/utils';
-	import type { Profile } from '$lib/types/profile';
+	import type { Profile } from '$lib/types/Profile';
 	import { get } from 'svelte/store';
 	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
 
@@ -19,12 +19,19 @@
 	export let currentTitle: string = '';
 	export let currentCuid: string = '';
 	let profilePreview: boolean = false;
+	let validationErrors: string[] = [];
+
+	let top: HTMLDivElement;
+
+	function scrollToTop() {
+		top.scrollIntoView();
+	}
 
 	function resetSchemas(): void {
 		dispatch('schemasReset');
 	}
 
-	function handleSubmit(event: SubmitEvent): void {
+	async function handleSubmit(event: SubmitEvent): Promise<void> {
 		// TODO - determine if we really need to prevent the default form submission behavior
 		event.preventDefault();
 		const target = event.target as HTMLFormElement | null;
@@ -54,9 +61,37 @@
 
 			currentProfile = GenerateSchemaInstance(schemas, formDataObject);
 
-			profilePreview = true;
-			// TODO - clear the form fields
-			// target.reset();
+			try {
+				const response = await fetch('/profile-generator/validate', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(currentProfile)
+				});
+
+				if (response.status === 422) {
+					const data = await response.json();
+					validationErrors = data?.errors.map((error: any) => {
+						const pointer = error.source?.pointer || 'Unknown source';
+						return `${error.title}: ${error.detail} (Source: ${pointer})`;
+					});
+					// Scroll to the top of the page if there are validation errors
+					if (validationErrors.length > 0) {
+						scrollToTop();
+					}
+					return;
+				} else if (response.status !== 200) {
+					console.error('Unexpected response status:', response.status);
+					return;
+				}
+
+				// Handle successful validation
+				validationErrors = [];
+				profilePreview = true;
+			} catch (errors) {
+				console.log('errors', errors);
+			}
 		}
 	}
 
@@ -100,6 +135,20 @@
 				},
 				body: JSON.stringify(profileToSave)
 			});
+
+			if (response.status === 422) {
+				const data = await response.json();
+				validationErrors = data?.errors.map((error: any) => {
+					const pointer = error.source?.pointer || 'Unknown source';
+					return `${error.title}: ${error.detail} (Source: ${pointer})`;
+				});
+				// Scroll to the top of the page if there are validation errors
+				if (validationErrors.length > 0) {
+					scrollToTop();
+				}
+				profilePreview = false;
+				return;
+			}
 
 			if (!response.ok) {
 				const errorData = await response.json();
@@ -195,7 +244,17 @@
 	}
 </script>
 
-<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
+<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4" bind:this={top}>
+	{#if validationErrors.length > 0}
+		<div class="bg-red-100 text-red-700 dark:bg-red-500 dark:text-white p-4 rounded mb-4">
+			<ul class="list-disc list-inside text-left">
+				{#each validationErrors as error}
+					<li>{error}</li>
+				{/each}
+			</ul>
+		</div>
+	{/if}
+
 	{#if !profilePreview}
 		<div class="font-medium mb-4">Editing profile with the following schemas</div>
 

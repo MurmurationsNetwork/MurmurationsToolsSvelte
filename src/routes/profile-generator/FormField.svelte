@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
-	import type { Field } from '$lib/types/schema';
-	import type { ProfileArray, ProfileObject, ProfileValue } from '$lib/types/profileObject';
+	import type { Field } from '$lib/types/Schema';
+	import type { ProfileArray, ProfileObject, ProfileValue } from '$lib/types/ProfileObject';
 
 	export let name: string;
 	export let fieldName: string;
@@ -147,7 +147,7 @@
 				{name}
 				{fieldName}
 				field={integrateFieldsToItems(field.items, field.title, field.description)}
-				requiredFields={field.required}
+				{requiredFields}
 				isParentRequired={requiredFields.includes(fieldName)}
 				isParentArray={true}
 				bind:fieldValue
@@ -186,7 +186,10 @@
 	{:else if field.type === 'object' && field.properties}
 		<fieldset class="px-4 py-0 border-4 border-dotted border-gray-500">
 			{#if !hideTitle}
-				<legend class="my-2 px-1 font-bold">{field.title}</legend>
+				<legend class="my-2 px-1 font-bold"
+					>{field.title}{#if requiredFields.includes(fieldName)}
+						<span class="ml-1 text-red-500">*</span>{/if}</legend
+				>
 			{/if}
 			{#if !hideDescription && field.description}
 				<div class="text-sm text-gray-500 dark:text-gray-400">{field.description}</div>
