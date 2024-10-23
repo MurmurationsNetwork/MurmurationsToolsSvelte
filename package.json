@@ -24,7 +24,7 @@
 		"bcryptjs": "^2.4.3",
 		"cuid": "^3.0.0",
 		"highlight.js": "11.10.0",
-		"mongodb": "^6.9.0",
+		"mongodb": "^6.10.0",
 		"svelte-awesome": "^3.3.4",
 		"uuid": "^10.0.0"
 	},
