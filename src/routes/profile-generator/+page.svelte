@@ -12,10 +12,11 @@
 	// Fetch the list of schemas
 	type Data = {
 		schemasList: string[];
+		errorMessage: string | null;
 	};
 
 	export let data: Data;
-	$: ({ schemasList } = data);
+	$: ({ schemasList, errorMessage } = data);
 
 	// Set selected schema in the parent component
 	let schemasSelected: string[] = [];
@@ -145,7 +146,7 @@
 			<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 			<div class="md:basis-2/3 md:order-first p-2">
 				{#if schemasSelected.length === 0}
-					<SchemaSelector {schemasList} on:schemaSelected={handleSchemasSelected} />
+					<SchemaSelector {schemasList} {errorMessage} on:schemaSelected={handleSchemasSelected} />
 				{:else}
 					<ProfileEditor
 						{schemasSelected}

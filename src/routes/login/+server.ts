@@ -30,7 +30,10 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 	} catch (err) {
 		console.error(`Login/Register failed: ${err}`);
-		return jsonError('Failed to connect to MongoDB', 500);
+		return jsonError(
+			'Unable to connect to the MongoDB service, please contact the administrator.',
+			500
+		);
 	}
 };
 

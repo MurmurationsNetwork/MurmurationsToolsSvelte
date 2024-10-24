@@ -9,8 +9,8 @@ interface Schema {
 }
 
 export const load: PageServerLoad = async ({ fetch }) => {
-	const allSchemas = await getSchemas(fetch);
-	const schemasList = allSchemas
+	const { schemas, error } = await getSchemas(fetch);
+	const schemasList = schemas
 		.filter((s: string) => {
 			return !s.startsWith('default-v');
 		})
@@ -18,25 +18,26 @@ export const load: PageServerLoad = async ({ fetch }) => {
 			return !s.startsWith('test_schema-v');
 		});
 
-	return { schemasList };
+	return { schemasList, errorMessage: error };
 };
 
 const getSchemas = async (fetch: (input: RequestInfo, init?: RequestInit) => Promise<Response>) => {
 	if (!PUBLIC_LIBRARY_URL) {
-		console.error('PUBLIC_LIBRARY_URL is not defined');
-		return [];
+		return { schemas: [], error: 'PUBLIC_LIBRARY_URL is not defined' };
 	}
 
 	try {
 		const response = await fetch(`${PUBLIC_LIBRARY_URL}/v2/schemas`);
 		if (!response.ok) {
-			console.error(`Get Schema Error, status: ${response.status}`);
-			return [];
+			const errorMessage = `Get Schema Error, status: ${response.status}`;
+			return { schemas: [], error: errorMessage };
 		}
 		const result = await response.json();
-		return result.data.map((schema: Schema) => schema.name);
+		return { schemas: result.data.map((schema: Schema) => schema.name), error: null };
 	} catch (error) {
-		console.error(error);
-		return [];
+		return {
+			schemas: [],
+			error: 'Unable to connect to the Library service, please contact the administrator.'
+		};
 	}
 };
