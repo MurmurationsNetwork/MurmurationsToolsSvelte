@@ -8,8 +8,10 @@
 	let email = '';
 	let password = '';
 	let errorMessage = '';
+	let isSubmitting = false;
 
 	async function handleSubmit() {
+		isSubmitting = true;
 		const res = await fetch('/login', {
 			method: 'POST',
 			headers: {
@@ -30,6 +32,7 @@
 
 		// Clear the password (security)
 		password = '';
+		isSubmitting = false;
 	}
 </script>
 
@@ -93,8 +96,13 @@
 					<button
 						type="submit"
 						class="btn font-semibold md:btn-lg w-32 md:w-36 variant-filled-primary dark:bg-blue-700 dark:text-white"
+						disabled={isSubmitting}
 					>
-						{#if loginType === 'login'}
+						{#if isSubmitting}
+							<span transition:slide={{ delay: 50, duration: 100, easing: backInOut, axis: 'x' }}
+								>Loading...</span
+							>
+						{:else if loginType === 'login'}
 							<span transition:slide={{ delay: 50, duration: 100, easing: backInOut, axis: 'x' }}
 								>Login</span
 							>
