@@ -13,7 +13,7 @@ interface ValidationError {
 
 export async function validateProfile(
 	profile: string
-): Promise<{ success: boolean; errors?: ValidationError[] }> {
+): Promise<{ success: boolean; errors?: ValidationError[] | string }> {
 	try {
 		const response = await fetch(`${PUBLIC_INDEX_URL}/v2/validate`, {
 			method: 'POST',
@@ -33,17 +33,9 @@ export async function validateProfile(
 
 		return { success: true };
 	} catch (error) {
-		console.error('Error validating profile:', error);
 		return {
 			success: false,
-			errors: [
-				{
-					status: 500,
-					source: { pointer: '' },
-					title: 'Internal validation error',
-					detail: String(error)
-				}
-			]
+			errors: 'Unable to connect to Index service, please contact the administrator.'
 		};
 	}
 }

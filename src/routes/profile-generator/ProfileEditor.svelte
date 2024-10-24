@@ -20,6 +20,8 @@
 	export let currentCuid: string = '';
 	let profilePreview: boolean = false;
 	let validationErrors: string[] = [];
+	let serviceError: string = '';
+	let isSubmitting: boolean = false;
 
 	let top: HTMLDivElement;
 
@@ -34,6 +36,8 @@
 	async function handleSubmit(event: SubmitEvent): Promise<void> {
 		// TODO - determine if we really need to prevent the default form submission behavior
 		event.preventDefault();
+		isSubmitting = true;
+		serviceError = '';
 		const target = event.target as HTMLFormElement | null;
 		if (target) {
 			const formData = new FormData(target);
@@ -70,8 +74,8 @@
 					body: JSON.stringify(currentProfile)
 				});
 
+				const data = await response.json();
 				if (response.status === 422) {
-					const data = await response.json();
 					validationErrors = data?.errors.map((error: any) => {
 						const pointer = error.source?.pointer || 'Unknown source';
 						return `${error.title}: ${error.detail} (Source: ${pointer})`;
@@ -80,9 +84,16 @@
 					if (validationErrors.length > 0) {
 						scrollToTop();
 					}
+					isSubmitting = false;
 					return;
 				} else if (response.status !== 200) {
-					console.error('Unexpected response status:', response.status);
+					if (typeof data.errors === 'string') {
+						serviceError = data.errors;
+					} else {
+						serviceError = `Unexpected response status: ${response.status}`;
+					}
+					scrollToTop();
+					isSubmitting = false;
 					return;
 				}
 
@@ -90,9 +101,11 @@
 				validationErrors = [];
 				profilePreview = true;
 			} catch (errors) {
-				console.log('errors', errors);
+				serviceError = 'Unable to connect to Index service, please contact the administrator.';
+				console.error('validation errors: ', errors);
 			}
 		}
+		isSubmitting = false;
 	}
 
 	let schemas: Schema | null = null;
@@ -104,6 +117,7 @@
 
 	async function saveAndPostProfile(event: SubmitEvent) {
 		event.preventDefault();
+		serviceError = '';
 
 		if (!get(isAuthenticatedStore)) {
 			alert('Please log in first.');
@@ -255,6 +269,12 @@
 		</div>
 	{/if}
 
+	{#if serviceError != ''}
+		<div class="bg-red-100 text-red-800 dark:bg-red-500 dark:text-white p-4 rounded mb-4">
+			{serviceError}
+		</div>
+	{/if}
+
 	{#if !profilePreview}
 		<div class="font-medium mb-4">Editing profile with the following schemas</div>
 
@@ -269,9 +289,17 @@
 				{/if}
 			</div>
 			<div class="flex justify-around mt-0">
-				<button type="submit" class="btn font-semibold md:btn-lg variant-filled-primary"
-					>Validate</button
+				<button
+					type="submit"
+					class="btn font-semibold md:btn-lg variant-filled-primary"
+					disabled={isSubmitting}
 				>
+					{#if isSubmitting}
+						Loading...
+					{:else}
+						Validate
+					{/if}
+				</button>
 				<button
 					type="button"
 					on:click={resetSchemas}
