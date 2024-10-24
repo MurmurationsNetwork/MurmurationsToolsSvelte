@@ -7,6 +7,7 @@
 	let loginType = 'login';
 	let email = '';
 	let password = '';
+	let errorMessage = '';
 
 	async function handleSubmit() {
 		const res = await fetch('/login', {
@@ -23,7 +24,8 @@
 			isAuthenticatedStore.set(true);
 			await goto('/');
 		} else {
-			console.log('Login failed: ' + data.error);
+			errorMessage =
+				loginType === 'login' ? 'Login failed: ' + data.error : 'Register failed: ' + data.error;
 		}
 
 		// Clear the password (security)
@@ -36,6 +38,9 @@
 		<div
 			class="card variant-ghost-primary border-2 mx-2 my-4 p-4 w-3/4 md:w-1/2 dark:border-gray-700 dark:text-white"
 		>
+			{#if errorMessage}
+				<div class="text-red-500">{errorMessage}</div>
+			{/if}
 			<form on:submit|preventDefault={handleSubmit}>
 				<fieldset class="flex my-3 justify-center">
 					<label class="mr-3">
