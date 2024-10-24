@@ -45,6 +45,7 @@ export async function closeDatabaseConnection(): Promise<void> {
 			console.log('MongoDB connection closed');
 		} catch (error) {
 			console.error('Failed to close MongoDB connection', error);
+			throw error;
 		}
 	}
 }
