@@ -10,18 +10,19 @@ export const GET: RequestHandler = async ({ params }) => {
 		}
 
 		const response = await fetch(`${PUBLIC_LIBRARY_URL}/v2/schemas/${schema_name}`);
+		const data = await response.json();
 
 		if (response.ok) {
-			const data = await response.json();
 			return json(data);
 		} else {
-			// Log error if fetching status fails
 			console.error('Failed to fetch status:', response.statusText);
-			return json({ status: 'unknown' }, { status: response.status });
+			return json(data, { status: response.status });
 		}
 	} catch (error) {
-		// Log error if there is an exception
 		console.error('Error fetching status:', error);
-		return json({ status: 'unknown' }, { status: 500 });
+		return jsonError(
+			'Unable to connect to the Library service, please contact the administrator.',
+			500
+		);
 	}
 };

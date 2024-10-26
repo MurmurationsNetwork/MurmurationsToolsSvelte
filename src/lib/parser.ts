@@ -50,6 +50,7 @@ const parseSchemas = async (url: string, schemaNames: string[]): Promise<Schema 
 
 async function retrieveSchema(url: string, schemaName: string): Promise<RetrievedSchema | null> {
 	const schemaUrl = `${url}/${schemaName}`;
+
 	try {
 		const response = await fetch(schemaUrl);
 		if (!response.ok) {
