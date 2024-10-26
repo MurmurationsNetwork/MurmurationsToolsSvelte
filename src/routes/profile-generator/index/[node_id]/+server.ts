@@ -1,12 +1,13 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { PUBLIC_INDEX_URL, PUBLIC_TOOLS_URL } from '$env/static/public';
+import { jsonError } from '$lib/utils';
 
 // Get the status of a profile in the index
 export const GET: RequestHandler = async ({ params }) => {
 	try {
 		const { node_id } = params;
 		if (!node_id) {
-			return json({ error: 'Missing node_id' }, { status: 400 });
+			return jsonError('Missing node_id', 400);
 		}
 
 		const response = await fetch(`${PUBLIC_INDEX_URL}/v2/nodes/${node_id}`);
@@ -30,7 +31,7 @@ export const POST: RequestHandler = async ({ params }) => {
 		const { node_id } = params;
 
 		if (!node_id) {
-			return json({ error: 'Missing cuid' }, { status: 400 });
+			return jsonError('Missing cuid', 400);
 		}
 
 		const profileUrl = `${PUBLIC_TOOLS_URL}/profiles/${node_id}`;
@@ -55,7 +56,10 @@ export const POST: RequestHandler = async ({ params }) => {
 		return json({ node_id: result.data.node_id });
 	} catch (error) {
 		console.error('Error posting profile to index:', error);
-		return json({ error: 'Internal server error' }, { status: 500 });
+		return jsonError(
+			'Unable to connect to the Index service, please contact the administrator',
+			500
+		);
 	}
 };
 
@@ -65,7 +69,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
 		const { node_id } = params;
 
 		if (!node_id) {
-			return json({ error: 'Missing node_id' }, { status: 400 });
+			return jsonError('Missing node_id', 400);
 		}
 
 		const response = await fetch(`${PUBLIC_INDEX_URL}/v2/nodes/${node_id}`, {
@@ -74,15 +78,15 @@ export const DELETE: RequestHandler = async ({ params }) => {
 
 		if (!response.ok) {
 			const errorData = await response.json();
-			return json(
-				{ error: errorData.error || 'Error deleting profile from index' },
-				{ status: response.status }
-			);
+			return jsonError(errorData.error || 'Error deleting profile from index', response.status);
 		}
 
 		return json({ success: true, message: 'Profile successfully deleted from index' });
 	} catch (error) {
 		console.error('Error deleting profile from index:', error);
-		return json({ error: 'Internal server error' }, { status: 500 });
+		return jsonError(
+			'Unable to connect to the Index service, please contact the administrator',
+			500
+		);
 	}
 };

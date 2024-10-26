@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { serialize } from 'cookie';
 import { PUBLIC_ENV } from '$env/static/public';
-import { GenerateCuid } from '$lib/utils';
+import { generateCuid } from '$lib/utils';
 import type { Db } from 'mongodb';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -44,7 +44,7 @@ const handleRegistration = async (db: Db, emailHash: string, password: string, e
 	}
 
 	const hashedPassword = await bcrypt.hash(password, 10);
-	const cuid = GenerateCuid();
+	const cuid = generateCuid();
 
 	const newUser = {
 		cuid,

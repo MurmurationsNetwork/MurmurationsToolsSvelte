@@ -2,6 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
 import type { Profile } from '$lib/types/Profile';
 import { validateProfile } from '$lib/server/server-utils';
+import { jsonError } from '$lib/utils';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	try {
@@ -241,5 +242,3 @@ async function deleteProfile(emailHash: string, profileCuid: string): Promise<bo
 		await closeDatabaseConnection();
 	}
 }
-
-const jsonError = (error: string, status: number) => json({ success: false, error }, { status });

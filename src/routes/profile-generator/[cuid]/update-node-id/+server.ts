@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
+import { jsonError } from '$lib/utils';
 
 // Update node_id for a profile
 export const PUT: RequestHandler = async ({ request, params }) => {
@@ -22,10 +23,11 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 		return json({ success: true, message: 'Node ID updated successfully' });
 	} catch (err) {
 		console.error(`Profile update failed: ${err}`);
-		return jsonError('Internal server error', 500);
+		return jsonError(
+			'Unable to connect to the MongoDB service, please contact the administrator.',
+			500
+		);
 	} finally {
 		await closeDatabaseConnection();
 	}
 };
-
-const jsonError = (error: string, status: number) => json({ success: false, error }, { status });

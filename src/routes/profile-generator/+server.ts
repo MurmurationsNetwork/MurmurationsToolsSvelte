@@ -34,13 +34,16 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.find({ cuid: { $in: profileCuids } })
 			.toArray();
 
-		await closeDatabaseConnection();
-
 		// Return the profiles as JSON
 		return json({ profiles });
 	} catch (err) {
 		console.error(`Failed to fetch user profiles: ${err}`);
-		return jsonError('Internal server error', 500);
+		return jsonError(
+			'Unable to connect to the MongoDB service, please contact the administrator',
+			500
+		);
+	} finally {
+		await closeDatabaseConnection();
 	}
 };
 
@@ -64,7 +67,10 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ success: true });
 	} catch (err) {
 		console.error(`Profile save failed: ${err}`);
-		return jsonError('Internal server error', 500);
+		return jsonError(
+			'Unable to connect to the MongoDB/Index service, please contact the administrator',
+			500
+		);
 	}
 };
 

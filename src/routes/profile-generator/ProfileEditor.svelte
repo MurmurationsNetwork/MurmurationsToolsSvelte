@@ -6,7 +6,7 @@
 	import { GenerateSchemaInstance } from '$lib/generator';
 	import type { Schema } from '$lib/types/Schema';
 	import type { ProfileObject } from '$lib/types/ProfileObject';
-	import { GenerateCuid } from '$lib/utils';
+	import { generateCuid } from '$lib/utils';
 	import type { Profile } from '$lib/types/Profile';
 	import { get } from 'svelte/store';
 	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
@@ -129,7 +129,7 @@
 		const title = formData.get('title') as string;
 
 		try {
-			const cuid = currentCuid || GenerateCuid();
+			const cuid = currentCuid || generateCuid();
 			const profileToSave: Profile = {
 				cuid,
 				linked_schemas: schemasSelected,
