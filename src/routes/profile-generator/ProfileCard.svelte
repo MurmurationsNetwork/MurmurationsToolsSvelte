@@ -9,6 +9,8 @@
 	export let last_updated: string;
 	export let schemas: string[];
 
+	let errorMessage: string = '';
+
 	let statusColor: string;
 	const dispatch = createEventDispatcher();
 
@@ -18,17 +20,20 @@
 	async function fetchStatus(node_id: string): Promise<string> {
 		if (node_id === '') return 'unknown';
 
-		try {
-			const response = await fetch(`/profile-generator/index/${node_id}`);
-			if (response.ok) {
-				const data = await response.json();
-				return data.status ?? 'unknown';
-			} else {
-				console.error('Failed to fetch status:', response.statusText);
-				return 'unknown';
+		const response = await fetch(`/profile-generator/index/${node_id}`);
+		const data = await response.json();
+		if (response.ok) {
+			errorMessage = '';
+			return data.status ?? 'unknown';
+		} else {
+			if (response.status === 404) {
+				return 'Not found';
 			}
-		} catch (error) {
-			console.error('Error fetching status:', error);
+
+			console.error('Failed to fetch status:', data.error || response.statusText);
+			errorMessage = data.error
+				? data.error
+				: `Unknown error occurred. HTTP Status: ${response.status}. Please contact the administrator.`;
 			return 'unknown';
 		}
 	}
@@ -102,6 +107,9 @@
 </script>
 
 <QueryClientProvider client={queryClient}>
+	{#if errorMessage}
+		<div class="text-red-500">{errorMessage}</div>
+	{/if}
 	<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
 		<div class="font-medium">{title}</div>
 		<div class="m-4">
@@ -115,13 +123,15 @@
 				{/each}
 			</ul>
 		</div>
-		<div class="flex justify-around mt-4 md:mt-8">
-			<button on:click={handleModify} class="btn font-semibold md:btn-lg variant-filled-primary"
-				>Modify</button
-			>
-			<button on:click={handleDelete} class="btn font-semibold md:btn-lg variant-filled-secondary"
-				>Delete</button
-			>
-		</div>
+		{#if !errorMessage}
+			<div class="flex justify-around mt-4 md:mt-8">
+				<button on:click={handleModify} class="btn font-semibold md:btn-lg variant-filled-primary"
+					>Modify</button
+				>
+				<button on:click={handleDelete} class="btn font-semibold md:btn-lg variant-filled-secondary"
+					>Delete</button
+				>
+			</div>
+		{/if}
 	</div>
 </QueryClientProvider>

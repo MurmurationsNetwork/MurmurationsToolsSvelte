@@ -12,16 +12,19 @@ export const GET: RequestHandler = async ({ params }) => {
 
 		const response = await fetch(`${PUBLIC_INDEX_URL}/v2/nodes/${node_id}`);
 
+		const data = await response.json();
 		if (response.ok) {
-			const data = await response.json();
 			return json({ status: data.data.status });
 		} else {
 			console.error('Failed to fetch status:', response.statusText);
-			return json({ status: 'unknown' }, { status: response.status });
+			return json(data, { status: response.status });
 		}
 	} catch (error) {
 		console.error('Error fetching status:', error);
-		return json({ status: 'unknown' }, { status: 500 });
+		return jsonError(
+			'Unable to connect to the Index service, please contact the administrator.',
+			500
+		);
 	}
 };
 
