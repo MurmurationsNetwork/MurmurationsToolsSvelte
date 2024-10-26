@@ -59,6 +59,9 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Validate the profile before saving
 		const validationResponse = await validateProfile(profile?.profile);
 		if (!validationResponse.success) {
+			if (typeof validationResponse.errors === 'string') {
+				return json({ success: false, errors: validationResponse.errors }, { status: 500 });
+			}
 			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}
 
@@ -68,7 +71,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	} catch (err) {
 		console.error(`Profile save failed: ${err}`);
 		return jsonError(
-			'Unable to connect to the MongoDB/Index service, please contact the administrator',
+			'Unable to connect to the MongoDB service, please contact the administrator',
 			500
 		);
 	}

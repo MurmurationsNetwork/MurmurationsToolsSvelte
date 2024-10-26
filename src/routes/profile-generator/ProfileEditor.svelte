@@ -65,44 +65,33 @@
 
 			currentProfile = GenerateSchemaInstance(schemas, formDataObject);
 
-			try {
-				const response = await fetch('/profile-generator/validate', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify(currentProfile)
+			const response = await fetch('/profile-generator/validate', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(currentProfile)
+			});
+
+			const data = await response.json();
+			if (response.status === 422) {
+				validationErrors = data?.errors?.map((error: any) => {
+					const pointer = error.source?.pointer || 'Unknown source';
+					return `${error.title}: ${error.detail} (Source: ${pointer})`;
 				});
-
-				const data = await response.json();
-				if (response.status === 422) {
-					validationErrors = data?.errors.map((error: any) => {
-						const pointer = error.source?.pointer || 'Unknown source';
-						return `${error.title}: ${error.detail} (Source: ${pointer})`;
-					});
-					// Scroll to the top of the page if there are validation errors
-					if (validationErrors.length > 0) {
-						scrollToTop();
-					}
-					isSubmitting = false;
-					return;
-				} else if (response.status !== 200) {
-					if (typeof data.errors === 'string') {
-						serviceError = data.errors;
-					} else {
-						serviceError = `Unexpected response status: ${response.status}`;
-					}
+				// Scroll to the top of the page if there are validation errors
+				if (validationErrors.length > 0) {
 					scrollToTop();
-					isSubmitting = false;
-					return;
 				}
-
-				// Handle successful validation
+			} else if (response.status !== 200) {
+				serviceError =
+					typeof data.errors === 'string'
+						? data.errors
+						: `Unexpected response status: ${response.status}`;
+				scrollToTop();
+			} else {
 				validationErrors = [];
 				profilePreview = true;
-			} catch (errors) {
-				serviceError = 'Unable to connect to Index service, please contact the administrator.';
-				console.error('validation errors: ', errors);
 			}
 		}
 		isSubmitting = false;

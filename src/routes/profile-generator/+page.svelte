@@ -55,7 +55,7 @@
 					cuid: profile.cuid,
 					title: profile.title,
 					node_id: profile.node_id,
-					status: 'unknown',
+					status: 'received',
 					last_updated: new Date(profile.last_updated).toLocaleString(),
 					schemas: profile.linked_schemas
 				}));
