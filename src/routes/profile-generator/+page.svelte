@@ -152,12 +152,17 @@
 			<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 			<div class="md:basis-2/3 md:order-first p-2">
 				{#if profileErrorMessage}
-					<div class="bg-red-500 text-white dark:text-white">
+					<div class="bg-red-500 text-white dark:text-white mb-2">
 						<p class="font-medium">{profileErrorMessage}</p>
 					</div>
 				{/if}
+				{#if errorMessage}
+					<div class="bg-red-500 text-white dark:text-white">
+						<p class="font-medium">{errorMessage}</p>
+					</div>
+				{/if}
 				{#if schemasSelected.length === 0}
-					<SchemaSelector {schemasList} {errorMessage} on:schemaSelected={handleSchemasSelected} />
+					<SchemaSelector {schemasList} on:schemaSelected={handleSchemasSelected} />
 				{:else}
 					<ProfileEditor
 						{schemasSelected}
