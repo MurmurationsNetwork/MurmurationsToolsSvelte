@@ -29,14 +29,13 @@ const getSchemas = async (fetch: (input: RequestInfo, init?: RequestInit) => Pro
 	try {
 		const response = await fetch(`${PUBLIC_LIBRARY_URL}/v2/schemas`);
 		if (!response.ok) {
-			// const errorMessage = `Get Schema Error, status: ${response.status}`;
-			const errorMessage =
-				'Unable to connect to the Library service, please try again in a few minutes';
+			const errorMessage = `Unable to connect to the Library service, please try again in a few minutes. Status Code: ${response.status}`;
 			return { schemas: [], error: errorMessage };
 		}
 		const result = await response.json();
 		return { schemas: result.data.map((schema: Schema) => schema.name), error: null };
 	} catch (error) {
+		console.error('Error fetching schemas:', error);
 		return {
 			schemas: [],
 			error: `Unable to connect to the Library service, please try again in a few minutes: ${JSON.stringify(error)}`
