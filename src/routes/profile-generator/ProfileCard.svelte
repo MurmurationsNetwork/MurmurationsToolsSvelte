@@ -24,6 +24,7 @@
 		const data = await response.json();
 		if (response.ok) {
 			errorMessage = '';
+			dispatch('profileErrorOccurred', null);
 			return data.status ?? 'unknown';
 		} else {
 			if (response.status === 404) {
@@ -34,6 +35,8 @@
 			errorMessage = data.error
 				? data.error
 				: `Unknown error occurred. HTTP Status: ${response.status}. Please try again in a few minutes.`;
+			dispatch('profileErrorOccurred', errorMessage);
+
 			return 'unknown';
 		}
 	}
@@ -107,9 +110,6 @@
 </script>
 
 <QueryClientProvider client={queryClient}>
-	{#if errorMessage}
-		<div class="text-red-500">{errorMessage}</div>
-	{/if}
 	<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
 		<div class="font-medium">{title}</div>
 		<div class="m-4">

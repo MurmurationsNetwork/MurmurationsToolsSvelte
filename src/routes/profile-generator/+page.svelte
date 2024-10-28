@@ -74,6 +74,11 @@
 	let profileCards: ProfileCard[] = [];
 	onMount(fetchProfiles);
 
+	let profileErrorMessage: string | null = null;
+	function handleProfileErrorOccurred(event: CustomEvent<string>) {
+		profileErrorMessage = event.detail;
+	}
+
 	let currentProfile: ProfileObject = {};
 	let currentTitle: string = '';
 	let currentCuid: string = '';
@@ -139,12 +144,18 @@
 						schemas={profileCard.schemas}
 						on:profileUpdated={handleProfileUpdated}
 						on:profileModify={handleProfileModify}
+						on:profileErrorOccurred={handleProfileErrorOccurred}
 					/>
 				{/each}
 			</div>
 			<!-- END: List of user-generated profiles -->
 			<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 			<div class="md:basis-2/3 md:order-first p-2">
+				{#if profileErrorMessage}
+					<div class="bg-red-500 text-white dark:text-white">
+						<p class="font-medium">{profileErrorMessage}</p>
+					</div>
+				{/if}
 				{#if schemasSelected.length === 0}
 					<SchemaSelector {schemasList} {errorMessage} on:schemaSelected={handleSchemasSelected} />
 				{:else}
