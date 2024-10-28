@@ -28,6 +28,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			}
 		} catch (error) {
 			// Logout user if MongoDB connection fails
+			console.error(`MongoDB connection failed: ${error}`);
 			event.locals.user = null;
 			isAuthenticatedStore.set(false);
 
