@@ -34,7 +34,7 @@ export async function validateProfile(
 		console.error('Fetch failed:', error);
 		return {
 			success: false,
-			errors: 'Unable to connect to Index service, please contact the administrator.'
+			errors: 'Unable to connect to Index service, please try again in a few minutes'
 		};
 	}
 }

@@ -37,7 +37,7 @@ const getSchemas = async (fetch: (input: RequestInfo, init?: RequestInit) => Pro
 	} catch (error) {
 		return {
 			schemas: [],
-			error: 'Unable to connect to the Library service, please contact the administrator.'
+			error: 'Unable to connect to the Library service, please try again in a few minutes'
 		};
 	}
 };

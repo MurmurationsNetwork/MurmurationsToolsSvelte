@@ -27,7 +27,9 @@
 			await goto('/');
 		} else {
 			errorMessage =
-				loginType === 'login' ? 'Login failed: ' + data.error : 'Register failed: ' + data.error;
+				loginType === 'login'
+					? 'Login failed: ' + data.error
+					: 'Registration failed: ' + data.error;
 		}
 
 		// Clear the password (security)

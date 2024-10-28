@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ params }) => {
 	} catch (error) {
 		console.error('Error fetching status:', error);
 		return jsonError(
-			'Unable to connect to the Index service, please contact the administrator.',
+			'Unable to connect to the Index service, please try again in a few minutes',
 			500
 		);
 	}
@@ -60,7 +60,7 @@ export const POST: RequestHandler = async ({ params }) => {
 	} catch (error) {
 		console.error('Error posting profile to index:', error);
 		return jsonError(
-			'Unable to connect to the Index service, please contact the administrator',
+			'Unable to connect to the Index service, please try again in a few minutes',
 			500
 		);
 	}
@@ -88,7 +88,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
 	} catch (error) {
 		console.error('Error deleting profile from index:', error);
 		return jsonError(
-			'Unable to connect to the Index service, please contact the administrator',
+			'Unable to connect to the Index service, please try again in a few minutes',
 			500
 		);
 	}

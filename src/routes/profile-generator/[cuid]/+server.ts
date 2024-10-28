@@ -25,10 +25,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		return json({ success: true, profile });
 	} catch (err) {
 		console.error(`Failed to get profile: ${err}`);
-		return jsonError(
-			'Unable to connect to the MongoDB service, please contact the administrator.',
-			500
-		);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	}
 };
 
@@ -81,10 +78,7 @@ export const PUT: RequestHandler = async ({ params, locals }) => {
 		return json({ success: true, message: 'Profile updated successfully' });
 	} catch (err) {
 		console.error(`User's profile update failed: ${err}`);
-		return jsonError(
-			'Unable to connect to the MongoDB service, please contact the administrator.',
-			500
-		);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	}
 };
 
@@ -140,10 +134,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 		return json({ success: true, message: 'Profile updated successfully' });
 	} catch (err) {
 		console.error(`Profile update failed: ${err}`);
-		return jsonError(
-			'Unable to connect to the MongoDB service, please contact the administrator.',
-			500
-		);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	}
 };
 
@@ -199,10 +190,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		return json({ success: true, message: 'Profile deleted successfully' });
 	} catch (err) {
 		console.error(`Profile deletion failed: ${err}`);
-		return jsonError(
-			'Unable to connect to the MongoDB service, please contact the administrator.',
-			500
-		);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	}
 };
 

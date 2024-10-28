@@ -38,10 +38,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		return json({ profiles });
 	} catch (err) {
 		console.error(`Failed to fetch user profiles: ${err}`);
-		return jsonError(
-			'Unable to connect to the MongoDB service, please contact the administrator',
-			500
-		);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	} finally {
 		await closeDatabaseConnection();
 	}
@@ -70,10 +67,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ success: true });
 	} catch (err) {
 		console.error(`Profile save failed: ${err}`);
-		return jsonError(
-			'Unable to connect to the MongoDB service, please contact the administrator',
-			500
-		);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	}
 };
 

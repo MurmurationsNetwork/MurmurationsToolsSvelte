@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ params }) => {
 	} catch (error) {
 		console.error('Error fetching status:', error);
 		return jsonError(
-			'Unable to connect to the Library service, please contact the administrator.',
+			'Unable to connect to the Library service, please try again in a few minutes',
 			500
 		);
 	}

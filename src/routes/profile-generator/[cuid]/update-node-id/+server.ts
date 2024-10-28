@@ -23,10 +23,7 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 		return json({ success: true, message: 'Node ID updated successfully' });
 	} catch (err) {
 		console.error(`Profile update failed: ${err}`);
-		return jsonError(
-			'Unable to connect to the MongoDB service, please contact the administrator.',
-			500
-		);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	} finally {
 		await closeDatabaseConnection();
 	}

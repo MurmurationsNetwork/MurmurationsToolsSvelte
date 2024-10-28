@@ -33,7 +33,7 @@
 			console.error('Failed to fetch status:', data.error || response.statusText);
 			errorMessage = data.error
 				? data.error
-				: `Unknown error occurred. HTTP Status: ${response.status}. Please contact the administrator.`;
+				: `Unknown error occurred. HTTP Status: ${response.status}. Please try again in a few minutes.`;
 			return 'unknown';
 		}
 	}
