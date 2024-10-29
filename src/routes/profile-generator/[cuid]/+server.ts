@@ -50,8 +50,6 @@ async function getProfileByCuid(cuid: string): Promise<Profile | null> {
 			profile: profile.profile,
 			title: profile.title
 		} as Profile;
-	} catch (error) {
-		throw error;
 	} finally {
 		await closeDatabaseConnection();
 	}
@@ -95,8 +93,6 @@ async function updateUserProfiles(emailHash: string, profileCuid: string): Promi
 			return false;
 		}
 		return true;
-	} catch (error) {
-		throw error;
 	} finally {
 		await closeDatabaseConnection();
 	}
@@ -164,8 +160,6 @@ async function updateProfile(
 		}
 
 		return true;
-	} catch (error) {
-		throw error;
 	} finally {
 		await closeDatabaseConnection();
 	}
@@ -227,8 +221,6 @@ async function deleteProfile(emailHash: string, profileCuid: string): Promise<bo
 
 		console.log('Profile deleted successfully');
 		return true;
-	} catch (error) {
-		throw error;
 	} finally {
 		await closeDatabaseConnection();
 	}

@@ -1,5 +1,4 @@
 import { PUBLIC_INDEX_URL } from '$env/static/public';
-import { jsonError } from '$lib/utils';
 
 interface ErrorSource {
 	pointer: string;

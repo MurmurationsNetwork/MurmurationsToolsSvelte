@@ -11,7 +11,7 @@
 		"test": "npm run test:integration && npm run test:unit",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "prettier --check . && eslint .",
+		"lint": "prettier --check . && eslint . --fix",
 		"format": "prettier --write .",
 		"test:integration": "PUBLIC_LIBRARY_URL=\"https://test-library.murmurations.network\" PUBLIC_INDEX_URL=\"https://test-index.murmurations.network\" playwright test",
 		"test:unit": "vitest run",

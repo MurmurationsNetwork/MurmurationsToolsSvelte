@@ -75,10 +75,12 @@
 
 			const data = await response.json();
 			if (response.status === 422) {
-				validationErrors = data?.errors?.map((error: any) => {
-					const pointer = error.source?.pointer || 'Unknown source';
-					return `${error.title}: ${error.detail} (Source: ${pointer})`;
-				});
+				validationErrors = data?.errors?.map(
+					(error: { title: string; detail: string; source?: { pointer?: string } }) => {
+						const pointer = error.source?.pointer || 'Unknown source';
+						return `${error.title}: ${error.detail} (Source: ${pointer})`;
+					}
+				);
 				// Scroll to the top of the page if there are validation errors
 				if (validationErrors.length > 0) {
 					scrollToTop();
@@ -141,10 +143,12 @@
 
 			if (response.status === 422) {
 				const data = await response.json();
-				validationErrors = data?.errors.map((error: any) => {
-					const pointer = error.source?.pointer || 'Unknown source';
-					return `${error.title}: ${error.detail} (Source: ${pointer})`;
-				});
+				validationErrors = data?.errors.map(
+					(error: { source?: { pointer?: string }; title: string; detail: string }) => {
+						const pointer = error.source?.pointer || 'Unknown source';
+						return `${error.title}: ${error.detail} (Source: ${pointer})`;
+					}
+				);
 				// Scroll to the top of the page if there are validation errors
 				if (validationErrors.length > 0) {
 					scrollToTop();

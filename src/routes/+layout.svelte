@@ -96,11 +96,14 @@
 			window.removeEventListener('offline', updateOnlineStatus);
 		};
 	});
+
+	// Sync system light/dark mode
+	onMount(() => {
+		autoModeWatcher();
+	});
 </script>
 
-<!-- Sync system light/dark mode -->
 <svelte:head>
-	{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}
 	<title>Murmurations Tools</title>
 </svelte:head>
 

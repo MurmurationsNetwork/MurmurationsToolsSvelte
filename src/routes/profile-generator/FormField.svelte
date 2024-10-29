@@ -159,7 +159,7 @@
 						<span class="ml-1 text-red-500">*</span>{/if}
 				</legend>
 				<div class="text-sm text-gray-500 dark:text-gray-400">{field.description}</div>
-				{#each $items as _, index}
+				{#each $items as item, index (item)}
 					<svelte:self
 						name={`${name}[${index}]`}
 						{fieldName}
