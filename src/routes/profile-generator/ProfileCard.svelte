@@ -17,8 +17,11 @@
 	const queryClient = new QueryClient();
 
 	// Function to fetch status
-	async function fetchStatus(node_id: string): Promise<string> {
+	async function fetchStatus(): Promise<string> {
 		if (node_id === '') return 'unknown';
+		if (['posted', 'deleted', 'validation_failed', 'post_failed'].includes(status)) {
+			return status;
+		}
 
 		const response = await fetch(`/profile-generator/index/${node_id}`);
 		const data = await response.json();
@@ -44,7 +47,7 @@
 	// Use svelte-query to fetch status
 	const statusQuery = createQuery({
 		queryKey: ['status', node_id],
-		queryFn: () => fetchStatus(node_id),
+		queryFn: fetchStatus,
 		refetchInterval: 5000
 	});
 
