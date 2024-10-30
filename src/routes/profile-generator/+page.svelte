@@ -79,6 +79,12 @@
 		profileErrorMessage = event.detail;
 	}
 
+	let profileEditorErrorMessage: string | null = null;
+
+	function handleProfileEditorErrorOccurred(event: CustomEvent<string>) {
+		profileEditorErrorMessage = event.detail;
+	}
+
 	let currentProfile: ProfileObject = {};
 	let currentTitle: string = '';
 	let currentCuid: string = '';
@@ -151,9 +157,9 @@
 			<!-- END: List of user-generated profiles -->
 			<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 			<div class="md:basis-2/3 md:order-first p-2">
-				{#if profileErrorMessage}
+				{#if profileErrorMessage || profileEditorErrorMessage}
 					<div class="bg-red-500 text-white dark:text-white mb-2">
-						<p class="font-medium">{profileErrorMessage}</p>
+						<p class="font-medium">{profileErrorMessage || profileEditorErrorMessage}</p>
 					</div>
 				{/if}
 				{#if errorMessage}
@@ -171,6 +177,7 @@
 						{currentCuid}
 						on:schemasReset={handleSchemasReset}
 						on:profileUpdated={handleProfileUpdated}
+						on:profileEditorErrorOccurred={handleProfileEditorErrorOccurred}
 					/>
 				{/if}
 			</div>

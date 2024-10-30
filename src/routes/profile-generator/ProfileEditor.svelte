@@ -159,7 +159,8 @@
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				throw new Error(errorData.error || 'Error saving profile');
+				console.log('errorData', errorData);
+				throw errorData.errors || 'Error saving profile';
 			}
 
 			const result = await response.json();
@@ -220,9 +221,11 @@
 
 			// Reset to initial state
 			profilePreview = false;
+			dispatch('profileEditorErrorOccurred', null);
 			resetSchemas();
 		} catch (error) {
 			console.error('Error saving and posting profile:', error);
+			dispatch('profileEditorErrorOccurred', error);
 		}
 
 		dispatch('profileUpdated');

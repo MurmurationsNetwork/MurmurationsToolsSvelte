@@ -2,6 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
 import type { Profile } from '$lib/types/Profile';
 import { validateProfile } from '$lib/server/server-utils';
+import { jsonError } from '$lib/utils';
 
 // Get all profiles
 export const GET: RequestHandler = async ({ locals }) => {
@@ -79,12 +80,7 @@ async function saveProfile(profile: Profile): Promise<void> {
 			...profile,
 			last_updated: Date.now()
 		});
-	} catch (error) {
-		console.error('Error saving profile:', error);
-		throw error;
 	} finally {
 		await closeDatabaseConnection();
 	}
 }
-
-const jsonError = (error: string, status: number) => json({ success: false, error }, { status });

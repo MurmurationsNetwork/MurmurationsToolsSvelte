@@ -33,7 +33,7 @@ export async function validateProfile(
 		console.error('Fetch failed:', error);
 		return {
 			success: false,
-			errors: 'Unable to connect to Index service, please try again in a few minutes'
+			errors: 'Unable to connect to the Index service, please try again in a few minutes'
 		};
 	}
 }
