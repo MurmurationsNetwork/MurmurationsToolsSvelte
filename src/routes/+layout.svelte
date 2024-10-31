@@ -53,11 +53,6 @@
 		placement: 'bottom'
 	};
 
-	export let data;
-	if (data?.userData) {
-		isAuthenticatedStore.set(true);
-	}
-
 	// Logout
 	async function logout() {
 		try {
@@ -99,7 +94,7 @@
 		};
 	});
 
-	let isDbOnline = true;
+	let isDbOnline = false;
 
 	$: dbStatus.subscribe((value) => {
 		isDbOnline = value;
@@ -108,6 +103,9 @@
 	onMount(() => {
 		checkDbStatus();
 	});
+
+	export let data: { isAuthenticated: boolean };
+	$: isAuthenticatedStore.set(data.isAuthenticated);
 </script>
 
 <!-- Sync system light/dark mode -->
@@ -160,7 +158,8 @@
 					</button>
 				{:else}
 					<a
-						class="btn btn-sm variant-filled-primary"
+						class="btn btn-sm variant-filled-primary {!isDbOnline &&
+							'opacity-50 pointer-events-none cursor-not-allowed'}"
 						href="/login"
 						id="login"
 						aria-disabled={!isDbOnline}

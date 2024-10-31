@@ -8,6 +8,7 @@ declare namespace App {
 			email_hash: string;
 			profiles: string[];
 		} | null;
+		isAuthenticated: boolean;
 	}
 	// interface PageData {}
 	// interface Error {}

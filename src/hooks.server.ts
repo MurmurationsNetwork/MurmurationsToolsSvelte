@@ -1,7 +1,7 @@
 import type { Handle } from '@sveltejs/kit';
 import { parse } from 'cookie';
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
-import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
+import { dbStatus } from '$lib/stores/dbStatus';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const cookieHeader = event.request.headers.get('cookie') || '';
@@ -20,10 +20,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 						{ projection: { _id: 0, cuid: 1, email_hash: 1, profiles: 1 } }
 					);
 				event.locals.user = user as { cuid: string; email_hash: string; profiles: string[] } | null;
-				isAuthenticatedStore.set(true);
+				event.locals.isAuthenticated = true;
 			} else {
 				event.locals.user = null;
-				isAuthenticatedStore.set(false);
+				event.locals.isAuthenticated = false;
 
 				const loginUrl = new URL('/login', event.url.origin);
 				return new Response(null, {
@@ -35,22 +35,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 				});
 			}
 		} catch (error) {
-			// Logout user if MongoDB connection fails
 			console.error(`MongoDB connection failed: ${error}`);
-			event.locals.user = null;
-			isAuthenticatedStore.set(false);
-
-			const loginUrl = new URL('/login', event.url.origin);
-			return new Response(null, {
-				status: 302,
-				headers: {
-					'Set-Cookie': 'murmurations_tools_session=; Path=/; HttpOnly; Max-Age=0',
-					Location: loginUrl.toString()
-				}
-			});
+			dbStatus.set(false);
+			event.locals.isAuthenticated = true;
 		} finally {
 			await closeDatabaseConnection();
 		}
+	} else {
+		event.locals.isAuthenticated = false;
 	}
 
 	return resolve(event);

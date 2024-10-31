@@ -6,6 +6,7 @@
 	import type { Profile } from '$lib/types/Profile';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import type { ProfileObject } from '$lib/types/ProfileObject';
+	import { dbStatus } from '$lib/stores/dbStatus';
 
 	const queryClient = new QueryClient();
 
@@ -114,6 +115,12 @@
 			console.error('Error fetching profile details:', error);
 		}
 	}
+
+	let isDbOnline = true;
+
+	$: dbStatus.subscribe((value) => {
+		isDbOnline = value;
+	});
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -123,7 +130,11 @@
 			<div class="bg-blue-50 dark:bg-gray-800 md:basis-1/3 m-2 px-2">
 				{#if profileCards.length === 0}
 					<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 dark:border-gray-600">
-						{#if !isLoggedIn}
+						{#if !isDbOnline}
+							<p class="font-medium dark:text-white text-left">
+								Unable to connect to the database, Unable to load profiles
+							</p>
+						{:else if !isLoggedIn}
 							<p class="font-medium dark:text-white text-left">
 								Login first if you want to save your profile here, or just create a profile by
 								selecting a schema from the list.
