@@ -44,6 +44,8 @@
 	// Popup for site environment
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
+	import { checkDbStatus } from '$lib/checkDbStatus';
+	import { dbStatus } from '$lib/stores/dbStatus';
 
 	const hoverSiteEnv: PopupSettings = {
 		event: 'hover',
@@ -96,6 +98,16 @@
 			window.removeEventListener('offline', updateOnlineStatus);
 		};
 	});
+
+	let isDbOnline = true;
+
+	$: dbStatus.subscribe((value) => {
+		isDbOnline = value;
+	});
+
+	onMount(() => {
+		checkDbStatus();
+	});
 </script>
 
 <!-- Sync system light/dark mode -->
@@ -110,6 +122,11 @@
 		{#if !isOnline}
 			<div class="bg-red-500 text-white text-center p-2">
 				O F F L I N E -- Check your network connection
+			</div>
+		{/if}
+		{#if !isDbOnline}
+			<div class="bg-yellow-200 border-l-4 border-yellow-500 text-yellow-700 p-4 text-center">
+				<p>Unable to connect to the database, please try again in a few minutes</p>
 			</div>
 		{/if}
 		<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
