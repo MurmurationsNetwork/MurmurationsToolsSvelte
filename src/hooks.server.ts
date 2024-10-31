@@ -12,7 +12,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		try {
 			const db = await connectToDatabase();
 			const session = await db.collection('sessions').findOne({ session_token: sessionToken });
-
 			if (session) {
 				const user = await db
 					.collection('users')
@@ -25,6 +24,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 			} else {
 				event.locals.user = null;
 				isAuthenticatedStore.set(false);
+
+				const loginUrl = new URL('/login', event.url.origin);
+				return new Response(null, {
+					status: 302,
+					headers: {
+						'Set-Cookie': 'murmurations_tools_session=; Path=/; HttpOnly; Max-Age=0',
+						Location: loginUrl.toString()
+					}
+				});
 			}
 		} catch (error) {
 			// Logout user if MongoDB connection fails

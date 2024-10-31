@@ -1,12 +1,11 @@
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
 import type { RequestHandler } from '@sveltejs/kit';
-import { json } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { serialize } from 'cookie';
 import { PUBLIC_ENV } from '$env/static/public';
-import { generateCuid } from '$lib/utils';
+import { generateCuid, jsonError } from '$lib/utils';
 import type { Db } from 'mongodb';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -99,5 +98,3 @@ const createSuccessResponse = (email: string, sessionToken: string, message: str
 		}
 	});
 };
-
-const jsonError = (error: string, status: number) => json({ success: false, error }, { status });
