@@ -104,7 +104,13 @@
 
 	// Use parseRef to retrieve the schema based on schemasSelected
 	onMount(async () => {
-		schemas = await ParseRef(schemasSelected);
+		try {
+			dispatch('profileEditorErrorOccurred', null);
+			schemas = await ParseRef(schemasSelected);
+		} catch (error) {
+			dispatch('profileEditorErrorOccurred', error);
+			resetSchemas();
+		}
 	});
 
 	async function saveAndPostProfile(event: SubmitEvent) {
