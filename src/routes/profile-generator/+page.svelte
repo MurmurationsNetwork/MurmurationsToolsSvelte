@@ -121,6 +121,10 @@
 	$: dbStatus.subscribe((value) => {
 		isDbOnline = value;
 	});
+
+	$: if (isDbOnline) {
+		fetchProfiles();
+	}
 </script>
 
 <QueryClientProvider client={queryClient}>
