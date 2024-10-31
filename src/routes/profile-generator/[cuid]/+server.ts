@@ -116,7 +116,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 		const validationResponse = await validateProfile(profile);
 		if (!validationResponse.success) {
 			if (typeof validationResponse.errors === 'string') {
-				return json({ success: false, errors: validationResponse.errors }, { status: 500 });
+				return jsonError(validationResponse.errors, 500);
 			}
 			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}

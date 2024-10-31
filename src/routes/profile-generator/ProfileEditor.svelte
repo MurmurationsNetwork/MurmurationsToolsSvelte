@@ -10,6 +10,7 @@
 	import type { Profile } from '$lib/types/Profile';
 	import { get } from 'svelte/store';
 	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
+	import { dbStatus } from '$lib/stores/dbStatus';
 
 	const dispatch = createEventDispatcher();
 
@@ -160,7 +161,7 @@
 			if (!response.ok) {
 				const errorData = await response.json();
 				console.log('errorData', errorData);
-				throw errorData.errors || 'Error saving profile';
+				throw errorData.error || 'Error saving profile';
 			}
 
 			const result = await response.json();
@@ -252,6 +253,13 @@
 			throw error;
 		}
 	}
+
+	let isDbOnline: boolean = get(dbStatus);
+
+	// Subscribe to dbStatus changes
+	dbStatus.subscribe((value) => {
+		isDbOnline = value;
+	});
 </script>
 
 <div class="card variant-ghost-primary border-2 mx-2 my-4 p-4" bind:this={top}>
@@ -337,7 +345,9 @@
 					</label>
 				</div>
 			</div>
-			<button class="btn font-semibold md:btn-lg variant-filled-primary">Save & Post</button>
+			<button class="btn font-semibold md:btn-lg variant-filled-primary" disabled={!isDbOnline}
+				>Save & Post</button
+			>
 		</form>
 	{/if}
 </div>
