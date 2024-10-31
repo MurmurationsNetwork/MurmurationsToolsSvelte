@@ -27,7 +27,7 @@ test('home page has expected h1 content', async ({ page }) => {
 test('clicking links loads correct pages', async ({ page }) => {
 	await page.goto('/');
 	await page.locator('#login').click();
-	await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
+	await expect(page).toHaveURL(/\/login/);
 	await page.locator('#profile-generator').click();
 	await expect(page).toHaveURL(/\/profile-generator/);
 	await page.locator('#batch-importer').click();
