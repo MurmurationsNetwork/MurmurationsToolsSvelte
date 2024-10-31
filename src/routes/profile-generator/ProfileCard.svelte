@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { QueryClient, QueryClientProvider, createQuery } from '@tanstack/svelte-query';
+	import { dbStatus } from '$lib/stores/dbStatus';
+	import { get } from 'svelte/store';
 
 	export let cuid: string;
 	export let title: string;
@@ -15,6 +17,13 @@
 	const dispatch = createEventDispatcher();
 
 	const queryClient = new QueryClient();
+
+	let isDbConnected: boolean = get(dbStatus);
+
+	// Subscribe to dbStatus changes
+	dbStatus.subscribe((value) => {
+		isDbConnected = value;
+	});
 
 	// Function to fetch status
 	async function fetchStatus(): Promise<string> {
@@ -126,15 +135,17 @@
 				{/each}
 			</ul>
 		</div>
-		{#if !errorMessage}
-			<div class="flex justify-around mt-4 md:mt-8">
-				<button on:click={handleModify} class="btn font-semibold md:btn-lg variant-filled-primary"
-					>Modify</button
-				>
-				<button on:click={handleDelete} class="btn font-semibold md:btn-lg variant-filled-secondary"
-					>Delete</button
-				>
-			</div>
-		{/if}
+		<div class="flex justify-around mt-4 md:mt-8">
+			<button
+				on:click={handleModify}
+				class="btn font-semibold md:btn-lg variant-filled-primary"
+				disabled={!!errorMessage || !isDbConnected}>Modify</button
+			>
+			<button
+				on:click={handleDelete}
+				class="btn font-semibold md:btn-lg variant-filled-secondary"
+				disabled={!!errorMessage || !isDbConnected}>Delete</button
+			>
+		</div>
 	</div>
 </QueryClientProvider>
