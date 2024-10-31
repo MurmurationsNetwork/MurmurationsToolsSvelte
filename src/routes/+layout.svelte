@@ -150,11 +150,24 @@
 			</div>
 			<svelte:fragment slot="trail">
 				{#if $isAuthenticatedStore}
-					<button on:click={logout} class="btn btn-sm variant-filled-primary" id="logout">
+					<button
+						on:click={logout}
+						class="btn btn-sm variant-filled-primary"
+						id="logout"
+						disabled={!isDbOnline}
+					>
 						Logout
 					</button>
 				{:else}
-					<a class="btn btn-sm variant-filled-primary" href="/login" id="login"> Login </a>
+					<a
+						class="btn btn-sm variant-filled-primary"
+						href="/login"
+						id="login"
+						aria-disabled={!isDbOnline}
+						class:disabled={!isDbOnline}
+					>
+						Login
+					</a>
 				{/if}
 			</svelte:fragment>
 		</AppBar>

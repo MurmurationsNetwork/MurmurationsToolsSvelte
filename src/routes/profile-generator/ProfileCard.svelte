@@ -18,11 +18,11 @@
 
 	const queryClient = new QueryClient();
 
-	let isDbConnected: boolean = get(dbStatus);
+	let isDbOnline: boolean = get(dbStatus);
 
 	// Subscribe to dbStatus changes
 	dbStatus.subscribe((value) => {
-		isDbConnected = value;
+		isDbOnline = value;
 	});
 
 	// Function to fetch status
@@ -139,12 +139,12 @@
 			<button
 				on:click={handleModify}
 				class="btn font-semibold md:btn-lg variant-filled-primary"
-				disabled={!!errorMessage || !isDbConnected}>Modify</button
+				disabled={!!errorMessage || !isDbOnline}>Modify</button
 			>
 			<button
 				on:click={handleDelete}
 				class="btn font-semibold md:btn-lg variant-filled-secondary"
-				disabled={!!errorMessage || !isDbConnected}>Delete</button
+				disabled={!!errorMessage || !isDbOnline}>Delete</button
 			>
 		</div>
 	</div>
