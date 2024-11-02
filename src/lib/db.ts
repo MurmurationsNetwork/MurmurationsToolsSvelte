@@ -25,7 +25,8 @@ let client: MongoClient;
 export async function connectToDatabase(): Promise<Db> {
 	if (!db) {
 		try {
-			const client = new MongoClient(uri);
+			// Set 3 seconds timeout for the connection
+			const client = new MongoClient(uri, { serverSelectionTimeoutMS: 3000 });
 			await client.connect();
 			db = client.db(dbName);
 			console.log('Connected to MongoDB');
@@ -44,6 +45,7 @@ export async function closeDatabaseConnection(): Promise<void> {
 			console.log('MongoDB connection closed');
 		} catch (error) {
 			console.error('Failed to close MongoDB connection', error);
+			throw error;
 		}
 	}
 }

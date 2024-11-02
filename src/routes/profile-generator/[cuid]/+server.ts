@@ -2,6 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
 import type { Profile } from '$lib/types/Profile';
 import { validateProfile } from '$lib/server/server-utils';
+import { jsonError } from '$lib/utils';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	try {
@@ -24,7 +25,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		return json({ success: true, profile });
 	} catch (err) {
 		console.error(`Failed to get profile: ${err}`);
-		return jsonError('Internal server error', 500);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	}
 };
 
@@ -49,9 +50,6 @@ async function getProfileByCuid(cuid: string): Promise<Profile | null> {
 			profile: profile.profile,
 			title: profile.title
 		} as Profile;
-	} catch (error) {
-		console.error('Error fetching profile:', error);
-		throw error;
 	} finally {
 		await closeDatabaseConnection();
 	}
@@ -70,16 +68,19 @@ export const PUT: RequestHandler = async ({ params, locals }) => {
 			return jsonError('Missing required fields or user not authenticated', 400);
 		}
 
-		await updateUserProfiles(locals.user.email_hash, cuid);
+		const isUpdated = await updateUserProfiles(locals.user.email_hash, cuid);
+		if (!isUpdated) {
+			return jsonError('Failed to update profile', 404);
+		}
 
 		return json({ success: true, message: 'Profile updated successfully' });
 	} catch (err) {
-		console.error(`Profile update failed: ${err}`);
-		return jsonError('Internal server error', 500);
+		console.error(`User's profile update failed: ${err}`);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	}
 };
 
-async function updateUserProfiles(emailHash: string, profileCuid: string): Promise<void> {
+async function updateUserProfiles(emailHash: string, profileCuid: string): Promise<boolean> {
 	const db = await connectToDatabase();
 
 	try {
@@ -88,11 +89,10 @@ async function updateUserProfiles(emailHash: string, profileCuid: string): Promi
 			.updateOne({ email_hash: emailHash }, { $addToSet: { profiles: profileCuid } });
 
 		if (result.modifiedCount === 0) {
-			console.log('Failed to add profile to user profiles');
+			console.error('Failed to add profile to user profiles');
+			return false;
 		}
-	} catch (error) {
-		console.error('Error updating user profiles:', error);
-		throw error;
+		return true;
 	} finally {
 		await closeDatabaseConnection();
 	}
@@ -115,6 +115,9 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 		// Validate the profile before updating
 		const validationResponse = await validateProfile(profile);
 		if (!validationResponse.success) {
+			if (typeof validationResponse.errors === 'string') {
+				return jsonError(validationResponse.errors, 500);
+			}
 			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}
 
@@ -127,7 +130,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 		return json({ success: true, message: 'Profile updated successfully' });
 	} catch (err) {
 		console.error(`Profile update failed: ${err}`);
-		return jsonError('Internal server error', 500);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	}
 };
 
@@ -157,9 +160,6 @@ async function updateProfile(
 		}
 
 		return true;
-	} catch (error) {
-		console.error('Error updating profile:', error);
-		throw error;
 	} finally {
 		await closeDatabaseConnection();
 	}
@@ -184,7 +184,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		return json({ success: true, message: 'Profile deleted successfully' });
 	} catch (err) {
 		console.error(`Profile deletion failed: ${err}`);
-		return jsonError('Internal server error', 500);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	}
 };
 
@@ -215,18 +215,13 @@ async function deleteProfile(emailHash: string, profileCuid: string): Promise<bo
 		const deleteResult = await db.collection('profiles').deleteOne({ cuid: profileCuid });
 
 		if (deleteResult.deletedCount === 0) {
-			console.log('Failed to delete profile from profiles collection');
+			console.error('Failed to delete profile from profiles collection');
 			return false;
 		}
 
 		console.log('Profile deleted successfully');
 		return true;
-	} catch (error) {
-		console.error('Error deleting profile:', error);
-		throw error;
 	} finally {
 		await closeDatabaseConnection();
 	}
 }
-
-const jsonError = (error: string, status: number) => json({ success: false, error }, { status });

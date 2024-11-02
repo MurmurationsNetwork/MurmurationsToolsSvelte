@@ -1,12 +1,11 @@
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
 import type { RequestHandler } from '@sveltejs/kit';
-import { json } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { serialize } from 'cookie';
 import { PUBLIC_ENV } from '$env/static/public';
-import { GenerateCuid } from '$lib/utils';
+import { generateCuid, jsonError } from '$lib/utils';
 import type { Db } from 'mongodb';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -29,8 +28,8 @@ export const POST: RequestHandler = async ({ request }) => {
 				return jsonError('Invalid action', 400);
 		}
 	} catch (err) {
-		console.error(`Login/Register failed: ${err}`);
-		return jsonError('Internal server error', 500);
+		console.error(`Login/Registration failed: ${err}`);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	}
 };
 
@@ -41,7 +40,7 @@ const handleRegistration = async (db: Db, emailHash: string, password: string, e
 	}
 
 	const hashedPassword = await bcrypt.hash(password, 10);
-	const cuid = GenerateCuid();
+	const cuid = generateCuid();
 
 	const newUser = {
 		cuid,
@@ -99,5 +98,3 @@ const createSuccessResponse = (email: string, sessionToken: string, message: str
 		}
 	});
 };
-
-const jsonError = (error: string, status: number) => json({ success: false, error }, { status });

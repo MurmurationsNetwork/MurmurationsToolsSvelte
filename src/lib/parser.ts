@@ -3,16 +3,11 @@ import type { RetrievedSchema, Schema } from '$lib/types/Schema';
 export const ParseRef = async (schemaName: string | string[]): Promise<Schema | null> => {
 	const url = `profile-generator/schemas`;
 
-	try {
-		const schemaNames = Array.isArray(schemaName)
-			? schemaName
-			: schemaName.split(',').map((name) => name.trim());
+	const schemaNames = Array.isArray(schemaName)
+		? schemaName
+		: schemaName.split(',').map((name) => name.trim());
 
-		return await parseSchemas(url, schemaNames);
-	} catch (err) {
-		console.error(`Schema Parse error: ${err}`);
-		return null;
-	}
+	return await parseSchemas(url, schemaNames);
 };
 
 const parseSchemas = async (url: string, schemaNames: string[]): Promise<Schema | null> => {
@@ -20,45 +15,50 @@ const parseSchemas = async (url: string, schemaNames: string[]): Promise<Schema 
 		return null;
 	}
 
-	const schemas = await Promise.all(schemaNames.map((name) => retrieveSchema(url, name)));
+	try {
+		const schemas = await Promise.all(schemaNames.map((name) => retrieveSchema(url, name)));
 
-	// Filter out null values
-	const filteredSchemas = schemas.filter((schema) => schema !== null) as RetrievedSchema[];
+		// Filter out null values
+		const filteredSchemas = schemas.filter((schema) => schema !== null) as RetrievedSchema[];
 
-	if (filteredSchemas.length === 0) {
-		return null;
-	}
-
-	const mergedSchema: Schema = {
-		$schema: filteredSchemas[0].$schema,
-		type: 'object',
-		properties: {},
-		required: [],
-		metadata: {
-			schema: []
+		if (filteredSchemas.length === 0) {
+			return null;
 		}
-	};
 
-	filteredSchemas.forEach((schema) => {
-		Object.assign(mergedSchema.properties, schema.properties);
-		mergedSchema.required = Array.from(new Set(mergedSchema.required.concat(schema.required)));
-		mergedSchema.metadata.schema.push(schema.metadata.schema.name);
-	});
+		const mergedSchema: Schema = {
+			$schema: filteredSchemas[0].$schema,
+			type: 'object',
+			properties: {},
+			required: [],
+			metadata: {
+				schema: []
+			}
+		};
 
-	return mergedSchema;
+		filteredSchemas.forEach((schema) => {
+			Object.assign(mergedSchema.properties, schema.properties);
+			mergedSchema.required = Array.from(new Set(mergedSchema.required.concat(schema.required)));
+			mergedSchema.metadata.schema.push(schema.metadata.schema.name);
+		});
+
+		return mergedSchema;
+	} catch (err) {
+		console.error(`Schema Parse error: ${err}`);
+		throw err;
+	}
 };
 
 async function retrieveSchema(url: string, schemaName: string): Promise<RetrievedSchema | null> {
 	const schemaUrl = `${url}/${schemaName}`;
+
 	try {
 		const response = await fetch(schemaUrl);
 		if (!response.ok) {
-			console.error(`Get Schema Error, status: ${response.status}`);
-			return null;
+			throw 'Unable to connect to the Library service, please try again in a few minutes';
 		}
 		return await response.json();
-	} catch (error) {
-		console.error(`Error fetching schema: ${error}`);
-		return null;
+	} catch (err) {
+		console.error(`Error fetching schema: ${err}`);
+		throw err;
 	}
 }

@@ -7,8 +7,11 @@
 	let loginType = 'login';
 	let email = '';
 	let password = '';
+	let errorMessage = '';
+	let isSubmitting = false;
 
 	async function handleSubmit() {
+		isSubmitting = true;
 		const res = await fetch('/login', {
 			method: 'POST',
 			headers: {
@@ -23,11 +26,15 @@
 			isAuthenticatedStore.set(true);
 			await goto('/');
 		} else {
-			console.log('Login failed: ' + data.error);
+			errorMessage =
+				loginType === 'login'
+					? 'Login failed: ' + data.error
+					: 'Registration failed: ' + data.error;
 		}
 
 		// Clear the password (security)
 		password = '';
+		isSubmitting = false;
 	}
 </script>
 
@@ -36,6 +43,9 @@
 		<div
 			class="card variant-ghost-primary border-2 mx-2 my-4 p-4 w-3/4 md:w-1/2 dark:border-gray-700 dark:text-white"
 		>
+			{#if errorMessage}
+				<div class="text-red-500">{errorMessage}</div>
+			{/if}
 			<form on:submit|preventDefault={handleSubmit}>
 				<fieldset class="flex my-3 justify-center">
 					<label class="mr-3">
@@ -88,8 +98,13 @@
 					<button
 						type="submit"
 						class="btn font-semibold md:btn-lg w-32 md:w-36 variant-filled-primary dark:bg-blue-700 dark:text-white"
+						disabled={isSubmitting}
 					>
-						{#if loginType === 'login'}
+						{#if isSubmitting}
+							<span transition:slide={{ delay: 50, duration: 100, easing: backInOut, axis: 'x' }}
+								>Loading...</span
+							>
+						{:else if loginType === 'login'}
 							<span transition:slide={{ delay: 50, duration: 100, easing: backInOut, axis: 'x' }}
 								>Login</span
 							>

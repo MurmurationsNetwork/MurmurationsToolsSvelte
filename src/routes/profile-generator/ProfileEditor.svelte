@@ -6,10 +6,11 @@
 	import { GenerateSchemaInstance } from '$lib/generator';
 	import type { Schema } from '$lib/types/Schema';
 	import type { ProfileObject } from '$lib/types/ProfileObject';
-	import { GenerateCuid } from '$lib/utils';
+	import { generateCuid } from '$lib/utils';
 	import type { Profile } from '$lib/types/Profile';
 	import { get } from 'svelte/store';
 	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
+	import { dbStatus } from '$lib/stores/dbStatus';
 
 	const dispatch = createEventDispatcher();
 
@@ -20,6 +21,8 @@
 	export let currentCuid: string = '';
 	let profilePreview: boolean = false;
 	let validationErrors: string[] = [];
+	let serviceError: string = '';
+	let isSubmitting: boolean = false;
 
 	let top: HTMLDivElement;
 
@@ -34,6 +37,8 @@
 	async function handleSubmit(event: SubmitEvent): Promise<void> {
 		// TODO - determine if we really need to prevent the default form submission behavior
 		event.preventDefault();
+		isSubmitting = true;
+		serviceError = '';
 		const target = event.target as HTMLFormElement | null;
 		if (target) {
 			const formData = new FormData(target);
@@ -61,49 +66,56 @@
 
 			currentProfile = GenerateSchemaInstance(schemas, formDataObject);
 
-			try {
-				const response = await fetch('/profile-generator/validate', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify(currentProfile)
-				});
+			const response = await fetch('/profile-generator/validate', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(currentProfile)
+			});
 
-				if (response.status === 422) {
-					const data = await response.json();
-					validationErrors = data?.errors.map((error: any) => {
+			const data = await response.json();
+			if (response.status === 422) {
+				validationErrors = data?.errors?.map(
+					(error: { title: string; detail: string; source?: { pointer?: string } }) => {
 						const pointer = error.source?.pointer || 'Unknown source';
 						return `${error.title}: ${error.detail} (Source: ${pointer})`;
-					});
-					// Scroll to the top of the page if there are validation errors
-					if (validationErrors.length > 0) {
-						scrollToTop();
 					}
-					return;
-				} else if (response.status !== 200) {
-					console.error('Unexpected response status:', response.status);
-					return;
+				);
+				// Scroll to the top of the page if there are validation errors
+				if (validationErrors.length > 0) {
+					scrollToTop();
 				}
-
-				// Handle successful validation
+			} else if (response.status !== 200) {
+				serviceError =
+					typeof data.errors === 'string'
+						? data.errors
+						: `Unexpected response status: ${response.status}`;
+				scrollToTop();
+			} else {
 				validationErrors = [];
 				profilePreview = true;
-			} catch (errors) {
-				console.log('errors', errors);
 			}
 		}
+		isSubmitting = false;
 	}
 
 	let schemas: Schema | null = null;
 
 	// Use parseRef to retrieve the schema based on schemasSelected
 	onMount(async () => {
-		schemas = await ParseRef(schemasSelected);
+		try {
+			dispatch('profileEditorErrorOccurred', null);
+			schemas = await ParseRef(schemasSelected);
+		} catch (error) {
+			dispatch('profileEditorErrorOccurred', error);
+			resetSchemas();
+		}
 	});
 
 	async function saveAndPostProfile(event: SubmitEvent) {
 		event.preventDefault();
+		serviceError = '';
 
 		if (!get(isAuthenticatedStore)) {
 			alert('Please log in first.');
@@ -115,7 +127,7 @@
 		const title = formData.get('title') as string;
 
 		try {
-			const cuid = currentCuid || GenerateCuid();
+			const cuid = currentCuid || generateCuid();
 			const profileToSave: Profile = {
 				cuid,
 				linked_schemas: schemasSelected,
@@ -138,10 +150,12 @@
 
 			if (response.status === 422) {
 				const data = await response.json();
-				validationErrors = data?.errors.map((error: any) => {
-					const pointer = error.source?.pointer || 'Unknown source';
-					return `${error.title}: ${error.detail} (Source: ${pointer})`;
-				});
+				validationErrors = data?.errors.map(
+					(error: { source?: { pointer?: string }; title: string; detail: string }) => {
+						const pointer = error.source?.pointer || 'Unknown source';
+						return `${error.title}: ${error.detail} (Source: ${pointer})`;
+					}
+				);
 				// Scroll to the top of the page if there are validation errors
 				if (validationErrors.length > 0) {
 					scrollToTop();
@@ -152,7 +166,8 @@
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				throw new Error(errorData.error || 'Error saving profile');
+				console.log('errorData', errorData);
+				throw errorData.error || 'Error saving profile';
 			}
 
 			const result = await response.json();
@@ -213,9 +228,11 @@
 
 			// Reset to initial state
 			profilePreview = false;
+			dispatch('profileEditorErrorOccurred', null);
 			resetSchemas();
 		} catch (error) {
 			console.error('Error saving and posting profile:', error);
+			dispatch('profileEditorErrorOccurred', error);
 		}
 
 		dispatch('profileUpdated');
@@ -242,6 +259,13 @@
 			throw error;
 		}
 	}
+
+	let isDbOnline: boolean = get(dbStatus);
+
+	// Subscribe to dbStatus changes
+	dbStatus.subscribe((value) => {
+		isDbOnline = value;
+	});
 </script>
 
 <div class="card variant-ghost-primary border-2 mx-2 my-4 p-4" bind:this={top}>
@@ -252,6 +276,12 @@
 					<li>{error}</li>
 				{/each}
 			</ul>
+		</div>
+	{/if}
+
+	{#if serviceError != ''}
+		<div class="bg-red-100 text-red-800 dark:bg-red-500 dark:text-white p-4 rounded mb-4">
+			{serviceError}
 		</div>
 	{/if}
 
@@ -269,9 +299,17 @@
 				{/if}
 			</div>
 			<div class="flex justify-around mt-0">
-				<button type="submit" class="btn font-semibold md:btn-lg variant-filled-primary"
-					>Validate</button
+				<button
+					type="submit"
+					class="btn font-semibold md:btn-lg variant-filled-primary"
+					disabled={isSubmitting}
 				>
+					{#if isSubmitting}
+						Loading...
+					{:else}
+						Validate
+					{/if}
+				</button>
 				<button
 					type="button"
 					on:click={resetSchemas}
@@ -313,7 +351,9 @@
 					</label>
 				</div>
 			</div>
-			<button class="btn font-semibold md:btn-lg variant-filled-primary">Save & Post</button>
+			<button class="btn font-semibold md:btn-lg variant-filled-primary" disabled={!isDbOnline}
+				>Save & Post</button
+			>
 		</form>
 	{/if}
 </div>

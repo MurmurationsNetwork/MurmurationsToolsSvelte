@@ -6,16 +6,18 @@
 	import type { Profile } from '$lib/types/Profile';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import type { ProfileObject } from '$lib/types/ProfileObject';
+	import { dbStatus } from '$lib/stores/dbStatus';
 
 	const queryClient = new QueryClient();
 
 	// Fetch the list of schemas
 	type Data = {
 		schemasList: string[];
+		errorMessage: string | null;
 	};
 
 	export let data: Data;
-	$: ({ schemasList } = data);
+	$: ({ schemasList, errorMessage } = data);
 
 	// Set selected schema in the parent component
 	let schemasSelected: string[] = [];
@@ -54,7 +56,7 @@
 					cuid: profile.cuid,
 					title: profile.title,
 					node_id: profile.node_id,
-					status: 'unknown',
+					status: 'received',
 					last_updated: new Date(profile.last_updated).toLocaleString(),
 					schemas: profile.linked_schemas
 				}));
@@ -72,6 +74,17 @@
 
 	let profileCards: ProfileCard[] = [];
 	onMount(fetchProfiles);
+
+	let profileErrorMessage: string | null = null;
+	function handleProfileErrorOccurred(event: CustomEvent<string>) {
+		profileErrorMessage = event.detail;
+	}
+
+	let profileEditorErrorMessage: string | null = null;
+
+	function handleProfileEditorErrorOccurred(event: CustomEvent<string>) {
+		profileEditorErrorMessage = event.detail;
+	}
 
 	let currentProfile: ProfileObject = {};
 	let currentTitle: string = '';
@@ -102,6 +115,16 @@
 			console.error('Error fetching profile details:', error);
 		}
 	}
+
+	let isDbOnline = true;
+
+	$: dbStatus.subscribe((value) => {
+		isDbOnline = value;
+	});
+
+	$: if (isDbOnline) {
+		fetchProfiles();
+	}
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -111,7 +134,11 @@
 			<div class="bg-blue-50 dark:bg-gray-800 md:basis-1/3 m-2 px-2">
 				{#if profileCards.length === 0}
 					<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 dark:border-gray-600">
-						{#if !isLoggedIn}
+						{#if !isDbOnline}
+							<p class="font-medium dark:text-white text-left">
+								Unable to connect to the database, Unable to load profiles
+							</p>
+						{:else if !isLoggedIn}
 							<p class="font-medium dark:text-white text-left">
 								Login first if you want to save your profile here, or just create a profile by
 								selecting a schema from the list.
@@ -138,12 +165,23 @@
 						schemas={profileCard.schemas}
 						on:profileUpdated={handleProfileUpdated}
 						on:profileModify={handleProfileModify}
+						on:profileErrorOccurred={handleProfileErrorOccurred}
 					/>
 				{/each}
 			</div>
 			<!-- END: List of user-generated profiles -->
 			<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
 			<div class="md:basis-2/3 md:order-first p-2">
+				{#if profileErrorMessage || profileEditorErrorMessage}
+					<div class="bg-red-500 text-white dark:text-white mb-2">
+						<p class="font-medium">{profileErrorMessage || profileEditorErrorMessage}</p>
+					</div>
+				{/if}
+				{#if errorMessage}
+					<div class="bg-red-500 text-white dark:text-white">
+						<p class="font-medium">{errorMessage}</p>
+					</div>
+				{/if}
 				{#if schemasSelected.length === 0}
 					<SchemaSelector {schemasList} on:schemaSelected={handleSchemasSelected} />
 				{:else}
@@ -154,6 +192,7 @@
 						{currentCuid}
 						on:schemasReset={handleSchemasReset}
 						on:profileUpdated={handleProfileUpdated}
+						on:profileEditorErrorOccurred={handleProfileEditorErrorOccurred}
 					/>
 				{/if}
 			</div>

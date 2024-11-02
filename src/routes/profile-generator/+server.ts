@@ -2,6 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
 import type { Profile } from '$lib/types/Profile';
 import { validateProfile } from '$lib/server/server-utils';
+import { jsonError } from '$lib/utils';
 
 // Get all profiles
 export const GET: RequestHandler = async ({ locals }) => {
@@ -34,13 +35,13 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.find({ cuid: { $in: profileCuids } })
 			.toArray();
 
-		await closeDatabaseConnection();
-
 		// Return the profiles as JSON
 		return json({ profiles });
 	} catch (err) {
 		console.error(`Failed to fetch user profiles: ${err}`);
-		return jsonError('Internal server error', 500);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
+	} finally {
+		await closeDatabaseConnection();
 	}
 };
 
@@ -56,6 +57,9 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Validate the profile before saving
 		const validationResponse = await validateProfile(profile?.profile);
 		if (!validationResponse.success) {
+			if (typeof validationResponse.errors === 'string') {
+				return json({ success: false, errors: validationResponse.errors }, { status: 500 });
+			}
 			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}
 
@@ -64,7 +68,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ success: true });
 	} catch (err) {
 		console.error(`Profile save failed: ${err}`);
-		return jsonError('Internal server error', 500);
+		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
 	}
 };
 
@@ -76,12 +80,7 @@ async function saveProfile(profile: Profile): Promise<void> {
 			...profile,
 			last_updated: Date.now()
 		});
-	} catch (error) {
-		console.error('Error saving profile:', error);
-		throw error;
 	} finally {
 		await closeDatabaseConnection();
 	}
 }
-
-const jsonError = (error: string, status: number) => json({ success: false, error }, { status });

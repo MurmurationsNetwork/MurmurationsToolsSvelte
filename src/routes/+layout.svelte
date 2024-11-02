@@ -44,17 +44,14 @@
 	// Popup for site environment
 	import type { PopupSettings } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
+	import { checkDbStatus } from '$lib/checkDbStatus';
+	import { dbStatus } from '$lib/stores/dbStatus';
 
 	const hoverSiteEnv: PopupSettings = {
 		event: 'hover',
 		target: 'hoverSiteEnv',
 		placement: 'bottom'
 	};
-
-	export let data;
-	if (data?.userData) {
-		isAuthenticatedStore.set(true);
-	}
 
 	// Logout
 	async function logout() {
@@ -96,10 +93,24 @@
 			window.removeEventListener('offline', updateOnlineStatus);
 		};
 	});
+
+	let isDbOnline = false;
+
+	$: dbStatus.subscribe((value) => {
+		isDbOnline = value;
+	});
+
+	onMount(() => {
+		checkDbStatus();
+	});
+
+	export let data: { isAuthenticated: boolean };
+	$: isAuthenticatedStore.set(data.isAuthenticated);
 </script>
 
 <!-- Sync system light/dark mode -->
 <svelte:head>
+	<!-- eslint-disable-next-line -->
 	{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}
 	<title>Murmurations Tools</title>
 </svelte:head>
@@ -109,6 +120,11 @@
 		{#if !isOnline}
 			<div class="bg-red-500 text-white text-center p-2">
 				O F F L I N E -- Check your network connection
+			</div>
+		{/if}
+		{#if !isDbOnline}
+			<div class="bg-yellow-200 border-l-4 border-yellow-500 text-yellow-700 p-4 text-center">
+				<p>Unable to connect to the database, please try again in a few minutes</p>
 			</div>
 		{/if}
 		<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
@@ -132,11 +148,25 @@
 			</div>
 			<svelte:fragment slot="trail">
 				{#if $isAuthenticatedStore}
-					<button on:click={logout} class="btn btn-sm variant-filled-primary" id="logout">
+					<button
+						on:click={logout}
+						class="btn btn-sm variant-filled-primary"
+						id="logout"
+						disabled={!isDbOnline}
+					>
 						Logout
 					</button>
 				{:else}
-					<a class="btn btn-sm variant-filled-primary" href="/login" id="login"> Login </a>
+					<a
+						class="btn btn-sm variant-filled-primary {!isDbOnline &&
+							'opacity-50 pointer-events-none cursor-not-allowed'}"
+						href="/login"
+						id="login"
+						aria-disabled={!isDbOnline}
+						class:disabled={!isDbOnline}
+					>
+						Login
+					</a>
 				{/if}
 			</svelte:fragment>
 		</AppBar>

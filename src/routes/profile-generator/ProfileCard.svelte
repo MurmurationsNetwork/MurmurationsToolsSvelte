@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { QueryClient, QueryClientProvider, createQuery } from '@tanstack/svelte-query';
+	import { dbStatus } from '$lib/stores/dbStatus';
+	import { get } from 'svelte/store';
 
 	export let cuid: string;
 	export let title: string;
@@ -9,26 +11,44 @@
 	export let last_updated: string;
 	export let schemas: string[];
 
+	let errorMessage: string = '';
+
 	let statusColor: string;
 	const dispatch = createEventDispatcher();
 
 	const queryClient = new QueryClient();
 
-	// Function to fetch status
-	async function fetchStatus(node_id: string): Promise<string> {
-		if (node_id === '') return 'unknown';
+	let isDbOnline: boolean = get(dbStatus);
 
-		try {
-			const response = await fetch(`/profile-generator/index/${node_id}`);
-			if (response.ok) {
-				const data = await response.json();
-				return data.status ?? 'unknown';
-			} else {
-				console.error('Failed to fetch status:', response.statusText);
-				return 'unknown';
+	// Subscribe to dbStatus changes
+	dbStatus.subscribe((value) => {
+		isDbOnline = value;
+	});
+
+	// Function to fetch status
+	async function fetchStatus(): Promise<string> {
+		if (node_id === '') return 'unknown';
+		if (['posted', 'deleted', 'validation_failed', 'post_failed'].includes(status)) {
+			return status;
+		}
+
+		const response = await fetch(`/profile-generator/index/${node_id}`);
+		const data = await response.json();
+		if (response.ok) {
+			errorMessage = '';
+			dispatch('profileErrorOccurred', null);
+			return data.status ?? 'unknown';
+		} else {
+			if (response.status === 404) {
+				return 'Not found';
 			}
-		} catch (error) {
-			console.error('Error fetching status:', error);
+
+			console.error('Failed to fetch status:', data.error || response.statusText);
+			errorMessage = data.error
+				? data.error
+				: `Unknown error occurred. HTTP Status: ${response.status}. Please try again in a few minutes.`;
+			dispatch('profileErrorOccurred', errorMessage);
+
 			return 'unknown';
 		}
 	}
@@ -36,7 +56,7 @@
 	// Use svelte-query to fetch status
 	const statusQuery = createQuery({
 		queryKey: ['status', node_id],
-		queryFn: () => fetchStatus(node_id),
+		queryFn: fetchStatus,
 		refetchInterval: 5000
 	});
 
@@ -116,11 +136,15 @@
 			</ul>
 		</div>
 		<div class="flex justify-around mt-4 md:mt-8">
-			<button on:click={handleModify} class="btn font-semibold md:btn-lg variant-filled-primary"
-				>Modify</button
+			<button
+				on:click={handleModify}
+				class="btn font-semibold md:btn-lg variant-filled-primary"
+				disabled={!!errorMessage || !isDbOnline}>Modify</button
 			>
-			<button on:click={handleDelete} class="btn font-semibold md:btn-lg variant-filled-secondary"
-				>Delete</button
+			<button
+				on:click={handleDelete}
+				class="btn font-semibold md:btn-lg variant-filled-secondary"
+				disabled={!!errorMessage || !isDbOnline}>Delete</button
 			>
 		</div>
 	</div>
