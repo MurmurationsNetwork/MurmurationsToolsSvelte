@@ -1,1 +1,135 @@
-<h1>Index Updater</h1>
+<script lang="ts">
+	let postProfileUrl = '';
+	let checkProfileUrl = '';
+	let deleteProfileUrl = '';
+	let postResponse = '';
+	let statusResponse = '';
+	let deleteResponse = '';
+
+	async function postProfile() {
+		const response = await fetch('/index-updater', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ profile_url: postProfileUrl })
+		});
+		const data = await response.json();
+		if (response.ok) {
+			postResponse = JSON.stringify(data?.data);
+		} else {
+			postResponse = JSON.stringify(data);
+		}
+	}
+
+	async function checkProfileStatus() {
+		const response = await fetch(`/index-updater?url=${checkProfileUrl}`);
+		const data = await response.json();
+		if (response.ok) {
+			statusResponse = JSON.stringify(data?.data);
+		} else {
+			statusResponse = JSON.stringify(data);
+		}
+	}
+
+	async function deleteProfile() {
+		const response = await fetch('/index-updater', {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ profile_url: deleteProfileUrl })
+		});
+		const data = await response.json();
+		deleteResponse = JSON.stringify(data);
+	}
+</script>
+
+<div class="container mx-auto p-6 bg-white">
+	<h1 class="text-2xl font-bold mb-6 text-center">Index Updater</h1>
+	<div class="mb-6">
+		<h2 class="text-xl font-semibold mb-2">Add/Update Profile in Index</h2>
+		<p class="text-gray-700 mb-4">
+			Post your profile to your website then add your profile, and always update the Index every
+			time you change it to enable data aggregators to learn about your recent changes.
+		</p>
+		<div class="flex">
+			<input
+				type="text"
+				placeholder="https://your.site/directory/profile.json"
+				class="flex-grow p-2 border rounded-l-md"
+				bind:value={postProfileUrl}
+			/>
+			<button
+				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600"
+				on:click={postProfile}
+			>
+				Post Profile
+			</button>
+		</div>
+		{#if postResponse}
+			<div
+				class="my-2 overflow-auto rounded-xl bg-green-100 p-2 text-sm md:my-4 md:p-4 dark:bg-green-700"
+			>
+				<pre>{JSON.stringify(JSON.parse(postResponse), null, 2)}</pre>
+			</div>
+		{/if}
+	</div>
+
+	<div class="mb-6">
+		<h2 class="text-xl font-semibold mb-2">Check Profile Status in Index</h2>
+		<p class="text-gray-700 mb-4">
+			Get status and other information about your profile from the Index.
+		</p>
+		<div class="flex">
+			<input
+				type="text"
+				placeholder="https://your.site/directory/profile.json"
+				class="flex-grow p-2 border rounded-l-md"
+				bind:value={checkProfileUrl}
+			/>
+			<button
+				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600"
+				on:click={checkProfileStatus}
+			>
+				Check Status
+			</button>
+		</div>
+		{#if statusResponse}
+			<div
+				class="my-2 overflow-auto rounded-xl bg-green-100 p-2 text-sm md:my-4 md:p-4 dark:bg-green-700"
+			>
+				<pre>{JSON.stringify(JSON.parse(statusResponse), null, 2)}</pre>
+			</div>
+		{/if}
+	</div>
+
+	<div>
+		<h2 class="text-xl font-semibold mb-2">Delete Profile from Index</h2>
+		<p class="text-gray-700 mb-4">
+			Remove your profile from your website first (it should return a <code>404 Not Found</code> status
+			code) and then submit it here to delete it from the Index.
+		</p>
+		<div class="flex">
+			<input
+				type="text"
+				placeholder="https://your.site/directory/profile.json"
+				class="flex-grow p-2 border rounded-l-md"
+				bind:value={deleteProfileUrl}
+			/>
+			<button
+				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600"
+				on:click={deleteProfile}
+			>
+				Delete Profile
+			</button>
+		</div>
+		{#if deleteResponse}
+			<div
+				class="my-2 overflow-auto rounded-xl bg-green-100 p-2 text-sm md:my-4 md:p-4 dark:bg-green-700"
+			>
+				<pre>{JSON.stringify(JSON.parse(deleteResponse), null, 2)}</pre>
+			</div>
+		{/if}
+	</div>
+</div>
