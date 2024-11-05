@@ -22,7 +22,8 @@ export const GET: RequestHandler = async ({ url }) => {
 
 		return json(data);
 	} catch (error) {
-		return json({ error: `Error: ${JSON.stringify(error)}` }, { status: 500 });
+		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+		return json({ error: `${errorMessage}` }, { status: 500 });
 	}
 };
 
@@ -45,7 +46,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json(data);
 	} catch (error) {
-		return json({ error: `Error: ${JSON.stringify(error)}` }, { status: 500 });
+		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+		return json({ error: `${errorMessage}` }, { status: 500 });
 	}
 };
 
@@ -69,6 +71,7 @@ export const DELETE: RequestHandler = async ({ request }) => {
 
 		return json(data);
 	} catch (error) {
-		return json({ error: `Error: ${JSON.stringify(error)}` }, { status: 500 });
+		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+		return json({ error: `${errorMessage}` }, { status: 500 });
 	}
 };
