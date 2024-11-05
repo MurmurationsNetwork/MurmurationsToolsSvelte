@@ -5,8 +5,15 @@
 	let postResponse = '';
 	let statusResponse = '';
 	let deleteResponse = '';
+	let postResponseOk = true;
+	let statusResponseOk = true;
+	let deleteResponseOk = true;
+	let isSubmittingPost = false;
+	let isSubmittingCheck = false;
+	let isSubmittingDelete = false;
 
 	async function postProfile() {
+		isSubmittingPost = true;
 		const response = await fetch('/index-updater', {
 			method: 'POST',
 			headers: {
@@ -15,24 +22,27 @@
 			body: JSON.stringify({ profile_url: postProfileUrl })
 		});
 		const data = await response.json();
-		if (response.ok) {
-			postResponse = JSON.stringify(data?.data);
-		} else {
-			postResponse = JSON.stringify(data);
-		}
+		postResponseOk = response.ok;
+		postResponse = JSON.stringify(data);
+		isSubmittingPost = false;
 	}
 
 	async function checkProfileStatus() {
+		isSubmittingCheck = true;
 		const response = await fetch(`/index-updater?url=${checkProfileUrl}`);
 		const data = await response.json();
-		if (response.ok) {
+		if (data?.data) {
 			statusResponse = JSON.stringify(data?.data);
+			statusResponseOk = true;
 		} else {
 			statusResponse = JSON.stringify(data);
+			statusResponseOk = false;
 		}
+		isSubmittingCheck = false;
 	}
 
 	async function deleteProfile() {
+		isSubmittingDelete = true;
 		const response = await fetch('/index-updater', {
 			method: 'DELETE',
 			headers: {
@@ -41,7 +51,13 @@
 			body: JSON.stringify({ profile_url: deleteProfileUrl })
 		});
 		const data = await response.json();
+		if (data?.data) {
+			deleteResponseOk = true;
+		} else {
+			deleteResponseOk = false;
+		}
 		deleteResponse = JSON.stringify(data);
+		isSubmittingDelete = false;
 	}
 </script>
 
@@ -63,13 +79,16 @@
 			<button
 				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600"
 				on:click={postProfile}
+				disabled={isSubmittingPost}
 			>
-				Post Profile
+				{isSubmittingPost ? 'Submitting...' : 'Post Profile'}
 			</button>
 		</div>
 		{#if postResponse}
 			<div
-				class="my-2 overflow-auto rounded-xl bg-green-100 p-2 text-sm md:my-4 md:p-4 dark:bg-green-700"
+				class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {postResponseOk
+					? 'bg-green-100 dark:bg-green-700'
+					: 'bg-red-100 dark:bg-red-700'}"
 			>
 				<pre>{JSON.stringify(JSON.parse(postResponse), null, 2)}</pre>
 			</div>
@@ -91,13 +110,16 @@
 			<button
 				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600"
 				on:click={checkProfileStatus}
+				disabled={isSubmittingCheck}
 			>
-				Check Status
+				{isSubmittingCheck ? 'Submitting...' : 'Check Status'}
 			</button>
 		</div>
 		{#if statusResponse}
 			<div
-				class="my-2 overflow-auto rounded-xl bg-green-100 p-2 text-sm md:my-4 md:p-4 dark:bg-green-700"
+				class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {statusResponseOk
+					? 'bg-green-100 dark:bg-green-700'
+					: 'bg-red-100 dark:bg-red-700'}"
 			>
 				<pre>{JSON.stringify(JSON.parse(statusResponse), null, 2)}</pre>
 			</div>
@@ -120,13 +142,16 @@
 			<button
 				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600"
 				on:click={deleteProfile}
+				disabled={isSubmittingDelete}
 			>
-				Delete Profile
+				{isSubmittingDelete ? 'Submitting...' : 'Delete Profile'}
 			</button>
 		</div>
 		{#if deleteResponse}
 			<div
-				class="my-2 overflow-auto rounded-xl bg-green-100 p-2 text-sm md:my-4 md:p-4 dark:bg-green-700"
+				class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {deleteResponseOk
+					? 'bg-green-100 dark:bg-green-700'
+					: 'bg-red-100 dark:bg-red-700'}"
 			>
 				<pre>{JSON.stringify(JSON.parse(deleteResponse), null, 2)}</pre>
 			</div>
