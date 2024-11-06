@@ -23,7 +23,11 @@ export const GET: RequestHandler = async ({ url }) => {
 		return json(data);
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-		return json({ error: `${errorMessage}` }, { status: 500 });
+		console.error(errorMessage);
+		return json(
+			{ error: 'The index service is currently not available. Please try again in a few minutes.' },
+			{ status: 500 }
+		);
 	}
 };
 
@@ -47,7 +51,11 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json(data);
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-		return json({ error: `${errorMessage}` }, { status: 500 });
+		console.error(errorMessage);
+		return json(
+			{ error: 'The index service is currently not available. Please try again in a few minutes.' },
+			{ status: 500 }
+		);
 	}
 };
 
@@ -76,6 +84,10 @@ export const DELETE: RequestHandler = async ({ request }) => {
 		return json(data);
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-		return json({ error: `${errorMessage}` }, { status: 500 });
+		console.error(errorMessage);
+		return json(
+			{ error: 'The index service is currently not available. Please try again in a few minutes.' },
+			{ status: 500 }
+		);
 	}
 };
