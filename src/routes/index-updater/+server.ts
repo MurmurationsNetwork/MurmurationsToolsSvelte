@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	try {
-		const response = await fetch(`${PUBLIC_INDEX_URL}/v2/nodes`, {
+		const response = await fetch(`${PUBLIC_INDEX_URL}/v2/nodes-sync`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -68,6 +68,10 @@ export const DELETE: RequestHandler = async ({ request }) => {
 			}
 		});
 		const data = await response.json();
+
+		if (!response.ok) {
+			return json(data, { status: response.status });
+		}
 
 		return json(data);
 	} catch (error) {

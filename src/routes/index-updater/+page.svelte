@@ -23,7 +23,11 @@
 		});
 		const data = await response.json();
 		postResponseOk = response.ok;
-		postResponse = JSON.stringify(data);
+		if (data?.data) {
+			postResponse = JSON.stringify(data?.data);
+		} else {
+			postResponse = JSON.stringify(data);
+		}
 		isSubmittingPost = false;
 	}
 
@@ -51,21 +55,21 @@
 			body: JSON.stringify({ profile_url: deleteProfileUrl })
 		});
 		const data = await response.json();
-		if (data?.data) {
-			deleteResponseOk = true;
-		} else {
-			deleteResponseOk = false;
-		}
+		deleteResponseOk = response.ok;
 		deleteResponse = JSON.stringify(data);
 		isSubmittingDelete = false;
 	}
 </script>
 
-<div class="container mx-auto p-6 bg-white">
-	<h1 class="text-2xl font-bold mb-6 text-center">Index Updater</h1>
+<div class="container mx-auto p-6">
+	<h1 class="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100">
+		Index Updater
+	</h1>
 	<div class="mb-6">
-		<h2 class="text-xl font-semibold mb-2">Add/Update Profile in Index</h2>
-		<p class="text-gray-700 mb-4">
+		<h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
+			Add/Update Profile in Index
+		</h2>
+		<p class="text-gray-700 dark:text-gray-300 mb-4">
 			Post your profile to your website then add your profile, and always update the Index every
 			time you change it to enable data aggregators to learn about your recent changes.
 		</p>
@@ -73,11 +77,11 @@
 			<input
 				type="text"
 				placeholder="https://your.site/directory/profile.json"
-				class="flex-grow p-2 border rounded-l-md"
+				class="flex-grow p-2 border rounded-l-md dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
 				bind:value={postProfileUrl}
 			/>
 			<button
-				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600"
+				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600 disabled:bg-red-300 dark:bg-red-700 dark:hover:bg-red-800 dark:disabled:bg-red-500"
 				on:click={postProfile}
 				disabled={isSubmittingPost}
 			>
@@ -90,25 +94,31 @@
 					? 'bg-green-100 dark:bg-green-700'
 					: 'bg-red-100 dark:bg-red-700'}"
 			>
-				<pre>{JSON.stringify(JSON.parse(postResponse), null, 2)}</pre>
+				<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
+						JSON.parse(postResponse),
+						null,
+						2
+					)}</pre>
 			</div>
 		{/if}
 	</div>
 
 	<div class="mb-6">
-		<h2 class="text-xl font-semibold mb-2">Check Profile Status in Index</h2>
-		<p class="text-gray-700 mb-4">
+		<h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
+			Check Profile Status in Index
+		</h2>
+		<p class="text-gray-700 dark:text-gray-300 mb-4">
 			Get status and other information about your profile from the Index.
 		</p>
 		<div class="flex">
 			<input
 				type="text"
 				placeholder="https://your.site/directory/profile.json"
-				class="flex-grow p-2 border rounded-l-md"
+				class="flex-grow p-2 border rounded-l-md dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
 				bind:value={checkProfileUrl}
 			/>
 			<button
-				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600"
+				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600 disabled:bg-red-300 dark:bg-red-700 dark:hover:bg-red-800 dark:disabled:bg-red-500"
 				on:click={checkProfileStatus}
 				disabled={isSubmittingCheck}
 			>
@@ -121,14 +131,20 @@
 					? 'bg-green-100 dark:bg-green-700'
 					: 'bg-red-100 dark:bg-red-700'}"
 			>
-				<pre>{JSON.stringify(JSON.parse(statusResponse), null, 2)}</pre>
+				<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
+						JSON.parse(statusResponse),
+						null,
+						2
+					)}</pre>
 			</div>
 		{/if}
 	</div>
 
 	<div>
-		<h2 class="text-xl font-semibold mb-2">Delete Profile from Index</h2>
-		<p class="text-gray-700 mb-4">
+		<h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
+			Delete Profile from Index
+		</h2>
+		<p class="text-gray-700 dark:text-gray-300 mb-4">
 			Remove your profile from your website first (it should return a <code>404 Not Found</code> status
 			code) and then submit it here to delete it from the Index.
 		</p>
@@ -136,11 +152,11 @@
 			<input
 				type="text"
 				placeholder="https://your.site/directory/profile.json"
-				class="flex-grow p-2 border rounded-l-md"
+				class="flex-grow p-2 border rounded-l-md dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
 				bind:value={deleteProfileUrl}
 			/>
 			<button
-				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600"
+				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600 disabled:bg-red-300 dark:bg-red-700 dark:hover:bg-red-800 dark:disabled:bg-red-500"
 				on:click={deleteProfile}
 				disabled={isSubmittingDelete}
 			>
@@ -153,7 +169,11 @@
 					? 'bg-green-100 dark:bg-green-700'
 					: 'bg-red-100 dark:bg-red-700'}"
 			>
-				<pre>{JSON.stringify(JSON.parse(deleteResponse), null, 2)}</pre>
+				<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
+						JSON.parse(deleteResponse),
+						null,
+						2
+					)}</pre>
 			</div>
 		{/if}
 	</div>
