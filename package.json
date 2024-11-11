@@ -20,7 +20,7 @@
 	},
 	"dependencies": {
 		"@floating-ui/dom": "1.6.12",
-		"@tanstack/svelte-query": "^5.59.17",
+		"@tanstack/svelte-query": "^5.59.20",
 		"bcryptjs": "^2.4.3",
 		"cuid": "^3.0.0",
 		"highlight.js": "11.10.0",
