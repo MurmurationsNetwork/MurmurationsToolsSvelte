@@ -15,6 +15,8 @@ if (!host || !user || !pass || !dbName || !e) {
 
 let uri = `mongodb://${user}:${pass}@${host}`;
 
+console.log('uri', uri);
+
 if (e !== 'local') {
 	uri += '?tls=true';
 }

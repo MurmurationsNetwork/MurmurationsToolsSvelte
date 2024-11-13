@@ -47,6 +47,7 @@
 		name: string;
 		tags: string;
 		primary_url: string;
+		last_updated: string;
 		lat: string;
 		lon: string;
 		region: string;
@@ -70,6 +71,7 @@
 		name: '',
 		tags: '',
 		primary_url: '',
+		last_updated: '',
 		lat: '',
 		lon: '',
 		region: '',
@@ -100,7 +102,15 @@
 		isLoading = true;
 		for (const [key] of Object.entries(searchParamsObj)) {
 			if (searchParams.has(key) && searchParams.get(key)) {
-				searchParamsObj[key as keyof SearchParamsObj] = searchParams.get(key) as string;
+				if (key === 'last_updated') {
+					searchParamsObj[key as keyof SearchParamsObj] = new Date(
+						parseInt(searchParams.get(key) as string) * 1000
+					)
+						.toISOString()
+						.slice(0, 16);
+				} else {
+					searchParamsObj[key as keyof SearchParamsObj] = searchParams.get(key) as string;
+				}
 			}
 		}
 
@@ -120,6 +130,7 @@
 			? parseInt(searchParams.get('page_size') as string)
 			: 30;
 
+		// Wait for the route to update, prevent the error at the upcoming pushState
 		await tick();
 
 		// Update the URL with the current search parameters
@@ -146,7 +157,11 @@
 
 		for (const [key, value] of Object.entries(searchParamsObj)) {
 			if (value) {
-				searchParams.append(key, value.toString());
+				if (key === 'last_updated') {
+					searchParams.append(key, (new Date(value).valueOf() / 1000).toString());
+				} else {
+					searchParams.append(key, value.toString());
+				}
 			} else {
 				searchParams.delete(key);
 			}
@@ -247,6 +262,13 @@
 				bind:value={searchParamsObj.primary_url}
 				name="primary_url"
 				placeholder="primary_url search"
+			/>
+			<input
+				class="flex-auto rounded p-2 dark:bg-gray-700"
+				type="datetime-local"
+				name="last_updated"
+				placeholder="last_updated search"
+				bind:value={searchParamsObj.last_updated}
 			/>
 			<input
 				class="flex-auto rounded p-2 dark:bg-gray-700"
