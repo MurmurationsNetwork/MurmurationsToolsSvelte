@@ -351,6 +351,13 @@
 					: 'bg-red-500 hover:bg-red-400 dark:bg-purple-200 dark:text-gray-800 dark:hover:bg-purple-100'}"
 				type="submit"
 				disabled={isLoading}
+				on:click={() => {
+					window.goatcounter.count({
+						path: (p) => p + '?search',
+						title: 'IE search',
+						event: true
+					});
+				}}
 			>
 				{#if isLoading}
 					Searching...

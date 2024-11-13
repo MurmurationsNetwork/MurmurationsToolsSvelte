@@ -113,6 +113,13 @@
 	<!-- eslint-disable-next-line -->
 	{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}
 	<title>Murmurations Tools</title>
+	<script
+		data-goatcounter={import.meta.env.PROD
+			? 'https://stats-tools.murmurations.network/count'
+			: 'https://test-stats-tools.murmurations.network/count'}
+		async
+		src="//stats.murmurations.network/count.js"
+	></script>
 </svelte:head>
 
 <AppShell>
