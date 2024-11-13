@@ -50,8 +50,9 @@
 		last_updated: string;
 		lat: string;
 		lon: string;
-		region: string;
+		range: string;
 		locality: string;
+		region: string;
 		country: string;
 		status: string;
 		tags_exact: string;
@@ -74,8 +75,9 @@
 		last_updated: '',
 		lat: '',
 		lon: '',
-		region: '',
+		range: '',
 		locality: '',
+		region: '',
 		country: '',
 		status: '',
 		tags_filter: 'and',
@@ -283,6 +285,20 @@
 				bind:value={searchParamsObj.lon}
 				name="lon"
 				placeholder="lon search"
+			/>
+			<input
+				class="flex-auto rounded p-2 dark:bg-gray-700"
+				type="text"
+				bind:value={searchParamsObj.range}
+				name="range"
+				placeholder="range search"
+			/>
+			<input
+				class="flex-auto rounded p-2 dark:bg-gray-700"
+				type="text"
+				bind:value={searchParamsObj.locality}
+				name="locality"
+				placeholder="locality search"
 			/>
 			<input
 				class="flex-auto rounded p-2 dark:bg-gray-700"
