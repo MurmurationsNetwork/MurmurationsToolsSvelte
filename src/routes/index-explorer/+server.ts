@@ -5,7 +5,9 @@ export const GET: RequestHandler = async ({ url }) => {
 	const params = Object.fromEntries(url.searchParams.entries());
 	let searchParams = '';
 
-	if (params?.schema) searchParams += 'schema=' + params.schema;
+	if (params?.schema && params.schema !== 'all') {
+		searchParams += 'schema=' + params.schema;
+	}
 	if (params?.name) searchParams += '&name=' + params.name;
 	if (params?.tags) searchParams += '&tags=' + params.tags;
 	if (params?.primary_url) searchParams += '&primary_url=' + params.primary_url;
@@ -32,6 +34,11 @@ export const GET: RequestHandler = async ({ url }) => {
 				'Content-Type': 'application/json'
 			}
 		});
+
+		if (response.status === 400) {
+			const data = await response.json();
+			return json({ error: data?.errors?.[0]?.detail }, { status: 400 });
+		}
 
 		if (!response.ok && response.status !== 400) {
 			const data = await response.json();

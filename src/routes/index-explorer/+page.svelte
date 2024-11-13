@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { timestampToDatetime } from '$lib/datetime';
 	import SortableColumn from './SortableColumn.svelte';
+	import Pagination from './Pagination.svelte';
+	import { pushState } from '$app/navigation';
 
 	// Fetch the list of schemas and countries
 	type Data = {
@@ -26,13 +28,13 @@
 		country: string;
 	};
 
-	// type Links = {
-	// 	first: string;
-	// 	prev: string;
-	// 	self: string;
-	// 	next: string;
-	// 	last: string;
-	// };
+	type Links = {
+		first: string;
+		prev: string;
+		self: string;
+		next: string;
+		last: string;
+	};
 
 	type Meta = {
 		message: string;
@@ -51,14 +53,14 @@
 		locality: string;
 		country: string;
 		status: string;
-		exact_matches: string;
-		all_tags: string;
+		tags_exact: string;
+		tags_filter: string;
 		page_size: string;
 		page: string;
 	};
 
 	let sortedNodes: Node[] = [];
-	// let links: Links | null = null;
+	let links: Links | null = null;
 	let meta: Meta | null = null;
 	let page: number = 1;
 	let pageSize: number = 30;
@@ -74,8 +76,8 @@
 		locality: '',
 		country: '',
 		status: '',
-		all_tags: 'and',
-		exact_matches: 'false',
+		tags_filter: 'and',
+		tags_exact: 'false',
 		page_size: '30',
 		page: '1'
 	};
@@ -83,11 +85,11 @@
 	let searchParams: URLSearchParams;
 	let isLoading: boolean = false;
 
-	let allTagsChecked: boolean = false;
-	let exactMatchesChecked: boolean = false;
+	let tagsFilterChecked: boolean = false;
+	let tagsExactChecked: boolean = false;
 
-	$: searchParamsObj.all_tags = allTagsChecked ? 'or' : 'and';
-	$: searchParamsObj.exact_matches = exactMatchesChecked ? 'true' : 'false';
+	$: searchParamsObj.tags_filter = tagsFilterChecked ? 'or' : 'and';
+	$: searchParamsObj.tags_exact = tagsExactChecked ? 'true' : 'false';
 
 	onMount(async () => {
 		searchParams = new URLSearchParams(window.location.search);
@@ -105,29 +107,33 @@
 		// Check if schema is empty
 		if (!searchParamsObj.schema) {
 			error = 'The schema is required';
+			isLoading = false;
 			return;
 		}
 
 		// Clear the error message
 		error = null;
 
+		// Set the page and page size
 		page = searchParams.has('page') ? parseInt(searchParams.get('page') as string) : 1;
 		pageSize = searchParams.has('page_size')
 			? parseInt(searchParams.get('page_size') as string)
 			: 30;
 
+		await tick();
+
 		// Update the URL with the current search parameters
 		const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
-		history.replaceState(null, '', newUrl);
+		pushState(newUrl, '');
 
 		const response = await fetch(`/index-explorer?${searchParams.toString()}`);
+		const result = await response.json();
 		if (response.ok) {
-			const result = await response.json();
 			sortedNodes = result.data;
-			// links = result.links;
+			links = result.links;
 			meta = result.meta;
 		} else {
-			error = 'Error fetching data';
+			error = result?.error ?? 'Error fetching data';
 		}
 
 		isLoading = false;
@@ -139,11 +145,16 @@
 		searchParams = new URLSearchParams();
 
 		for (const [key, value] of Object.entries(searchParamsObj)) {
-			// Only retain non-empty values
 			if (value) {
 				searchParams.append(key, value.toString());
+			} else {
+				searchParams.delete(key);
 			}
 		}
+
+		// If we are performing a new search, set the page to 1
+		searchParams.delete('page');
+		searchParams.set('page', '1');
 
 		await performSearch();
 	}
@@ -177,6 +188,12 @@
 				return 0;
 			});
 		}
+	}
+
+	function handlePageChange(event: CustomEvent) {
+		page = event.detail;
+		searchParams.set('page', page.toString());
+		performSearch();
 	}
 </script>
 
@@ -283,15 +300,12 @@
 				<option value="500" selected={searchParamsObj.page_size === '500'}>500</option>
 			</select>
 			<div class="flex-auto">
-				<input type="checkbox" bind:checked={allTagsChecked} name="all_tags" class="mr-2" /> all tags
+				<input type="checkbox" bind:checked={tagsFilterChecked} name="tags_filter" class="mr-2" /> all
+				tags
 			</div>
 			<div class="flex-auto">
-				<input
-					type="checkbox"
-					bind:checked={exactMatchesChecked}
-					name="exact_matches"
-					class="mr-2"
-				/> exact matches only
+				<input type="checkbox" bind:checked={tagsExactChecked} name="tags_exact" class="mr-2" /> exact
+				matches only
 			</div>
 			<button
 				class="w-full rounded py-1 font-bold text-white {isLoading
@@ -481,7 +495,14 @@
 							</div>
 						</div>
 						<div class="my-4 text-center">
-							<!-- <Pagination links={links} meta={meta} searchParams={searchParams} /> -->
+							{#if links && meta && searchParams.has('page') && searchParams.has('page_size') && searchParams.has('schema')}
+								<Pagination
+									{links}
+									{meta}
+									searchParams={searchParamsObj}
+									on:pageChange={handlePageChange}
+								/>
+							{/if}
 						</div>
 					</div>
 				{/if}
