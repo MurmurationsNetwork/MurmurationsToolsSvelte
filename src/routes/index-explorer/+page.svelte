@@ -74,14 +74,20 @@
 		locality: '',
 		country: '',
 		status: '',
+		all_tags: 'and',
 		exact_matches: 'false',
-		all_tags: 'false',
 		page_size: '30',
 		page: '1'
 	};
 
 	let searchParams: URLSearchParams;
 	let isLoading: boolean = false;
+
+	let allTagsChecked: boolean = false;
+	let exactMatchesChecked: boolean = false;
+
+	$: searchParamsObj.all_tags = allTagsChecked ? 'or' : 'and';
+	$: searchParamsObj.exact_matches = exactMatchesChecked ? 'true' : 'false';
 
 	onMount(async () => {
 		searchParams = new URLSearchParams(window.location.search);
@@ -277,20 +283,15 @@
 				<option value="500" selected={searchParamsObj.page_size === '500'}>500</option>
 			</select>
 			<div class="flex-auto">
-				<input
-					type="checkbox"
-					bind:checked={searchParamsObj.exact_matches}
-					name="exact_matches"
-					class="mr-2"
-				/> exact matches only
+				<input type="checkbox" bind:checked={allTagsChecked} name="all_tags" class="mr-2" /> all tags
 			</div>
 			<div class="flex-auto">
 				<input
 					type="checkbox"
-					bind:checked={searchParamsObj.all_tags}
-					name="all_tags"
+					bind:checked={exactMatchesChecked}
+					name="exact_matches"
 					class="mr-2"
-				/> all tags
+				/> exact matches only
 			</div>
 			<button
 				class="w-full rounded py-1 font-bold text-white {isLoading
