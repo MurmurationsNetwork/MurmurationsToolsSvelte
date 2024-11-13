@@ -141,13 +141,15 @@
 
 		const response = await fetch(`/index-explorer?${searchParams.toString()}`);
 		const result = await response.json();
+		console.log('result', result);
 		if (response.ok) {
-			sortedNodes = result.data;
+			sortedNodes = Array.isArray(result.data) ? result.data : [];
 			links = result.links;
 			meta = result.meta;
 		} else {
 			error = result?.error ?? 'Error fetching data';
 		}
+		console.log('sortedNodes', sortedNodes);
 
 		isLoading = false;
 	}
@@ -472,66 +474,75 @@
 													class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
 												>
 													<a
-														href={`https://${node.primary_url}`}
+														href={`https://${node.primary_url || ''}`}
 														target="_blank"
 														rel="noreferrer"
 														class="text-yellow-600 no-underline hover:underline dark:text-green-300"
 													>
-														{node.primary_url?.length > 30
-															? `${node.primary_url?.substring(0, 30)}...`
-															: node.primary_url}
+														{node.primary_url && node.primary_url.length > 30
+															? `${node.primary_url.substring(0, 30)}...`
+															: node.primary_url || 'N/A'}
 													</a>
 												</td>
 												<td
 													class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
-													>{node.name}</td
 												>
+													{node.name || 'N/A'}
+												</td>
 												<td
 													class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
 												>
 													<a
-														href={`${node.profile_url}`}
+														href={`${node.profile_url || ''}`}
 														target="_blank"
 														rel="noreferrer"
 														class="text-yellow-600 no-underline hover:underline dark:text-green-300"
 													>
-														{node.profile_url?.length > 65
-															? `${node.profile_url?.substring(0, 65)}...`
-															: node.profile_url}
+														{node.profile_url && node.profile_url.length > 65
+															? `${node.profile_url.substring(0, 65)}...`
+															: node.profile_url || 'N/A'}
 													</a>
 												</td>
 												<td
 													class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
-													>{timestampToDatetime(node.last_updated)}</td
 												>
+													{node.last_updated ? timestampToDatetime(node.last_updated) : 'N/A'}
+												</td>
 												<td class="p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50">
 													<div class="flex flex-wrap">
-														{#each node.tags as tag}
-															<div
-																class="m-1 rounded-lg bg-red-200 px-1 md:px-2 md:py-1 dark:bg-purple-400"
-															>
-																{tag}
-															</div>
-														{/each}
+														{#if node?.tags?.length}
+															{#each node.tags as tag}
+																<div
+																	class="m-1 rounded-lg bg-red-200 px-1 md:px-2 md:py-1 dark:bg-purple-400"
+																>
+																	{tag}
+																</div>
+															{/each}
+														{:else}
+															<div class="m-1 text-gray-500">No Tags</div>
+														{/if}
 													</div>
 												</td>
 												{#if searchParamsObj?.locality}
 													<td
 														class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
-														>{node.locality}</td
 													>
+														{node.locality || 'N/A'}
+													</td>
 												{/if}
 												{#if searchParamsObj?.region}
 													<td
 														class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
-														>{node.region}</td
 													>
+														{node.region || 'N/A'}
+													</td>
 												{/if}
 												{#if searchParamsObj?.country}
 													<td
 														class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
-														>{node.country}</td
 													>
+														{node.country || 'N/A'}
+													</td>
 												{/if}
 											</tr>
 										{/each}
