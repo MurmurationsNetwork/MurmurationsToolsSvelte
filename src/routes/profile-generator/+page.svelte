@@ -7,6 +7,7 @@
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import type { ProfileObject } from '$lib/types/ProfileObject';
 	import { dbStatus } from '$lib/stores/dbStatus';
+	import { PUBLIC_TOOLS_URL } from '$env/static/public';
 
 	const queryClient = new QueryClient();
 
@@ -49,7 +50,7 @@
 
 	async function fetchProfiles() {
 		try {
-			const response = await fetch('/profile-generator');
+			const response = await fetch(`${PUBLIC_TOOLS_URL}/profile-generator`);
 			if (response.ok) {
 				const data = await response.json();
 				profileCards = data.profiles.map((profile: Profile) => ({
