@@ -9,16 +9,49 @@ interface Schema {
 }
 
 export const load: PageServerLoad = async ({ fetch }) => {
-	const [{ schemas, schemasError }, { countries, countriesError }] = await Promise.all([
-		getSchemas(fetch),
-		getCountries(fetch)
-	]);
+	const serverStorage: { [key: string]: string } = {};
+	const storedSchemas = serverStorage['schemas'];
+	const storedCountries = serverStorage['countries'];
+
+	let schemas, countries;
+	let errorMessage = null;
+
+	// If there is no data in serverStorage, fetch it from the server
+	// Otherwise, return the data from serverStorage and start background update to enhance performance
+	if (storedSchemas && storedCountries) {
+		schemas = JSON.parse(storedSchemas);
+		countries = JSON.parse(storedCountries);
+
+		// Start background update
+		(async () => {
+			const [{ schemas: newSchemas, schemasError }, { countries: newCountries, countriesError }] =
+				await Promise.all([getSchemas(fetch), getCountries(fetch)]);
+
+			if (!schemasError && !countriesError) {
+				serverStorage['schemas'] = JSON.stringify(newSchemas);
+				serverStorage['countries'] = JSON.stringify(newCountries);
+			} else {
+				console.error('Background update error:', schemasError || countriesError);
+			}
+		})();
+	} else {
+		const [{ schemas: newSchemas, schemasError }, { countries: newCountries, countriesError }] =
+			await Promise.all([getSchemas(fetch), getCountries(fetch)]);
+
+		if (!schemasError && !countriesError) {
+			serverStorage['schemas'] = JSON.stringify(newSchemas);
+			serverStorage['countries'] = JSON.stringify(newCountries);
+		} else {
+			errorMessage = schemasError || countriesError;
+		}
+
+		schemas = newSchemas || [];
+		countries = newCountries || [];
+	}
 
 	const schemasList = schemas.filter(
 		(s) => !s.startsWith('default-v') && !s.startsWith('test_schema-v')
 	);
-
-	const errorMessage = schemasError || countriesError;
 
 	return { schemasList, countries, errorMessage };
 };
