@@ -9,16 +9,14 @@ interface Schema {
 }
 
 export const load: PageServerLoad = async ({ fetch }) => {
-	const { schemas, schemasError } = await getSchemas(fetch);
-	const { countries, countriesError } = await getCountries(fetch);
+	const [{ schemas, schemasError }, { countries, countriesError }] = await Promise.all([
+		getSchemas(fetch),
+		getCountries(fetch)
+	]);
 
-	const schemasList = schemas
-		.filter((s: string) => {
-			return !s.startsWith('default-v');
-		})
-		.filter((s: string) => {
-			return !s.startsWith('test_schema-v');
-		});
+	const schemasList = schemas.filter(
+		(s) => !s.startsWith('default-v') && !s.startsWith('test_schema-v')
+	);
 
 	const errorMessage = schemasError || countriesError;
 
