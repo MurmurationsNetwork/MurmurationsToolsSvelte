@@ -384,7 +384,7 @@
 		<div class="text-red-500">Error: {errorMessage || error}</div>
 	{:else}
 		<div class="mt-2 flex flex-col md:mt-4">
-			{#if meta?.number_of_results}
+			{#if meta?.number_of_results && !isLoading}
 				<div class="mb-2 flex-auto">
 					Result Count: {page > 1 ? (page - 1) * pageSize + 1 : 1}-
 					{page * pageSize > meta.number_of_results ? meta.number_of_results : page * pageSize} / {meta.number_of_results}
