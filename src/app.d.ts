@@ -14,3 +14,13 @@ declare namespace App {
 	// interface Error {}
 	// interface Platform {}
 }
+
+declare global {
+	interface Window {
+		goatcounter: {
+			count: (options: { path: (p: string) => string; title: string; event: boolean }) => void;
+		};
+	}
+}
+
+export {};

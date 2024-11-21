@@ -77,6 +77,24 @@
 		}
 	}
 
+	// Define routes that do not require DB status check
+	const routesWithoutDbCheck = ['/index-explorer', '/index-updater'];
+
+	let isDbOnline = false;
+
+	// Subscribe to dbStatus only if the route requires it
+	if (!routesWithoutDbCheck.includes($page.url.pathname)) {
+		dbStatus.subscribe((value) => {
+			isDbOnline = value;
+		});
+	}
+
+	onMount(() => {
+		if (!routesWithoutDbCheck.includes($page.url.pathname)) {
+			checkDbStatus();
+		}
+	});
+
 	let isOnline = true;
 
 	onMount(() => {
@@ -94,16 +112,6 @@
 		};
 	});
 
-	let isDbOnline = false;
-
-	$: dbStatus.subscribe((value) => {
-		isDbOnline = value;
-	});
-
-	onMount(() => {
-		checkDbStatus();
-	});
-
 	export let data: { isAuthenticated: boolean };
 	$: isAuthenticatedStore.set(data.isAuthenticated);
 </script>
@@ -113,6 +121,13 @@
 	<!-- eslint-disable-next-line -->
 	{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}
 	<title>Murmurations Tools</title>
+	<script
+		data-goatcounter={import.meta.env.PROD
+			? 'https://stats-tools.murmurations.network/count'
+			: 'https://test-stats-tools.murmurations.network/count'}
+		async
+		src="//stats.murmurations.network/count.js"
+	></script>
 </svelte:head>
 
 <AppShell>
@@ -122,7 +137,7 @@
 				O F F L I N E -- Check your network connection
 			</div>
 		{/if}
-		{#if !isDbOnline}
+		{#if !routesWithoutDbCheck.includes($page.url.pathname) && !isDbOnline}
 			<div class="bg-yellow-200 border-l-4 border-yellow-500 text-yellow-700 p-4 text-center">
 				<p>Unable to connect to the database, please try again in a few minutes</p>
 			</div>
