@@ -17,6 +17,7 @@
 	let file: FileList | null = null;
 	let batches: Batch[] = [];
 	let schemasSelected: string[] = [];
+	let errorsMessage: string[] | null = null;
 
 	interface Batch {
 		title: string;
@@ -26,36 +27,72 @@
 
 	async function handleImport() {
 		if (!file || !title || schemasSelected.length === 0) {
-			console.log('Title, file, and at least one schema are required');
+			errorMessage = 'Title, file, and at least one schema are required';
+			return;
+		}
+
+		if (file[0].type !== 'text/csv') {
+			errorMessage = 'Only CSV files are allowed';
 			return;
 		}
 
 		try {
 			const formData = new FormData();
-			formData.append('title', title);
 			formData.append('file', file[0]);
 			formData.append('schemas', JSON.stringify(schemasSelected));
+			formData.append('title', title);
 
-			const response = await fetch(`${PUBLIC_TOOLS_URL}/batch-import`, {
+			// Use the POST method from +server.ts
+			const response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`, {
 				method: 'POST',
 				body: formData
 			});
 
+			const res = await response.json();
+
 			if (!response.ok) {
-				const res = await response.json();
-				console.log(res);
+				if (res.errors) {
+					errorsMessage = res.errors.map(
+						(error: {
+							status: number;
+							source: { oid?: string; pointer?: string };
+							title?: string;
+							detail?: string;
+						}) => {
+							const errorDetails = [];
+							if (error.source?.oid !== undefined) errorDetails.push(`OID: ${error.source.oid}`);
+							if (error.source?.pointer !== undefined)
+								errorDetails.push(`Pointer: ${error.source.pointer}`);
+							if (error.title !== undefined) errorDetails.push(`Title: ${error.title}`);
+							if (error.detail !== undefined) errorDetails.push(`Detail: ${error.detail}`);
+							return errorDetails.join(' - ');
+						}
+					);
+				} else {
+					errorMessage = res.error || 'Failed to import batch';
+				}
 				return;
 			}
 
-			const data = await response.json();
-			console.log(data);
+			await fetchBatches();
+			resetForm();
 		} catch (error) {
-			console.log(error);
+			errorMessage =
+				(error as Error).message ||
+				'An error occurred while processing your request, please try again later';
 		}
 	}
 
 	function handleSchemasSelected(event: CustomEvent<string[]>) {
 		schemasSelected = event.detail;
+	}
+
+	function resetForm() {
+		schemasSelected = [];
+		title = '';
+		file = null;
+		errorMessage = null;
+		errorsMessage = null;
 	}
 
 	async function fetchBatches() {
@@ -137,6 +174,16 @@
 			{#if errorMessage}
 				<div class="bg-red-500 text-white dark:text-white">
 					<p class="font-medium">{errorMessage}</p>
+				</div>
+			{/if}
+			{#if errorsMessage !== null}
+				<div class="bg-red-500 text-white dark:text-white p-4 rounded text-left">
+					<p class="font-medium">There were errors in your submission:</p>
+					<ul>
+						{#each errorsMessage as error}
+							<li class="font-medium list-disc list-inside">{error}</li>
+						{/each}
+					</ul>
 				</div>
 			{/if}
 			<form on:submit|preventDefault={handleImport}>
