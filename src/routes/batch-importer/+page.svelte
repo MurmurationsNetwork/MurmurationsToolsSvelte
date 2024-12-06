@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { PUBLIC_TOOLS_URL } from '$env/static/public';
 	import SchemaSelector from '../profile-generator/SchemaSelector.svelte';
+	import { dbStatus } from '$lib/stores/dbStatus';
 
 	// Fetch the list of schemas
 	type Data = {
@@ -57,43 +58,76 @@
 		schemasSelected = event.detail;
 	}
 
+	async function fetchBatches() {
+		try {
+			const response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`);
+			if (response.ok) {
+				const data = await response.json();
+				batches = data.data.map((batch: Batch) => ({
+					title: batch.title,
+					batch_id: batch.batch_id,
+					schemas: batch.schemas
+				}));
+			} else {
+				console.error('Failed to fetch batches:', response.status);
+			}
+		} catch (error) {
+			console.error('Error fetching batches:', error);
+		}
+	}
+
 	onMount(async () => {
-		// Fetch initial batch data
+		await fetchBatches();
 	});
+
+	let isDbOnline = true;
+
+	$: dbStatus.subscribe((value) => {
+		isDbOnline = value;
+	});
+
+	async function handleModify(batch_id: string) {
+		console.log('Modify batch:', batch_id);
+	}
+
+	async function handleDelete(batch_id: string) {
+		console.log('Delete batch:', batch_id);
+	}
 </script>
 
 <div class="container mx-auto flex justify-center items-top">
 	<div class="text-center md:flex flex-row grow items-top">
 		<!-- BEGIN: List of batches -->
-		<div class="bg-blue-50 dark:bg-gray-800 md:basis-1/3 m-2 px-2">
+		<div class="bg-blue-50 dark:bg-gray-800 md:basis-1/3 m-2 px-2 overflow-auto">
 			{#if batches.length === 0}
 				<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 dark:border-gray-600">
-					<!-- {#if !isDbOnline}
-                        <p class="font-medium dark:text-white text-left">
-                            Unable to connect to the database, Unable to load profiles
-                        </p>
-                    {:else if !isLoggedIn}
-                        <p class="font-medium dark:text-white text-left">
-                            Login first if you want to save your profile here, or just create a profile by
-                            selecting a schema from the list.
-                        </p>
-                        <p class="font-medium dark:text-white pt-4">
-                            <a
-                                href="https://docs.murmurations.network/guides/create-a-profile.html#_2-hosted-by-our-profile-generator"
-                                target="_blank"
-                                class="text-blue-500 dark:text-blue-300">See our documentation for details</a
-                            >
-                        </p>
-                    {:else} -->
 					<p class="font-medium dark:text-white">No saved batches found</p>
-					<!-- {/if} -->
 				</div>
 			{/if}
 			{#each batches as batch}
-				<div>
-					<p>Title: {batch.title}</p>
-					<p>Batch ID: {batch.batch_id}</p>
-					<p>Schemas: {batch.schemas.join(', ')}</p>
+				<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
+					<div class="font-medium break-words">{batch.title}</div>
+					<div class="m-4">
+						<span class="badge variant-ghost-primary font-bold text-sm mx-4 mt-2 break-words"
+							>Batch ID: {batch.batch_id}</span
+						>
+						<span
+							class="badge variant-ghost-primary font-bold text-sm mx-4 mt-2 break-words whitespace-pre-wrap"
+							>Schemas: {batch.schemas.join(', ')}</span
+						>
+					</div>
+					<div class="flex justify-around mt-4 md:mt-8">
+						<button
+							on:click={() => handleModify(batch.batch_id)}
+							class="btn font-semibold md:btn-lg variant-filled-primary"
+							disabled={!!errorMessage || !isDbOnline}>Modify</button
+						>
+						<button
+							on:click={() => handleDelete(batch.batch_id)}
+							class="btn font-semibold md:btn-lg variant-filled-secondary"
+							disabled={!!errorMessage || !isDbOnline}>Delete</button
+						>
+					</div>
 				</div>
 			{/each}
 		</div>
