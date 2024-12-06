@@ -193,6 +193,16 @@
 					<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
 						<form on:submit|preventDefault={handleImport}>
 							<div class="font-medium">Import a new batch</div>
+							<h3 class="mt-8 text-left">
+								Schemas selected:
+								<ol>
+									{#each schemasSelected as schemaName}
+										<li>
+											<code>{schemaName}</code>
+										</li>
+									{/each}
+								</ol>
+							</h3>
 							<div class="my-2">
 								<label for="title">
 									<div class="my-2 font-bold text-left">
