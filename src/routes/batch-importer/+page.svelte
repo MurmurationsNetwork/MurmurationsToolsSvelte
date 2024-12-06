@@ -18,6 +18,7 @@
 	let batches: Batch[] = [];
 	let schemasSelected: string[] = [];
 	let errorsMessage: string[] | null = null;
+	let successMessage: string | null = null;
 
 	interface Batch {
 		title: string;
@@ -76,6 +77,7 @@
 
 			await fetchBatches();
 			resetForm();
+			successMessage = 'Batch imported successfully';
 		} catch (error) {
 			errorMessage =
 				(error as Error).message ||
@@ -93,6 +95,7 @@
 		file = null;
 		errorMessage = null;
 		errorsMessage = null;
+		successMessage = null;
 	}
 
 	async function fetchBatches() {
@@ -184,6 +187,11 @@
 							<li class="font-medium list-disc list-inside">{error}</li>
 						{/each}
 					</ul>
+				</div>
+			{/if}
+			{#if successMessage}
+				<div class="bg-green-500 text-white dark:text-white p-4 rounded text-left">
+					<p class="font-medium">{successMessage}</p>
 				</div>
 			{/if}
 			<form on:submit|preventDefault={handleImport}>
