@@ -84,6 +84,42 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 };
 
+export const DELETE: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) {
+		return jsonError('Authentication required', 401);
+	}
+
+	const formData = await request.formData();
+	const batchId = formData.get('batch_id');
+	const userId = locals.user?.cuid;
+
+	formData.append('user_id', userId);
+
+	if (!batchId) {
+		return jsonError('Missing batch_id', 400);
+	}
+
+	try {
+		const response = await fetch(`${PUBLIC_DATA_PROXY_URL}/v1/batch/import`, {
+			method: 'DELETE',
+			body: formData
+		});
+
+		if (!response.ok) {
+			const res = await response.json();
+			return jsonError(res.message || 'Failed to delete batch', response.status);
+		}
+
+		return json({ message: 'Batch deleted successfully' });
+	} catch (err) {
+		console.error(`Error occurred while deleting batch: ${err}`);
+		return jsonError(
+			'An error occurred while processing your request, please try again later',
+			500
+		);
+	}
+};
+
 const validateBatchImport = async (formData: FormData): Promise<Response> => {
 	try {
 		const response = await fetch(`${PUBLIC_DATA_PROXY_URL}/v1/batch/validate`, {

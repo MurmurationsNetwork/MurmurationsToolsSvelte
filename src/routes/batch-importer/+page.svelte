@@ -19,6 +19,7 @@
 	let schemasSelected: string[] = [];
 	let errorsMessage: string[] | null = null;
 	let successMessage: string | null = null;
+	let isLoading = false;
 
 	interface Batch {
 		title: string;
@@ -131,7 +132,31 @@
 	}
 
 	async function handleDelete(batch_id: string) {
-		console.log('Delete batch:', batch_id);
+		isLoading = true;
+		try {
+			const formData = new FormData();
+			formData.append('batch_id', batch_id);
+
+			const response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`, {
+				method: 'DELETE',
+				body: formData
+			});
+
+			if (!response.ok) {
+				const res = await response.json();
+				errorMessage = res.message || 'Failed to delete batch';
+				return;
+			}
+
+			await fetchBatches();
+			successMessage = 'Batch deleted successfully';
+		} catch (error) {
+			errorMessage =
+				(error as Error).message ||
+				'An error occurred while processing your request, please try again later';
+		} finally {
+			isLoading = false;
+		}
 	}
 </script>
 
@@ -160,12 +185,12 @@
 						<button
 							on:click={() => handleModify(batch.batch_id)}
 							class="btn font-semibold md:btn-lg variant-filled-primary"
-							disabled={!!errorMessage || !isDbOnline}>Modify</button
+							disabled={!!errorMessage || !isDbOnline || isLoading}>Modify</button
 						>
 						<button
 							on:click={() => handleDelete(batch.batch_id)}
 							class="btn font-semibold md:btn-lg variant-filled-secondary"
-							disabled={!!errorMessage || !isDbOnline}>Delete</button
+							disabled={!!errorMessage || !isDbOnline || isLoading}>Delete</button
 						>
 					</div>
 				</div>
