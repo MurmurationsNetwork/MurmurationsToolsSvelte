@@ -84,6 +84,58 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 };
 
+export const PUT: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) {
+		return jsonError('Authentication required', 401);
+	}
+
+	const formData = await request.formData();
+	const file = formData.get('file');
+	const schemas = formData.get('schemas');
+	const title = formData.get('title');
+	const batchId = formData.get('batch_id');
+	const userId = locals.user?.cuid;
+
+	formData.append('user_id', userId);
+	formData.append('schemas', '[' + schemas + ']');
+
+	if (!file || !schemas || !title || !batchId) {
+		return jsonError('Missing required fields', 400);
+	}
+
+	try {
+		// Validate the batch import data
+		const validationResponse = await validateBatchImport(formData);
+
+		if (validationResponse.status !== 200) {
+			return validationResponse;
+		}
+
+		const response = await fetch(`${PUBLIC_DATA_PROXY_URL}/v1/batch/import`, {
+			method: 'PUT',
+			body: formData
+		});
+
+		if (!response.ok) {
+			const res = await response.json();
+			if (res.errors) {
+				return json({ errors: res.errors }, { status: response.status });
+			}
+			const errorMessage = 'Failed to update batch';
+			return jsonError(errorMessage, response.status);
+		}
+
+		const data = await response.json();
+		return json({ data });
+	} catch (err) {
+		console.error(`Error occurred while updating batch: ${err}`);
+		return jsonError(
+			'An error occurred while processing your request, please try again later',
+			500
+		);
+	}
+};
+
 export const DELETE: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) {
 		return jsonError('Authentication required', 401);

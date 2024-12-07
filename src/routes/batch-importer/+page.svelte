@@ -20,6 +20,8 @@
 	let errorsMessage: string[] | null = null;
 	let successMessage: string | null = null;
 	let isLoading = false;
+	let isModifyMode = false;
+	let currentBatchId: string | null = null;
 
 	interface Batch {
 		title: string;
@@ -27,7 +29,8 @@
 		schemas: string[];
 	}
 
-	async function handleImport() {
+	async function handleImportOrModify() {
+		isLoading = true;
 		if (!file || !title || schemasSelected.length === 0) {
 			errorMessage = 'Title, file, and at least one schema are required';
 			return;
@@ -44,11 +47,19 @@
 			formData.append('schemas', JSON.stringify(schemasSelected));
 			formData.append('title', title);
 
-			// Use the POST method from +server.ts
-			const response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`, {
-				method: 'POST',
-				body: formData
-			});
+			let response;
+			if (isModifyMode && currentBatchId) {
+				formData.append('batch_id', currentBatchId);
+				response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`, {
+					method: 'PUT',
+					body: formData
+				});
+			} else {
+				response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`, {
+					method: 'POST',
+					body: formData
+				});
+			}
 
 			const res = await response.json();
 
@@ -71,64 +82,24 @@
 						}
 					);
 				} else {
-					errorMessage = res.error || 'Failed to import batch';
+					errorMessage = res.error || 'Failed to import/modify batch';
 				}
 				return;
 			}
 
 			await fetchBatches();
+			const wasModifyMode = isModifyMode;
 			resetForm();
-			successMessage = 'Batch imported successfully';
+			successMessage = wasModifyMode
+				? 'Batch modified successfully'
+				: 'Batch imported successfully';
 		} catch (error) {
 			errorMessage =
 				(error as Error).message ||
 				'An error occurred while processing your request, please try again later';
+		} finally {
+			isLoading = false;
 		}
-	}
-
-	function handleSchemasSelected(event: CustomEvent<string[]>) {
-		schemasSelected = event.detail;
-	}
-
-	function resetForm() {
-		schemasSelected = [];
-		title = '';
-		file = null;
-		errorMessage = null;
-		errorsMessage = null;
-		successMessage = null;
-	}
-
-	async function fetchBatches() {
-		try {
-			const response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`);
-			if (response.ok) {
-				const data = await response.json();
-				batches = data.data.map((batch: Batch) => ({
-					title: batch.title,
-					batch_id: batch.batch_id,
-					schemas: batch.schemas
-				}));
-			} else {
-				console.error('Failed to fetch batches:', response.status);
-			}
-		} catch (error) {
-			console.error('Error fetching batches:', error);
-		}
-	}
-
-	onMount(async () => {
-		await fetchBatches();
-	});
-
-	let isDbOnline = true;
-
-	$: dbStatus.subscribe((value) => {
-		isDbOnline = value;
-	});
-
-	async function handleModify(batch_id: string) {
-		console.log('Modify batch:', batch_id);
 	}
 
 	async function handleDelete(batch_id: string) {
@@ -158,6 +129,56 @@
 			isLoading = false;
 		}
 	}
+
+	function handleSchemasSelected(event: CustomEvent<string[]>) {
+		schemasSelected = event.detail;
+	}
+
+	function resetForm() {
+		schemasSelected = [];
+		title = '';
+		file = null;
+		errorMessage = null;
+		errorsMessage = null;
+		successMessage = null;
+		isModifyMode = false;
+		currentBatchId = null;
+	}
+
+	async function fetchBatches() {
+		try {
+			const response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`);
+			if (response.ok) {
+				const data = await response.json();
+				batches = data.data.map((batch: Batch) => ({
+					title: batch.title,
+					batch_id: batch.batch_id,
+					schemas: batch.schemas
+				}));
+			} else {
+				console.error('Failed to fetch batches:', response.status);
+			}
+		} catch (error) {
+			console.error('Error fetching batches:', error);
+		}
+	}
+
+	function handleModify(batch: Batch) {
+		title = batch.title;
+		schemasSelected = batch.schemas;
+		currentBatchId = batch.batch_id;
+		isModifyMode = true;
+	}
+
+	onMount(async () => {
+		await fetchBatches();
+	});
+
+	let isDbOnline = true;
+
+	$: dbStatus.subscribe((value) => {
+		isDbOnline = value;
+	});
 </script>
 
 <div class="container mx-auto flex justify-center items-top">
@@ -183,7 +204,7 @@
 					</div>
 					<div class="flex justify-around mt-4 md:mt-8">
 						<button
-							on:click={() => handleModify(batch.batch_id)}
+							on:click={() => handleModify(batch)}
 							class="btn font-semibold md:btn-lg variant-filled-primary"
 							disabled={!!errorMessage || !isDbOnline || isLoading}>Modify</button
 						>
@@ -219,13 +240,15 @@
 					<p class="font-medium">{successMessage}</p>
 				</div>
 			{/if}
-			<form on:submit|preventDefault={handleImport}>
+			<form on:submit|preventDefault={handleImportOrModify}>
 				{#if schemasSelected.length === 0}
 					<SchemaSelector {schemasList} on:schemaSelected={handleSchemasSelected} />
 				{:else}
 					<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
-						<form on:submit|preventDefault={handleImport}>
-							<div class="font-medium">Import a new batch</div>
+						<form on:submit|preventDefault={handleImportOrModify}>
+							<div class="font-medium">
+								{isModifyMode ? 'Modify the batch' : 'Import a new batch'}
+							</div>
 							<h3 class="mt-8 text-left">
 								Schemas selected:
 								<ol>
@@ -268,13 +291,16 @@
 								</label>
 							</div>
 							<div class="flex justify-around mt-4 md:mt-8">
-								<button type="submit" class="btn font-semibold md:btn-lg variant-filled-primary"
-									>Import</button
+								<button
+									type="submit"
+									class="btn font-semibold md:btn-lg variant-filled-primary"
+									disabled={isLoading}>{isModifyMode ? 'Modify' : 'Import'}</button
 								>
 								<button
 									type="button"
 									class="btn font-semibold md:btn-lg variant-filled-secondary"
-									on:click={() => (schemasSelected = [])}>Reset</button
+									on:click={resetForm}
+									disabled={isLoading}>Reset</button
 								>
 							</div>
 						</form>
