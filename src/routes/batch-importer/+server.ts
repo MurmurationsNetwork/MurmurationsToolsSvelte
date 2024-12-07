@@ -5,7 +5,7 @@ import { PUBLIC_DATA_PROXY_URL } from '$env/static/public';
 export const GET: RequestHandler = async ({ locals }) => {
 	try {
 		if (!locals.user) {
-			return jsonError('Authentication required', 401);
+			return jsonError('Please log in first to import the profile', 401);
 		}
 
 		const cuid = locals.user.cuid;
@@ -35,7 +35,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) {
-		return jsonError('Authentication required', 401);
+		return jsonError('Please log in first to import the profile', 401);
 	}
 
 	const formData = await request.formData();
@@ -86,7 +86,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 export const PUT: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) {
-		return jsonError('Authentication required', 401);
+		return jsonError('Please log in first to import the profile', 401);
 	}
 
 	const formData = await request.formData();
@@ -138,7 +138,7 @@ export const PUT: RequestHandler = async ({ request, locals }) => {
 
 export const DELETE: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) {
-		return jsonError('Authentication required', 401);
+		return jsonError('Please log in first to import the profile', 401);
 	}
 
 	const formData = await request.formData();

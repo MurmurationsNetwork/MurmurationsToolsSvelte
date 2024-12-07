@@ -22,6 +22,7 @@
 	let isLoading = false;
 	let isModifyMode = false;
 	let currentBatchId: string | null = null;
+	let isLoggedIn: boolean = false;
 
 	interface Batch {
 		title: string;
@@ -30,18 +31,18 @@
 	}
 
 	async function handleImportOrModify() {
-		isLoading = true;
-		if (!file || !title || schemasSelected.length === 0) {
-			errorMessage = 'Title, file, and at least one schema are required';
-			return;
-		}
-
-		if (file[0].type !== 'text/csv') {
-			errorMessage = 'Only CSV files are allowed';
-			return;
-		}
-
 		try {
+			isLoading = true;
+			if (!file || !title || schemasSelected.length === 0) {
+				errorMessage = 'Title, file, and at least one schema are required';
+				return;
+			}
+
+			if (file[0].type !== 'text/csv') {
+				errorMessage = 'Only CSV files are allowed';
+				return;
+			}
+
 			const formData = new FormData();
 			formData.append('file', file[0]);
 			formData.append('schemas', JSON.stringify(schemasSelected));
@@ -103,8 +104,9 @@
 	}
 
 	async function handleDelete(batch_id: string) {
-		isLoading = true;
 		try {
+			isLoading = true;
+
 			const formData = new FormData();
 			formData.append('batch_id', batch_id);
 
@@ -155,11 +157,15 @@
 					batch_id: batch.batch_id,
 					schemas: batch.schemas
 				}));
+				isLoggedIn = true;
+			} else if (response.status === 401) {
+				isLoggedIn = false;
 			} else {
-				console.error('Failed to fetch batches:', response.status);
+				isLoggedIn = true;
+				errorMessage = 'Failed to fetch batches: ' + response.status;
 			}
 		} catch (error) {
-			console.error('Error fetching batches:', error);
+			errorMessage = 'Error fetching batches: ' + (error as Error).message;
 		}
 	}
 
@@ -187,7 +193,25 @@
 		<div class="bg-blue-50 dark:bg-gray-800 md:basis-1/3 m-2 px-2 overflow-auto">
 			{#if batches.length === 0}
 				<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 dark:border-gray-600">
-					<p class="font-medium dark:text-white">No saved batches found</p>
+					{#if !isDbOnline}
+						<p class="font-medium dark:text-white text-left">
+							Unable to connect to the database, Unable to load batches
+						</p>
+					{:else if !isLoggedIn}
+						<p class="font-medium dark:text-white text-left">
+							Login first if you want to save your batch here, or just create a batch by selecting a
+							schema from the list.
+						</p>
+						<p class="font-medium dark:text-white pt-4">
+							<a
+								href="https://docs.murmurations.network/guides/create-a-profile.html#_2-hosted-by-our-profile-generator"
+								target="_blank"
+								class="text-blue-500 dark:text-blue-300">See our documentation for details</a
+							>
+						</p>
+					{:else}
+						<p class="font-medium dark:text-white">No saved batches found</p>
+					{/if}
 				</div>
 			{/if}
 			{#each batches as batch}
