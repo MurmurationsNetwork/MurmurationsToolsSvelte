@@ -61,120 +61,124 @@
 	}
 </script>
 
-<div class="container mx-auto p-6">
-	<h1 class="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100">
-		Index Updater
-	</h1>
-	<div class="mb-6">
-		<h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
-			Add/Update Profile in Index
-		</h2>
-		<p class="text-gray-700 dark:text-gray-300 mb-4">
-			Post your profile to your website then add your profile, and always update the Index every
-			time you change it to enable data aggregators to learn about your recent changes.
-		</p>
-		<div class="flex">
-			<input
-				type="text"
-				placeholder="https://your.site/directory/profile.json"
-				class="flex-grow p-2 border rounded-l-md dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-				bind:value={postProfileUrl}
-			/>
-			<button
-				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600 disabled:bg-red-300 dark:bg-red-700 dark:hover:bg-red-800 dark:disabled:bg-red-500"
-				on:click={postProfile}
-				disabled={isSubmittingPost}
-			>
-				{isSubmittingPost ? 'Submitting...' : 'Post Profile'}
-			</button>
-		</div>
-		{#if postResponse}
-			<div
-				class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {postResponseOk
-					? 'bg-green-100 dark:bg-green-700'
-					: 'bg-red-100 dark:bg-red-700'}"
-			>
-				<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
-						JSON.parse(postResponse),
-						null,
-						2
-					)}</pre>
+<div class="container mx-auto justify-center items-center flex">
+	<div
+		class="card variant-ghost-primary border-2 mx-2 my-4 p-6 w-3/4 md:w-1/2 dark:border-gray-700 dark:text-white"
+	>
+		<h1 class="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100">
+			Index Updater
+		</h1>
+		<div class="mb-6">
+			<h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
+				Add/Update Profile in Index
+			</h2>
+			<p class="text-gray-700 dark:text-gray-300 mb-4">
+				Post your profile to your website then add your profile, and always update the Index every
+				time you change it to enable data aggregators to learn about your recent changes.
+			</p>
+			<div class="flex flex-col md:flex-row">
+				<input
+					type="text"
+					placeholder="https://your.site/directory/profile.json"
+					class="w-full bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 mr-2 md:mr-4 mb-2 md:mb-0"
+					bind:value={postProfileUrl}
+				/>
+				<button
+					class="btn font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/2 md:w-1/4"
+					on:click={postProfile}
+					disabled={isSubmittingPost}
+				>
+					{isSubmittingPost ? 'Posting...' : 'Post'}
+				</button>
 			</div>
-		{/if}
-	</div>
+			{#if postResponse}
+				<div
+					class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {postResponseOk
+						? 'bg-green-100 dark:bg-green-700'
+						: 'bg-red-100 dark:bg-red-700'}"
+				>
+					<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
+							JSON.parse(postResponse),
+							null,
+							2
+						)}</pre>
+				</div>
+			{/if}
+		</div>
 
-	<div class="mb-6">
-		<h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
-			Check Profile Status in Index
-		</h2>
-		<p class="text-gray-700 dark:text-gray-300 mb-4">
-			Get status and other information about your profile from the Index.
-		</p>
-		<div class="flex">
-			<input
-				type="text"
-				placeholder="https://your.site/directory/profile.json"
-				class="flex-grow p-2 border rounded-l-md dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-				bind:value={checkProfileUrl}
-			/>
-			<button
-				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600 disabled:bg-red-300 dark:bg-red-700 dark:hover:bg-red-800 dark:disabled:bg-red-500"
-				on:click={checkProfileStatus}
-				disabled={isSubmittingCheck}
-			>
-				{isSubmittingCheck ? 'Submitting...' : 'Check Status'}
-			</button>
-		</div>
-		{#if statusResponse}
-			<div
-				class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {statusResponseOk
-					? 'bg-green-100 dark:bg-green-700'
-					: 'bg-red-100 dark:bg-red-700'}"
-			>
-				<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
-						JSON.parse(statusResponse),
-						null,
-						2
-					)}</pre>
+		<div class="mb-6">
+			<h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
+				Check Profile Status in Index
+			</h2>
+			<p class="text-gray-700 dark:text-gray-300 mb-4">
+				Get status and other information about your profile from the Index.
+			</p>
+			<div class="flex flex-col md:flex-row">
+				<input
+					type="text"
+					placeholder="https://your.site/directory/profile.json"
+					class="w-full bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 mr-2 md:mr-4 mb-2 md:mb-0"
+					bind:value={checkProfileUrl}
+				/>
+				<button
+					class="font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/2 md:w-1/4"
+					on:click={checkProfileStatus}
+					disabled={isSubmittingCheck}
+				>
+					{isSubmittingCheck ? 'Checking...' : 'Check'}
+				</button>
 			</div>
-		{/if}
-	</div>
+			{#if statusResponse}
+				<div
+					class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {statusResponseOk
+						? 'bg-green-100 dark:bg-green-700'
+						: 'bg-red-100 dark:bg-red-700'}"
+				>
+					<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
+							JSON.parse(statusResponse),
+							null,
+							2
+						)}</pre>
+				</div>
+			{/if}
+		</div>
 
-	<div>
-		<h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
-			Delete Profile from Index
-		</h2>
-		<p class="text-gray-700 dark:text-gray-300 mb-4">
-			Remove your profile from your website first (it should return a <code>404 Not Found</code> status
-			code) and then submit it here to delete it from the Index.
-		</p>
-		<div class="flex">
-			<input
-				type="text"
-				placeholder="https://your.site/directory/profile.json"
-				class="flex-grow p-2 border rounded-l-md dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-				bind:value={deleteProfileUrl}
-			/>
-			<button
-				class="bg-red-500 text-white px-4 py-2 rounded-r-md hover:bg-red-600 disabled:bg-red-300 dark:bg-red-700 dark:hover:bg-red-800 dark:disabled:bg-red-500"
-				on:click={deleteProfile}
-				disabled={isSubmittingDelete}
-			>
-				{isSubmittingDelete ? 'Submitting...' : 'Delete Profile'}
-			</button>
-		</div>
-		{#if deleteResponse}
-			<div
-				class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {deleteResponseOk
-					? 'bg-green-100 dark:bg-green-700'
-					: 'bg-red-100 dark:bg-red-700'}"
-			>
-				<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
-						JSON.parse(deleteResponse),
-						null,
-						2
-					)}</pre>
+		<div>
+			<h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
+				Delete Profile from Index
+			</h2>
+			<p class="text-gray-700 dark:text-gray-300 mb-4">
+				Remove your profile from your website first (it should return a <code>404 Not Found</code> status
+				code) and then submit it here to delete it from the Index.
+			</p>
+			<div class="flex flex-col md:flex-row">
+				<input
+					type="text"
+					placeholder="https://your.site/directory/profile.json"
+					class="w-full bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 mr-2 md:mr-4 mb-2 md:mb-0"
+					bind:value={deleteProfileUrl}
+				/>
+				<button
+					class="font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/2 md:w-1/4"
+					on:click={deleteProfile}
+					disabled={isSubmittingDelete}
+				>
+					{isSubmittingDelete ? 'Deleting...' : 'Delete'}
+				</button>
 			</div>
-		{/if}
+			{#if deleteResponse}
+				<div
+					class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {deleteResponseOk
+						? 'bg-green-100 dark:bg-green-700'
+						: 'bg-red-100 dark:bg-red-700'}"
+				>
+					<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
+							JSON.parse(deleteResponse),
+							null,
+							2
+						)}</pre>
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>
