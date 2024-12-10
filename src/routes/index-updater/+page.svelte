@@ -94,8 +94,8 @@
 			{#if postResponse}
 				<div
 					class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {postResponseOk
-						? 'bg-green-100 dark:bg-green-700'
-						: 'bg-red-100 dark:bg-red-700'}"
+						? 'bg-green-200 dark:bg-green-700'
+						: 'bg-red-200 dark:bg-red-700'}"
 				>
 					<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
 							JSON.parse(postResponse),
@@ -131,8 +131,8 @@
 			{#if statusResponse}
 				<div
 					class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {statusResponseOk
-						? 'bg-green-100 dark:bg-green-700'
-						: 'bg-red-100 dark:bg-red-700'}"
+						? 'bg-green-200 dark:bg-green-700'
+						: 'bg-red-200 dark:bg-red-700'}"
 				>
 					<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
 							JSON.parse(statusResponse),
@@ -169,8 +169,8 @@
 			{#if deleteResponse}
 				<div
 					class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {deleteResponseOk
-						? 'bg-green-100 dark:bg-green-700'
-						: 'bg-red-100 dark:bg-red-700'}"
+						? 'bg-green-200 dark:bg-green-700'
+						: 'bg-red-200 dark:bg-red-700'}"
 				>
 					<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
 							JSON.parse(deleteResponse),
