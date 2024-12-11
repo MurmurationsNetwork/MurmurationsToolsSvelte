@@ -22,11 +22,12 @@
 			body: JSON.stringify({ profile_url: postProfileUrl })
 		});
 		const data = await response.json();
-		postResponseOk = response.ok;
 		if (data?.data) {
+			postResponseOk = true;
 			postResponse = JSON.stringify(data?.data);
 		} else {
 			postResponse = JSON.stringify(data);
+			postResponseOk = false;
 		}
 		isSubmittingPost = false;
 	}
