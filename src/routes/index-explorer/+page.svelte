@@ -97,7 +97,9 @@
 
 	onMount(async () => {
 		searchParams = new URLSearchParams(window.location.search);
-		await performSearch();
+		if (searchParams.toString()) {
+			await performSearch();
+		}
 	});
 
 	async function performSearch() {
@@ -116,8 +118,7 @@
 			}
 		}
 
-		// Check if schema is empty
-		if (!searchParamsObj.schema) {
+		if (!searchParamsObj.schema && searchParams.toString()) {
 			error = 'The schema is required';
 			isLoading = false;
 			return;
