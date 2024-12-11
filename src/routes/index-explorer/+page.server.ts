@@ -50,7 +50,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
 	}
 
 	const schemasList = schemas.filter(
-		(s) => !s.startsWith('default-v') && !s.startsWith('test_schema-v')
+		(s: string) => !s.startsWith('default-v') && !s.startsWith('test_schema-v')
 	);
 
 	return { schemasList, countries, errorMessage };
