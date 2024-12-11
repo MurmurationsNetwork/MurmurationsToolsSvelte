@@ -63,9 +63,7 @@
 </script>
 
 <div class="container mx-auto justify-center items-center flex">
-	<div
-		class="card variant-ghost-primary border-2 mx-2 my-4 p-6 w-3/4 md:w-1/2 dark:border-gray-700 dark:text-white"
-	>
+	<div class="card variant-ghost-primary m-4 p-6 w-3/4 md:w-1/2">
 		<h1 class="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100">
 			Index Updater
 		</h1>
@@ -85,7 +83,7 @@
 					bind:value={postProfileUrl}
 				/>
 				<button
-					class="btn font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/2 md:w-1/4"
+					class="btn font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/3"
 					on:click={postProfile}
 					disabled={isSubmittingPost}
 				>
@@ -122,7 +120,7 @@
 					bind:value={checkProfileUrl}
 				/>
 				<button
-					class="font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/2 md:w-1/4"
+					class="btn font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/3"
 					on:click={checkProfileStatus}
 					disabled={isSubmittingCheck}
 				>
@@ -160,7 +158,7 @@
 					bind:value={deleteProfileUrl}
 				/>
 				<button
-					class="font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/2 md:w-1/4"
+					class="btn font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/3"
 					on:click={deleteProfile}
 					disabled={isSubmittingDelete}
 				>

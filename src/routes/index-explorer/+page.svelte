@@ -218,19 +218,24 @@
 </script>
 
 <div class="mx-auto p-2 md:p-4">
+	{#if errorMessage || error}
+		<div class="variant-filled-error py-2 px-4 mb-2 rounded-md">
+			Error: {errorMessage || error}
+		</div>
+	{/if}
 	<div class="mb-4 sm:flex sm:items-center">
 		<div class="text-gray-900 sm:flex-auto dark:text-gray-50">
 			<p>
-				For a description of the input fields below, please{' '}
+				{' '}
 				<a
 					class="text-primary-500"
 					target="_blank"
 					rel="noreferrer"
 					href="https://docs.murmurations.network/guides/view-the-data.html#search-the-index"
 				>
-					see our documentation
+					See our documentation
 				</a>
-				.
+				for a description of the input fields below.
 			</p>
 		</div>
 	</div>
@@ -382,187 +387,179 @@
 		</div>
 	</div>
 
-	{#if errorMessage || error}
-		<div
-			class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 bg-red-200 dark:bg-red-700"
-		>
-			Error: {errorMessage || error}
-		</div>
-	{:else}
-		<div class="mt-2 flex flex-col md:mt-4">
-			{#if meta?.number_of_results && !isLoading}
-				<div class="mb-2 flex-auto">
-					Result Count: {page > 1 ? (page - 1) * pageSize + 1 : 1}-
-					{page * pageSize > meta.number_of_results ? meta.number_of_results : page * pageSize} / {meta.number_of_results}
-				</div>
-			{/if}
-			<div class="mx-4 my-2 overflow-x-auto text-center sm:-mx-6 lg:-mx-8">
-				{#if isLoading}
-					<div class="loading-indicator">Loading...</div>
-				{:else if sortedNodes.length === 0}
-					<div class="text-center">Result not found, try to search again!</div>
-				{:else}
-					<div>
-						<div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-							<div class="variant-ghost-primary overflow-hidden md:rounded-lg">
-								<table class="min-w-full">
-									<thead class="variant-ghost-primary">
-										<tr>
+	<div class="mt-2 flex flex-col md:mt-4">
+		{#if meta?.number_of_results && !isLoading}
+			<div class="mb-2 flex-auto">
+				Result Count: {page > 1 ? (page - 1) * pageSize + 1 : 1}-
+				{page * pageSize > meta.number_of_results ? meta.number_of_results : page * pageSize} / {meta.number_of_results}
+			</div>
+		{/if}
+		<div class="mx-4 my-2 overflow-x-auto text-center sm:-mx-6 lg:-mx-8">
+			{#if isLoading}
+				<div class="loading-indicator">Loading...</div>
+			{:else if sortedNodes.length === 0}
+				<div class="text-center">Result not found, try to search again!</div>
+			{:else}
+				<div>
+					<div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+						<div class="variant-ghost-primary overflow-hidden md:rounded-lg">
+							<table class="min-w-full">
+								<thead class="variant-ghost-primary">
+									<tr>
+										<SortableColumn
+											prop="primary_url"
+											currentSortProp={sortProp}
+											currentSortOrder={sortOrder}
+											onSort={handleSort}
+										>
+											Primary URL
+										</SortableColumn>
+										<SortableColumn
+											prop="name"
+											currentSortProp={sortProp}
+											currentSortOrder={sortOrder}
+											onSort={handleSort}
+										>
+											Name
+										</SortableColumn>
+										<SortableColumn
+											prop="profile_url"
+											currentSortProp={sortProp}
+											currentSortOrder={sortOrder}
+											onSort={handleSort}
+										>
+											Profile URL
+										</SortableColumn>
+										<SortableColumn
+											prop="last_updated"
+											currentSortProp={sortProp}
+											currentSortOrder={sortOrder}
+											onSort={handleSort}
+										>
+											Last Updated
+										</SortableColumn>
+										<th>Tags</th>
+										{#if searchParamsObj?.locality}
 											<SortableColumn
-												prop="primary_url"
+												prop="locality"
 												currentSortProp={sortProp}
 												currentSortOrder={sortOrder}
 												onSort={handleSort}
 											>
-												Primary URL
+												Locality
 											</SortableColumn>
+										{/if}
+										{#if searchParamsObj?.region}
 											<SortableColumn
-												prop="name"
+												prop="region"
 												currentSortProp={sortProp}
 												currentSortOrder={sortOrder}
 												onSort={handleSort}
 											>
-												Name
+												Region
 											</SortableColumn>
+										{/if}
+										{#if searchParamsObj?.country}
 											<SortableColumn
-												prop="profile_url"
+												prop="country"
 												currentSortProp={sortProp}
 												currentSortOrder={sortOrder}
 												onSort={handleSort}
 											>
-												Profile URL
+												Country
 											</SortableColumn>
-											<SortableColumn
-												prop="last_updated"
-												currentSortProp={sortProp}
-												currentSortOrder={sortOrder}
-												onSort={handleSort}
+										{/if}
+									</tr>
+								</thead>
+								<tbody class="">
+									{#each sortedNodes as node}
+										<tr class="hover:opacity-80">
+											<td class="whitespace-normal p-1 text-sm md:p-2">
+												<a
+													href={`https://${node.primary_url || ''}`}
+													target="_blank"
+													rel="noreferrer"
+													class="font-bold text-primary-500"
+												>
+													{node.primary_url && node.primary_url.length > 30
+														? `${node.primary_url.substring(0, 30)}...`
+														: node.primary_url || 'N/A'}
+												</a>
+											</td>
+											<td class="whitespace-normal p-1 text-sm md:p-2">
+												{node.name || 'N/A'}
+											</td>
+											<td class="whitespace-normal p-1 text-sm md:p-2">
+												<a
+													href={`${node.profile_url || ''}`}
+													target="_blank"
+													rel="noreferrer"
+													class="font-bold text-primary-500"
+												>
+													{node.profile_url && node.profile_url.length > 65
+														? `${node.profile_url.substring(0, 65)}...`
+														: node.profile_url || 'N/A'}
+												</a>
+											</td>
+											<td
+												class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
 											>
-												Last Updated
-											</SortableColumn>
-											<th>Tags</th>
+												{node.last_updated ? timestampToDatetime(node.last_updated) : 'N/A'}
+											</td>
+											<td class="p-1 text-sm md:p-2">
+												<div class="flex flex-wrap">
+													{#if node?.tags?.length}
+														{#each node.tags as tag}
+															<div
+																class="m-1 rounded-lg px-1 md:px-2 md:py-1 variant-ghost-primary"
+															>
+																{tag}
+															</div>
+														{/each}
+													{:else}
+														<div class="m-1 text-gray-500">No Tags</div>
+													{/if}
+												</div>
+											</td>
 											{#if searchParamsObj?.locality}
-												<SortableColumn
-													prop="locality"
-													currentSortProp={sortProp}
-													currentSortOrder={sortOrder}
-													onSort={handleSort}
-												>
-													Locality
-												</SortableColumn>
-											{/if}
-											{#if searchParamsObj?.region}
-												<SortableColumn
-													prop="region"
-													currentSortProp={sortProp}
-													currentSortOrder={sortOrder}
-													onSort={handleSort}
-												>
-													Region
-												</SortableColumn>
-											{/if}
-											{#if searchParamsObj?.country}
-												<SortableColumn
-													prop="country"
-													currentSortProp={sortProp}
-													currentSortOrder={sortOrder}
-													onSort={handleSort}
-												>
-													Country
-												</SortableColumn>
-											{/if}
-										</tr>
-									</thead>
-									<tbody class="">
-										{#each sortedNodes as node}
-											<tr class="hover:opacity-80">
-												<td class="whitespace-normal p-1 text-sm md:p-2">
-													<a
-														href={`https://${node.primary_url || ''}`}
-														target="_blank"
-														rel="noreferrer"
-														class="font-bold text-primary-500"
-													>
-														{node.primary_url && node.primary_url.length > 30
-															? `${node.primary_url.substring(0, 30)}...`
-															: node.primary_url || 'N/A'}
-													</a>
-												</td>
-												<td class="whitespace-normal p-1 text-sm md:p-2">
-													{node.name || 'N/A'}
-												</td>
-												<td class="whitespace-normal p-1 text-sm md:p-2">
-													<a
-														href={`${node.profile_url || ''}`}
-														target="_blank"
-														rel="noreferrer"
-														class="font-bold text-primary-500"
-													>
-														{node.profile_url && node.profile_url.length > 65
-															? `${node.profile_url.substring(0, 65)}...`
-															: node.profile_url || 'N/A'}
-													</a>
-												</td>
 												<td
 													class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
 												>
-													{node.last_updated ? timestampToDatetime(node.last_updated) : 'N/A'}
+													{node.locality || 'N/A'}
 												</td>
-												<td class="p-1 text-sm md:p-2">
-													<div class="flex flex-wrap">
-														{#if node?.tags?.length}
-															{#each node.tags as tag}
-																<div
-																	class="m-1 rounded-lg px-1 md:px-2 md:py-1 variant-ghost-primary"
-																>
-																	{tag}
-																</div>
-															{/each}
-														{:else}
-															<div class="m-1 text-gray-500">No Tags</div>
-														{/if}
-													</div>
+											{/if}
+											{#if searchParamsObj?.region}
+												<td
+													class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
+												>
+													{node.region || 'N/A'}
 												</td>
-												{#if searchParamsObj?.locality}
-													<td
-														class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
-													>
-														{node.locality || 'N/A'}
-													</td>
-												{/if}
-												{#if searchParamsObj?.region}
-													<td
-														class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
-													>
-														{node.region || 'N/A'}
-													</td>
-												{/if}
-												{#if searchParamsObj?.country}
-													<td
-														class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
-													>
-														{node.country || 'N/A'}
-													</td>
-												{/if}
-											</tr>
-										{/each}
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<div class="my-4 text-center">
-							{#if links && meta && searchParams.has('page') && searchParams.has('page_size') && searchParams.has('schema')}
-								<Pagination
-									{links}
-									{meta}
-									searchParams={searchParamsObj}
-									on:pageChange={handlePageChange}
-								/>
-							{/if}
+											{/if}
+											{#if searchParamsObj?.country}
+												<td
+													class="whitespace-normal p-1 text-sm text-gray-900 md:p-2 dark:text-gray-50"
+												>
+													{node.country || 'N/A'}
+												</td>
+											{/if}
+										</tr>
+									{/each}
+								</tbody>
+							</table>
 						</div>
 					</div>
-				{/if}
-			</div>
+					<div class="my-4 text-center">
+						{#if links && meta && searchParams.has('page') && searchParams.has('page_size') && searchParams.has('schema')}
+							<Pagination
+								{links}
+								{meta}
+								searchParams={searchParamsObj}
+								on:pageChange={handlePageChange}
+							/>
+						{/if}
+					</div>
+				</div>
+			{/if}
 		</div>
-	{/if}
+	</div>
 </div>

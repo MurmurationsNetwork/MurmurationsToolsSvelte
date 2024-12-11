@@ -133,7 +133,7 @@
 <AppShell>
 	<svelte:fragment slot="header">
 		{#if !isOnline}
-			<div class="bg-red-500 text-white font-bold text-lg text-center">
+			<div class="variant-filled-error font-bold text-lg text-center">
 				O F F L I N E - Check your network connection
 			</div>
 		{/if}

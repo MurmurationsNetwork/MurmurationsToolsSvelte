@@ -190,9 +190,9 @@
 <div class="container mx-auto flex justify-center items-top">
 	<div class="text-center md:flex flex-row grow items-top">
 		<!-- BEGIN: List of batches -->
-		<div class="bg-blue-50 dark:bg-gray-800 md:basis-1/3 m-2 px-2 overflow-auto">
+		<div class="md:basis-1/3 px-2 overflow-auto">
 			{#if batches.length === 0}
-				<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 dark:border-gray-600">
+				<div class="card variant-ghost-primary mx-2 my-4 p-4">
 					{#if !isDbOnline}
 						<p class="font-medium dark:text-white text-left">
 							Unable to connect to the database, Unable to load batches
@@ -215,14 +215,15 @@
 				</div>
 			{/if}
 			{#each batches as batch}
-				<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
+				<div class="card variant-ghost-primary mx-2 my-4 p-4">
 					<div class="font-medium break-words">{batch.title}</div>
 					<div class="m-4">
 						<span class="badge variant-ghost-primary font-bold text-sm mx-4 mt-2 break-words"
-							>Batch ID: {batch.batch_id}</span
+							>Batch ID: {batch.batch_id.length > 6
+								? `${batch.batch_id.substring(0, 6)}...`
+								: batch.batch_id}</span
 						>
-						<span
-							class="badge variant-ghost-primary font-bold text-sm mx-4 mt-2 break-words whitespace-pre-wrap"
+						<span class="badge font-bold text-sm mx-4 mt-2 break-words whitespace-pre-wrap"
 							>Schemas: {batch.schemas.join(', ')}</span
 						>
 					</div>
@@ -243,14 +244,14 @@
 		</div>
 		<!-- END: List of batches -->
 		<!-- BEGIN: Schema selection box and import form -->
-		<div class="md:basis-2/3 md:order-first p-2">
+		<div class="md:basis-2/3 md:order-first">
 			{#if errorMessage}
-				<div class="bg-red-500 text-white dark:text-white">
+				<div class="variant-filled-error m-4 py-2 px-4 rounded-md">
 					<p class="font-medium">{errorMessage}</p>
 				</div>
 			{/if}
 			{#if errorsMessage !== null}
-				<div class="bg-red-500 text-white dark:text-white p-4 rounded text-left">
+				<div class="variant-filled-error py-2 px-4 m-4 rounded-md text-left">
 					<p class="font-medium">There were errors in your submission:</p>
 					<ul>
 						{#each errorsMessage as error}
@@ -260,7 +261,7 @@
 				</div>
 			{/if}
 			{#if successMessage}
-				<div class="bg-green-500 text-white dark:text-white p-4 rounded text-left">
+				<div class="variant-filled-success m-4 py-2 px-4 rounded-md">
 					<p class="font-medium">{successMessage}</p>
 				</div>
 			{/if}
@@ -268,7 +269,7 @@
 				{#if schemasSelected.length === 0}
 					<SchemaSelector {schemasList} on:schemaSelected={handleSchemasSelected} />
 				{:else}
-					<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
+					<div class="card variant-ghost-primary m-4 p-4">
 						<form on:submit|preventDefault={handleImportOrModify}>
 							<div class="font-medium">
 								{isModifyMode ? 'Modify the batch' : 'Import a new batch'}
