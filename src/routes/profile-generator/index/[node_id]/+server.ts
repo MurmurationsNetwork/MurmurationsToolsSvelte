@@ -40,7 +40,8 @@ export const POST: RequestHandler = async ({ params }) => {
 
 		let profileUrl = `${PUBLIC_TOOLS_URL}/profiles/${node_id}`;
 
-		// If the environment is local, use kubernetes service name
+		// Due to external URLs being inaccessible within k8s, causing the Index Service to fail to read the profile correctly.
+		// If the environment is local, use the PRIVATE_LOCAL_TOOLS_URL, which is usually the internal k8s URL.
 		if (PUBLIC_ENV === 'local') {
 			profileUrl = `${PRIVATE_LOCAL_TOOLS_URL}/profiles/${node_id}`;
 		}
