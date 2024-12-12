@@ -45,7 +45,9 @@
 	}
 
 	function handleProfileUpdated() {
-		fetchProfiles();
+		if (isLoggedIn) {
+			fetchProfiles();
+		}
 	}
 
 	async function fetchProfiles() {
@@ -74,7 +76,11 @@
 	}
 
 	let profileCards: ProfileCard[] = [];
-	onMount(fetchProfiles);
+	onMount(() => {
+		if (isLoggedIn) {
+			fetchProfiles();
+		}
+	});
 
 	let profileErrorMessage: string | null = null;
 	function handleProfileErrorOccurred(event: CustomEvent<string>) {
@@ -123,7 +129,7 @@
 		isDbOnline = value;
 	});
 
-	$: if (isDbOnline) {
+	$: if (isDbOnline && isLoggedIn) {
 		fetchProfiles();
 	}
 </script>
