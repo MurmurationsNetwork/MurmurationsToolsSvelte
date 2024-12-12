@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { createEventDispatcher } from 'svelte';
 
 	const dispatch = createEventDispatcher();
@@ -11,9 +12,13 @@
 	export let schemasList: string[];
 </script>
 
-<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4">
+<div class="card variant-ghost-primary border-0 m-4 p-4">
 	<form on:submit|preventDefault={selectSchemas}>
-		<div class="font-medium">Select one or more schemas to create a new profile</div>
+		<div class="font-medium">
+			Select one or more schemas to {$page.url.pathname === '/batch-importer'
+				? 'create a new batch of profiles'
+				: 'create a new profile'}
+		</div>
 		<div class="m-4">
 			<select
 				bind:value={schemasSelected}

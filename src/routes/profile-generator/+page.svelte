@@ -132,9 +132,9 @@
 	<div class="container mx-auto flex justify-center items-top">
 		<div class="text-center md:flex flex-row grow items-top">
 			<!-- BEGIN: List of user-generated profiles -->
-			<div class="bg-blue-50 dark:bg-gray-800 md:basis-1/3 m-2 px-2">
+			<div class="md:basis-1/3 px-2 overflow-auto">
 				{#if profileCards.length === 0}
-					<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4 dark:border-gray-600">
+					<div class="card variant-ghost-primary mx-2 my-4 p-4">
 						{#if !isDbOnline}
 							<p class="font-medium dark:text-white text-left">
 								Unable to connect to the database, Unable to load profiles
@@ -172,14 +172,14 @@
 			</div>
 			<!-- END: List of user-generated profiles -->
 			<!-- BEGIN: Schema selection box / Create/modify profile input / Profile preview -->
-			<div class="md:basis-2/3 md:order-first p-2">
+			<div class="md:basis-2/3 md:order-first">
 				{#if profileErrorMessage || profileEditorErrorMessage}
-					<div class="bg-red-500 text-white dark:text-white mb-2">
+					<div class="variant-filled-error py-2 px-4 m-4 rounded-md">
 						<p class="font-medium">{profileErrorMessage || profileEditorErrorMessage}</p>
 					</div>
 				{/if}
 				{#if errorMessage}
-					<div class="bg-red-500 text-white dark:text-white">
+					<div class="variant-filled-error py-2 px-4 m-4 rounded-md">
 						<p class="font-medium">{errorMessage}</p>
 					</div>
 				{/if}

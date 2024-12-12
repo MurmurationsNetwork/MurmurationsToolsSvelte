@@ -133,8 +133,8 @@
 <AppShell>
 	<svelte:fragment slot="header">
 		{#if !isOnline}
-			<div class="bg-red-500 text-white text-center p-2">
-				O F F L I N E -- Check your network connection
+			<div class="variant-filled-error font-bold text-lg text-center">
+				O F F L I N E - Check your network connection
 			</div>
 		{/if}
 		{#if !routesWithoutDbCheck.includes($page.url.pathname) && !isDbOnline}

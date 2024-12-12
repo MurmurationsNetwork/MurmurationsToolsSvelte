@@ -268,92 +268,96 @@
 	});
 </script>
 
-<div class="card variant-ghost-primary border-2 mx-2 my-4 p-4" bind:this={top}>
+<div class="md:basis-2/3 md:order-first">
 	{#if validationErrors.length > 0}
-		<div class="bg-red-100 text-red-700 dark:bg-red-500 dark:text-white p-4 rounded mb-4">
-			<ul class="list-disc list-inside text-left">
+		<div class="variant-filled-error m-4 py-2 px-4 rounded-md text-left">
+			<p class="font-medium">There were errors in your submission:</p>
+			<ul class="list-disc list-inside">
 				{#each validationErrors as error}
 					<li>{error}</li>
 				{/each}
 			</ul>
 		</div>
 	{/if}
-
-	{#if serviceError != ''}
-		<div class="bg-red-100 text-red-800 dark:bg-red-500 dark:text-white p-4 rounded mb-4">
-			{serviceError}
-		</div>
-	{/if}
-
-	{#if !profilePreview}
-		<div class="font-medium mb-4">Editing profile with the following schemas</div>
-
-		{#each schemasSelected as schema}
-			<span class="badge variant-ghost-primary font-medium text-sm mx-4 mb-2">{schema}</span>
-		{/each}
-
-		<form on:submit|preventDefault={handleSubmit}>
-			<div class="m-4 flex flex-col text-left">
-				{#if schemas !== null}
-					<DynamicForm {schemas} bind:currentProfile />
-				{/if}
+	<div class="card variant-ghost-primary m-4 p-4" bind:this={top}>
+		{#if serviceError != ''}
+			<div class="variant-filled-error py-2 px-4 rounded-md">
+				{serviceError}
 			</div>
-			<div class="flex justify-around mt-0">
-				<button
-					type="submit"
-					class="btn font-semibold md:btn-lg variant-filled-primary"
-					disabled={isSubmitting}
-				>
-					{#if isSubmitting}
-						Loading...
-					{:else}
-						Validate
-					{/if}
-				</button>
-				<button
-					type="button"
-					on:click={resetSchemas}
-					class="btn font-semibold md:btn-lg variant-filled-secondary">Reset</button
-				>
-			</div>
-		</form>
-	{/if}
+		{/if}
 
-	{#if profilePreview}
-		<div class="font-medium text-lg mb-4 mx-4 variant-filled-success">The profile is valid</div>
+		{#if !profilePreview}
+			<div class="font-medium mb-4">Editing profile with the following schemas</div>
 
-		<div class="m-4 bg-primary-300 dark:bg-primary-900 rounded-xl px-4 py-2">
-			<pre class="text-sm text-left whitespace-pre-wrap break-all">{JSON.stringify(
-					{ linked_schemas: schemasSelected, ...currentProfile },
-					null,
-					2
-				)}</pre>
-		</div>
-		<div class="flex justify-around mt-4 md:mt-8">
-			<button
-				on:click={() => (profilePreview = false)}
-				class="btn font-semibold md:btn-lg variant-filled-primary">Continue Editing</button
-			>
-		</div>
-		<form on:submit|preventDefault={saveAndPostProfile}>
-			<div class="mt-4 md:mt-8">
+			{#each schemasSelected as schema}
+				<span class="badge variant-ghost-primary font-medium text-sm mx-4 mb-2">{schema}</span>
+			{/each}
+
+			<form on:submit|preventDefault={handleSubmit}>
 				<div class="m-4 flex flex-col text-left">
-					<label>
-						<div class="my-2 dark:text-white">Title:</div>
-						<input
-							class="w-full dark:bg-gray-700 dark:text-white"
-							name="title"
-							id="title"
-							type="text"
-							value={currentTitle}
-							required
-						/>
-					</label>
+					{#if schemas !== null}
+						<DynamicForm {schemas} bind:currentProfile />
+					{/if}
 				</div>
+				<div class="flex justify-around mt-0">
+					<button
+						type="submit"
+						class="btn font-semibold md:btn-lg variant-filled-primary"
+						disabled={isSubmitting}
+					>
+						{#if isSubmitting}
+							Loading...
+						{:else}
+							Validate
+						{/if}
+					</button>
+					<button
+						type="button"
+						on:click={resetSchemas}
+						class="btn font-semibold md:btn-lg variant-filled-secondary">Reset</button
+					>
+				</div>
+			</form>
+		{/if}
+
+		{#if profilePreview}
+			<div class="font-medium text-lg mb-4 mx-4 variant-filled-success py-2 px-4 rounded-md">
+				The profile is valid
 			</div>
-			<button class="btn font-semibold md:btn-lg variant-filled-primary" disabled={!isDbOnline}
-				>Save & Post</button
-			>
-		</form>
-	{/if}
+
+			<div class="m-4 bg-primary-300 dark:bg-primary-900 rounded-xl px-4 py-2">
+				<pre class="text-sm text-left whitespace-pre-wrap break-all">{JSON.stringify(
+						{ linked_schemas: schemasSelected, ...currentProfile },
+						null,
+						2
+					)}</pre>
+			</div>
+			<div class="flex justify-around mt-4 md:mt-8">
+				<button
+					on:click={() => (profilePreview = false)}
+					class="btn font-semibold md:btn-lg variant-filled-primary">Continue Editing</button
+				>
+			</div>
+			<form on:submit|preventDefault={saveAndPostProfile}>
+				<div class="mt-4 md:mt-8">
+					<div class="m-4 flex flex-col text-left">
+						<label>
+							<div class="my-2 dark:text-white">Title:</div>
+							<input
+								class="w-full dark:bg-gray-700 dark:text-white"
+								name="title"
+								id="title"
+								type="text"
+								value={currentTitle}
+								required
+							/>
+						</label>
+					</div>
+				</div>
+				<button class="btn font-semibold md:btn-lg variant-filled-primary" disabled={!isDbOnline}
+					>Save & Post</button
+				>
+			</form>
+		{/if}
+	</div>
 </div>

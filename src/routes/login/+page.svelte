@@ -40,12 +40,10 @@
 
 <div class="container mx-auto flex justify-center items-center md:p-4">
 	<div class="flex flex-col grow items-center md:p-4">
-		<div
-			class="card variant-ghost-primary border-2 mx-2 my-4 p-4 w-3/4 md:w-1/2 dark:border-gray-700 dark:text-white"
-		>
-			{#if errorMessage}
-				<div class="text-red-500">{errorMessage}</div>
-			{/if}
+		{#if errorMessage}
+			<div class="variant-filled-error py-2 px-4 rounded-md">{errorMessage}</div>
+		{/if}
+		<div class="card variant-ghost-primary m-4 p-4 w-3/4 md:w-1/2">
 			<form on:submit|preventDefault={handleSubmit}>
 				<fieldset class="flex my-3 justify-center">
 					<label class="mr-3">
@@ -114,10 +112,6 @@
 							>
 						{/if}
 					</button>
-					<button
-						class="btn font-semibold md:btn-lg w-32 md:w-36 variant-filled-secondary dark:bg-gray-600 dark:text-white"
-						>Cancel</button
-					>
 				</div>
 			</form>
 		</div>
