@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { PUBLIC_INDEX_URL, PUBLIC_TOOLS_URL } from '$env/static/public';
+import { PUBLIC_ENV, PUBLIC_INDEX_URL, PUBLIC_TOOLS_URL } from '$env/static/public';
+import { PRIVATE_LOCAL_TOOLS_URL } from '$env/static/private';
 import { jsonError } from '$lib/utils';
 
 // Get the status of a profile in the index
@@ -37,7 +38,12 @@ export const POST: RequestHandler = async ({ params }) => {
 			return jsonError('Missing cuid', 400);
 		}
 
-		const profileUrl = `${PUBLIC_TOOLS_URL}/profiles/${node_id}`;
+		let profileUrl = `${PUBLIC_TOOLS_URL}/profiles/${node_id}`;
+
+		// If the environment is local, use kubernetes service name
+		if (PUBLIC_ENV === 'local') {
+			profileUrl = `${PRIVATE_LOCAL_TOOLS_URL}/profiles/${node_id}`;
+		}
 
 		const response = await fetch(`${PUBLIC_INDEX_URL}/v2/nodes`, {
 			method: 'POST',
