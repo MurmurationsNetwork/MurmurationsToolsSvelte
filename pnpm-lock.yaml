@@ -124,8 +124,8 @@ importers:
         specifier: ^5.4.11
         version: 5.4.11(@types/node@22.9.0)
       vite-plugin-tailwind-purgecss:
-        specifier: 0.3.3
-        version: 0.3.3(tailwindcss@3.4.15)(vite@5.4.11(@types/node@22.9.0))
+        specifier: 0.3.5
+        version: 0.3.5(tailwindcss@3.4.15)(vite@5.4.11(@types/node@22.9.0))
       vitest:
         specifier: ^2.1.4
         version: 2.1.8(@types/node@22.9.0)
@@ -1707,11 +1707,11 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite-plugin-tailwind-purgecss@0.3.3:
-    resolution: {integrity: sha512-fsTAzcSdFKrhLxX8zTq3zaTFjk+APmJWOAy+1ujsmxkh9y8hIvM81dWEgdXK1k7suQjns+b7JsoIUkHpxLf5UA==}
+  vite-plugin-tailwind-purgecss@0.3.5:
+    resolution: {integrity: sha512-Ds9My/ED/DMWwMGgGUfu/KVxHKQnacnu0b3Kvm7Dv6ubOGuJq50pfbShVxLuSXFc6dOQKLTLZaoqdW9qxpC26g==}
     peerDependencies:
       tailwindcss: ^3.3.0
-      vite: ^4.1.1 || ^5.0.0
+      vite: ^4.1.1 || ^5.0.0 || ^6.0.0
 
   vite@5.4.11:
     resolution: {integrity: sha512-c7jFQRklXua0mTzneGW9QVyxFjUgwcihC4bXEtujIo2ouWCe1Ajt/amn2PCxYnhYfd5k09JX3SB7OYWFKYqj8Q==}
@@ -3308,7 +3308,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-tailwind-purgecss@0.3.3(tailwindcss@3.4.15)(vite@5.4.11(@types/node@22.9.0)):
+  vite-plugin-tailwind-purgecss@0.3.5(tailwindcss@3.4.15)(vite@5.4.11(@types/node@22.9.0)):
     dependencies:
       chalk: 5.3.0
       css-tree: 2.3.1
