@@ -1,16 +1,16 @@
 <script lang="ts">
-	let postProfileUrl = '';
-	let checkProfileUrl = '';
-	let deleteProfileUrl = '';
-	let postResponse = '';
-	let statusResponse = '';
-	let deleteResponse = '';
-	let postResponseOk = true;
-	let statusResponseOk = true;
-	let deleteResponseOk = true;
-	let isSubmittingPost = false;
-	let isSubmittingCheck = false;
-	let isSubmittingDelete = false;
+	let postProfileUrl = $state('');
+	let checkProfileUrl = $state('');
+	let deleteProfileUrl = $state('');
+	let postResponse = $state('');
+	let statusResponse = $state('');
+	let deleteResponse = $state('');
+	let postResponseOk = $state(true);
+	let statusResponseOk = $state(true);
+	let deleteResponseOk = $state(true);
+	let isSubmittingPost = $state(false);
+	let isSubmittingCheck = $state(false);
+	let isSubmittingDelete = $state(false);
 
 	async function postProfile() {
 		isSubmittingPost = true;
@@ -84,7 +84,7 @@
 				/>
 				<button
 					class="btn font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/3"
-					on:click={postProfile}
+					onclick={postProfile}
 					disabled={isSubmittingPost}
 				>
 					{isSubmittingPost ? 'Posting...' : 'Post'}
@@ -121,7 +121,7 @@
 				/>
 				<button
 					class="btn font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/3"
-					on:click={checkProfileStatus}
+					onclick={checkProfileStatus}
 					disabled={isSubmittingCheck}
 				>
 					{isSubmittingCheck ? 'Checking...' : 'Check'}
@@ -159,7 +159,7 @@
 				/>
 				<button
 					class="btn font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/3"
-					on:click={deleteProfile}
+					onclick={deleteProfile}
 					disabled={isSubmittingDelete}
 				>
 					{isSubmittingDelete ? 'Deleting...' : 'Delete'}

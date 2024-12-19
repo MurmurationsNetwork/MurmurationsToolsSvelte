@@ -1,14 +1,16 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { slide } from 'svelte/transition';
 	import { backInOut } from 'svelte/easing';
 	import { goto } from '$app/navigation';
 	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
 
-	let loginType = 'login';
-	let email = '';
-	let password = '';
-	let errorMessage = '';
-	let isSubmitting = false;
+	let loginType = $state('login');
+	let email = $state('');
+	let password = $state('');
+	let errorMessage = $state('');
+	let isSubmitting = $state(false);
 
 	async function handleSubmit() {
 		isSubmitting = true;
@@ -44,7 +46,7 @@
 			<div class="variant-filled-error py-2 px-4 rounded-md">{errorMessage}</div>
 		{/if}
 		<div class="card variant-ghost-primary m-4 p-4 w-3/4 md:w-1/2">
-			<form on:submit|preventDefault={handleSubmit}>
+			<form onsubmit={preventDefault(handleSubmit)}>
 				<fieldset class="flex my-3 justify-center">
 					<label class="mr-3">
 						<input
@@ -53,7 +55,7 @@
 							name="login-type"
 							value="login"
 							checked
-							on:click={() => (loginType = 'login')}
+							onclick={() => (loginType = 'login')}
 						/>
 						Login
 					</label>
@@ -63,7 +65,7 @@
 							type="radio"
 							name="login-type"
 							value="register"
-							on:click={() => (loginType = 'register')}
+							onclick={() => (loginType = 'register')}
 						/>
 						Register
 					</label>

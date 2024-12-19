@@ -3,8 +3,12 @@
 	import type { ProfileObject } from '$lib/types/ProfileObject';
 	import FormField from './FormField.svelte';
 
-	export let schemas: Schema;
-	export let currentProfile: ProfileObject;
+	interface Props {
+		schemas: Schema;
+		currentProfile: ProfileObject;
+	}
+
+	let { schemas, currentProfile }: Props = $props();
 </script>
 
 <div class="m-4 flex flex-col text-left">

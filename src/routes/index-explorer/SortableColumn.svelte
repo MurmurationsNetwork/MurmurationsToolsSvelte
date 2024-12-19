@@ -1,8 +1,13 @@
 <script lang="ts">
-	export let prop: string;
-	export let currentSortProp: string;
-	export let currentSortOrder: 'asc' | 'desc' | null;
-	export let onSort: (key: string, order: 'asc' | 'desc') => void;
+	interface Props {
+		prop: string;
+		currentSortProp: string;
+		currentSortOrder: 'asc' | 'desc' | null;
+		onSort: (key: string, order: 'asc' | 'desc') => void;
+		children?: import('svelte').Snippet;
+	}
+
+	let { prop, currentSortProp, currentSortOrder, onSort, children }: Props = $props();
 
 	function handleSort() {
 		let newOrder: 'asc' | 'desc' = 'asc';
@@ -13,8 +18,8 @@
 	}
 </script>
 
-<th on:click={handleSort} class="cursor-pointer">
-	<slot></slot>
+<th onclick={handleSort} class="cursor-pointer">
+	{@render children?.()}
 	{#if currentSortProp === prop}
 		{#if currentSortOrder === 'asc'}
 			▲

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import { ParseRef } from '$lib/parser';
 	import { onMount } from 'svelte';
 	import DynamicForm from './DynamicForm.svelte';
@@ -12,26 +11,38 @@
 	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
 	import { dbStatus } from '$lib/stores/dbStatus';
 
-	const dispatch = createEventDispatcher();
+	interface Props {
+		schemasSelected: string[];
+		currentProfile: ProfileObject;
+		currentTitle: string;
+		currentCuid: string;
+		schemasReset: () => void;
+		profileUpdated: () => void;
+		profileEditorErrorOccurred: (error: any) => void;
+	}
 
-	export let schemasSelected: string[] = [];
+	let {
+		schemasSelected = $bindable(),
+		currentProfile = $bindable({}),
+		currentTitle = $bindable(''),
+		currentCuid = $bindable(''),
+		schemasReset,
+		profileUpdated,
+		profileEditorErrorOccurred
+	}: Props = $props();
+	let profilePreview: boolean = $state(false);
+	let validationErrors: string[] = $state([]);
+	let serviceError: string = $state('');
+	let isSubmitting: boolean = $state(false);
 
-	export let currentProfile: ProfileObject = {};
-	export let currentTitle: string = '';
-	export let currentCuid: string = '';
-	let profilePreview: boolean = false;
-	let validationErrors: string[] = [];
-	let serviceError: string = '';
-	let isSubmitting: boolean = false;
-
-	let top: HTMLDivElement;
+	let top: HTMLDivElement | undefined = $state();
 
 	function scrollToTop() {
-		top.scrollIntoView();
+		top?.scrollIntoView();
 	}
 
 	function resetSchemas(): void {
-		dispatch('schemasReset');
+		schemasReset();
 	}
 
 	async function handleSubmit(event: SubmitEvent): Promise<void> {
@@ -100,15 +111,15 @@
 		isSubmitting = false;
 	}
 
-	let schemas: Schema | null = null;
+	let schemas: Schema | null = $state(null);
 
 	// Use parseRef to retrieve the schema based on schemasSelected
 	onMount(async () => {
 		try {
-			dispatch('profileEditorErrorOccurred', null);
+			profileEditorErrorOccurred(null);
 			schemas = await ParseRef(schemasSelected);
 		} catch (error) {
-			dispatch('profileEditorErrorOccurred', error);
+			profileEditorErrorOccurred(error);
 			resetSchemas();
 		}
 	});
@@ -228,14 +239,14 @@
 
 			// Reset to initial state
 			profilePreview = false;
-			dispatch('profileEditorErrorOccurred', null);
+			profileEditorErrorOccurred(null);
 			resetSchemas();
 		} catch (error) {
 			console.error('Error saving and posting profile:', error);
-			dispatch('profileEditorErrorOccurred', error);
+			profileEditorErrorOccurred(error);
 		}
 
-		dispatch('profileUpdated');
+		profileUpdated();
 	}
 
 	async function postProfileToIndex(cuid: string): Promise<string> {
@@ -260,7 +271,7 @@
 		}
 	}
 
-	let isDbOnline: boolean = get(dbStatus);
+	let isDbOnline: boolean = $state(get(dbStatus));
 
 	// Subscribe to dbStatus changes
 	dbStatus.subscribe((value) => {
@@ -293,10 +304,10 @@
 				<span class="badge variant-ghost-primary font-medium text-sm mx-4 mb-2">{schema}</span>
 			{/each}
 
-			<form on:submit|preventDefault={handleSubmit}>
+			<form onsubmit={handleSubmit}>
 				<div class="m-4 flex flex-col text-left">
 					{#if schemas !== null}
-						<DynamicForm {schemas} bind:currentProfile />
+						<DynamicForm {schemas} {currentProfile} />
 					{/if}
 				</div>
 				<div class="flex justify-around mt-0">
@@ -313,7 +324,7 @@
 					</button>
 					<button
 						type="button"
-						on:click={resetSchemas}
+						onclick={resetSchemas}
 						class="btn font-semibold md:btn-lg variant-filled-secondary">Reset</button
 					>
 				</div>
@@ -334,11 +345,11 @@
 			</div>
 			<div class="flex justify-around mt-4 md:mt-8">
 				<button
-					on:click={() => (profilePreview = false)}
+					onclick={() => (profilePreview = false)}
 					class="btn font-semibold md:btn-lg variant-filled-primary">Continue Editing</button
 				>
 			</div>
-			<form on:submit|preventDefault={saveAndPostProfile}>
+			<form onsubmit={saveAndPostProfile}>
 				<div class="mt-4 md:mt-8">
 					<div class="m-4 flex flex-col text-left">
 						<label>

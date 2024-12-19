@@ -1,20 +1,36 @@
 <script lang="ts">
+	import FormField from './FormField.svelte';
 	import { writable } from 'svelte/store';
 	import type { Field } from '$lib/types/Schema';
 	import type { ProfileArray, ProfileObject, ProfileValue } from '$lib/types/ProfileObject';
 
-	export let name: string;
-	export let fieldName: string;
-	export let field: Field;
-	export let hideTitle: boolean = false;
-	export let hideDescription: boolean = false;
-	export let requiredFields: string[] = [];
-	export let isParentRequired: boolean = false;
-	export let isParentArray: boolean = false;
-	export let fieldValue: {
-		[key: string]: ProfileObject | ProfileArray | ProfileValue;
-	} = {};
-	export let currentProfile: ProfileObject | ProfileArray | ProfileValue | undefined = undefined;
+	interface Props {
+		name: string;
+		fieldName: string;
+		field: Field;
+		hideTitle?: boolean;
+		hideDescription?: boolean;
+		requiredFields?: string[];
+		isParentRequired?: boolean;
+		isParentArray?: boolean;
+		fieldValue?: {
+			[key: string]: ProfileObject | ProfileArray | ProfileValue;
+		};
+		currentProfile?: ProfileObject | ProfileArray | ProfileValue | undefined;
+	}
+
+	let {
+		name,
+		fieldName,
+		field,
+		hideTitle = false,
+		hideDescription = false,
+		requiredFields = [],
+		isParentRequired = false,
+		isParentArray = false,
+		fieldValue = $bindable({}),
+		currentProfile = undefined
+	}: Props = $props();
 
 	const items = writable<object[]>([{}]);
 
@@ -112,7 +128,7 @@
 				required={isParentRequired && requiredFields.includes(fieldName)}
 				maxlength={field.maxLength}
 				pattern={field.pattern}
-				bind:value={fieldValue[fieldName]}
+				value={fieldValue[fieldName]}
 			/>
 			{#if !hideDescription}
 				<div class="text-sm text-gray-500 dark:text-gray-400">{field.description}</div>
@@ -143,7 +159,7 @@
 		</label>
 	{:else if field.type === 'array' && field.items}
 		{#if field.items.type === 'string' && field.items.enum}
-			<svelte:self
+			<FormField
 				{name}
 				{fieldName}
 				field={integrateFieldsToItems(field.items, field.title, field.description)}
@@ -160,7 +176,7 @@
 				</legend>
 				<div class="text-sm text-gray-500 dark:text-gray-400">{field.description}</div>
 				{#each $items as item, index (item)}
-					<svelte:self
+					<FormField
 						name={`${name}[${index}]`}
 						{fieldName}
 						field={field.items}
@@ -168,18 +184,18 @@
 						hideDescription={field.items.type !== 'object'}
 						{requiredFields}
 						isParentRequired={requiredFields.includes(fieldName)}
-						bind:fieldValue={$items[index]}
+						bind:fieldValue={$items[index] as ProfileObject}
 					/>
 					<button
 						type="button"
 						class="btn-xs rounded-md text-xs font-bold md:btn-sm md:text-sm variant-filled-secondary mt-2 mb-4 py-1 px-2"
-						on:click={() => removeItem(index)}>-</button
+						onclick={() => removeItem(index)}>-</button
 					>
 				{/each}
 				<button
 					type="button"
 					class="btn-xs rounded-md text-xs font-bold md:btn-sm md:text-sm variant-filled-primary ml-2 py-1 px-2"
-					on:click={addItem}>+</button
+					onclick={addItem}>+</button
 				>
 			</fieldset>
 		{/if}
@@ -195,7 +211,7 @@
 				<div class="text-sm text-gray-500 dark:text-gray-400">{field.description}</div>
 			{/if}
 			{#each Object.entries(field.properties) as [key, value]}
-				<svelte:self
+				<FormField
 					name={name + '.' + key}
 					fieldName={key}
 					field={value}
