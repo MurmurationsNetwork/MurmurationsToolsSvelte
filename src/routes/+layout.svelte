@@ -34,7 +34,7 @@
 	import map0 from 'svelte-awesome/icons/mapO';
 
 	// Page store
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	// Floating UI for popups
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
@@ -80,22 +80,22 @@
 	// Define routes that do not require DB status check
 	const routesWithoutDbCheck = ['/index-explorer', '/index-updater'];
 
-	let isDbOnline = false;
+	let isDbOnline = $state(false);
 
 	// Subscribe to dbStatus only if the route requires it
-	if (!routesWithoutDbCheck.includes($page.url.pathname)) {
+	if (!routesWithoutDbCheck.includes(page.url.pathname)) {
 		dbStatus.subscribe((value) => {
 			isDbOnline = value;
 		});
 	}
 
 	onMount(() => {
-		if (!routesWithoutDbCheck.includes($page.url.pathname)) {
+		if (!routesWithoutDbCheck.includes(page.url.pathname)) {
 			checkDbStatus();
 		}
 	});
 
-	let isOnline = true;
+	let isOnline = $state(true);
 
 	onMount(() => {
 		isOnline = navigator.onLine;
@@ -112,8 +112,10 @@
 		};
 	});
 
-	export let data: { isAuthenticated: boolean };
-	$: isAuthenticatedStore.set(data.isAuthenticated);
+	let { data, children } = $props();
+	$effect(() => {
+		isAuthenticatedStore.set(data.isAuthenticated);
+	});
 </script>
 
 <!-- Sync system light/dark mode -->
@@ -131,24 +133,24 @@
 </svelte:head>
 
 <AppShell>
-	<svelte:fragment slot="header">
+	<div slot="header">
 		{#if !isOnline}
 			<div class="variant-filled-error font-bold text-lg text-center">
 				O F F L I N E - Check your network connection
 			</div>
 		{/if}
-		{#if !routesWithoutDbCheck.includes($page.url.pathname) && !isDbOnline}
+		{#if !routesWithoutDbCheck.includes(page.url.pathname) && !isDbOnline}
 			<div class="bg-yellow-200 border-l-4 border-yellow-500 text-yellow-700 p-4 text-center">
 				<p>Unable to connect to the database, please try again in a few minutes</p>
 			</div>
 		{/if}
 		<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
-			<svelte:fragment slot="lead">
+			<div slot="lead">
 				<a class="text-xl font-bold" href="/" id="site-logo"
 					><span class="md:hidden">Tools</span><span class="max-md:hidden">Murmurations Tools</span
 					></a
 				>
-			</svelte:fragment>
+			</div>
 			<!-- TODO - link to test/prod based on site third-level domain -->
 			<span>
 				<span class="md:hidden">Test</span><span class="max-md:hidden">Test Site</span> -
@@ -161,10 +163,10 @@
 				We offer both test and live sites so you can experiment in our test environment before
 				posting data to the live one.
 			</div>
-			<svelte:fragment slot="trail">
+			<div slot="trail">
 				{#if $isAuthenticatedStore}
 					<button
-						on:click={logout}
+						onclick={logout}
 						class="btn btn-sm variant-filled-primary"
 						id="logout"
 						disabled={!isDbOnline}
@@ -183,16 +185,16 @@
 						Login
 					</a>
 				{/if}
-			</svelte:fragment>
+			</div>
 		</AppBar>
-	</svelte:fragment>
+	</div>
 
-	<svelte:fragment slot="sidebarLeft">
-		<AppRail slot="lead">
+	<div slot="sidebarLeft">
+		<AppRail>
 			<AppRailAnchor
 				id="profile-generator"
 				href="/profile-generator"
-				selected={$page.url.pathname === '/profile-generator'}
+				selected={page.url.pathname === '/profile-generator'}
 			>
 				<svelte:fragment>
 					<Icon data={fileO} />
@@ -202,7 +204,7 @@
 			<AppRailAnchor
 				id="batch-importer"
 				href="/batch-importer"
-				selected={$page.url.pathname === '/batch-importer'}
+				selected={page.url.pathname === '/batch-importer'}
 			>
 				<svelte:fragment>
 					<Icon data={copy} />
@@ -212,7 +214,7 @@
 			<AppRailAnchor
 				id="index-explorer"
 				href="/index-explorer"
-				selected={$page.url.pathname === '/index-explorer'}
+				selected={page.url.pathname === '/index-explorer'}
 			>
 				<svelte:fragment>
 					<Icon data={search} />
@@ -222,7 +224,7 @@
 			<AppRailAnchor
 				id="index-updater"
 				href="/index-updater"
-				selected={$page.url.pathname === '/index-updater'}
+				selected={page.url.pathname === '/index-updater'}
 			>
 				<svelte:fragment>
 					<Icon data={edit} />
@@ -237,7 +239,7 @@
 				</svelte:fragment>
 			</AppRailAnchor>
 		</AppRail>
-	</svelte:fragment>
+	</div>
 
-	<slot />
+	{@render children()}
 </AppShell>

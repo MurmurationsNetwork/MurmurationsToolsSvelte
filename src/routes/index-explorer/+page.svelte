@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { onMount, tick } from 'svelte';
 	import { timestampToDatetime } from '$lib/datetime';
 	import SortableColumn from './SortableColumn.svelte';
@@ -12,10 +14,14 @@
 		errorMessage: string | null;
 	};
 
-	export let data: Data;
-	$: ({ schemasList, countries, errorMessage } = data);
+	interface Props {
+		data: Data;
+	}
 
-	let error: string | null = null;
+	let { data }: Props = $props();
+	let { schemasList, countries, errorMessage } = $derived(data);
+
+	let error: string | null = $state(null);
 
 	type Node = {
 		primary_url: string;
@@ -61,13 +67,13 @@
 		page: string;
 	};
 
-	let sortedNodes: Node[] = [];
-	let links: Links | null = null;
-	let meta: Meta | null = null;
-	let page: number = 1;
-	let pageSize: number = 30;
+	let sortedNodes: Node[] = $state([]);
+	let links: Links | null = $state(null);
+	let meta: Meta | null = $state(null);
+	let page: number = $state(1);
+	let pageSize: number = $state(30);
 
-	let searchParamsObj: SearchParamsObj = {
+	let searchParamsObj: SearchParamsObj = $state({
 		schema: '',
 		name: '',
 		tags: '',
@@ -84,16 +90,20 @@
 		tags_exact: 'false',
 		page_size: '30',
 		page: '1'
-	};
+	});
 
-	let searchParams: URLSearchParams;
-	let isLoading: boolean = false;
+	let searchParams: URLSearchParams = $state();
+	let isLoading: boolean = $state(false);
 
-	let tagsFilterChecked: boolean = false;
-	let tagsExactChecked: boolean = false;
+	let tagsFilterChecked: boolean = $state(false);
+	let tagsExactChecked: boolean = $state(false);
 
-	$: searchParamsObj.tags_filter = tagsFilterChecked ? 'or' : 'and';
-	$: searchParamsObj.tags_exact = tagsExactChecked ? 'true' : 'false';
+	run(() => {
+		searchParamsObj.tags_filter = tagsFilterChecked ? 'or' : 'and';
+	});
+	run(() => {
+		searchParamsObj.tags_exact = tagsExactChecked ? 'true' : 'false';
+	});
 
 	onMount(async () => {
 		searchParams = new URLSearchParams(window.location.search);
@@ -179,8 +189,8 @@
 		await performSearch();
 	}
 
-	let sortProp: string = '';
-	let sortOrder: 'asc' | 'desc' | null = null;
+	let sortProp: string = $state('');
+	let sortOrder: 'asc' | 'desc' | null = $state(null);
 
 	function handleSort(key: string, order: 'asc' | 'desc') {
 		sortProp = key;
@@ -239,7 +249,7 @@
 			</p>
 		</div>
 	</div>
-	<form on:submit={handleSearch} class="mb-2">
+	<form onsubmit={handleSearch} class="mb-2">
 		<div class="card flex flex-row flex-wrap justify-center gap-2 p-2 md:p-4 variant-ghost-primary">
 			<div class="flex flex-row flex-wrap items-center gap-2 justify-center">
 				<select
@@ -360,7 +370,7 @@
 				class="font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/2 md:w-1/4 max-w-32 md:max-w-48"
 				type="submit"
 				disabled={isLoading}
-				on:click={() => {
+				onclick={() => {
 					window.goatcounter.count({
 						path: (p) => p + '?search',
 						title: 'IE search',

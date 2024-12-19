@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run, preventDefault } from 'svelte/legacy';
+
 	import { onMount } from 'svelte';
 	import { PUBLIC_TOOLS_URL } from '$env/static/public';
 	import SchemaSelector from '../profile-generator/SchemaSelector.svelte';
@@ -10,19 +12,26 @@
 		errorMessage: string | null;
 	};
 
-	export let data: Data;
-	$: ({ schemasList, errorMessage } = data);
+	interface Props {
+		data: Data;
+	}
 
-	let title = '';
-	let file: FileList | null = null;
-	let batches: Batch[] = [];
-	let schemasSelected: string[] = [];
-	let errorsMessage: string[] | null = null;
-	let successMessage: string | null = null;
-	let isLoading = false;
-	let isModifyMode = false;
+	let { data }: Props = $props();
+	let errorMessage;
+	run(() => {
+		({ schemasList, errorMessage } = data);
+	});
+
+	let title = $state('');
+	let file: FileList | null = $state(null);
+	let batches: Batch[] = $state([]);
+	let schemasSelected: string[] = $state([]);
+	let errorsMessage: string[] | null = $state(null);
+	let successMessage: string | null = $state(null);
+	let isLoading = $state(false);
+	let isModifyMode = $state(false);
 	let currentBatchId: string | null = null;
-	let isLoggedIn: boolean = false;
+	let isLoggedIn: boolean = $state(false);
 
 	interface Batch {
 		title: string;
@@ -180,10 +189,12 @@
 		await fetchBatches();
 	});
 
-	let isDbOnline = true;
+	let isDbOnline = $state(true);
 
-	$: dbStatus.subscribe((value) => {
-		isDbOnline = value;
+	run(() => {
+		dbStatus.subscribe((value) => {
+			isDbOnline = value;
+		});
 	});
 </script>
 
@@ -229,12 +240,12 @@
 					</div>
 					<div class="flex justify-around mt-4 md:mt-8">
 						<button
-							on:click={() => handleModify(batch)}
+							onclick={() => handleModify(batch)}
 							class="btn font-semibold md:btn-lg variant-filled-primary"
 							disabled={!!errorMessage || !isDbOnline || isLoading}>Modify</button
 						>
 						<button
-							on:click={() => handleDelete(batch.batch_id)}
+							onclick={() => handleDelete(batch.batch_id)}
 							class="btn font-semibold md:btn-lg variant-filled-secondary"
 							disabled={!!errorMessage || !isDbOnline || isLoading}>Delete</button
 						>
@@ -265,12 +276,12 @@
 					<p class="font-medium">{successMessage}</p>
 				</div>
 			{/if}
-			<form on:submit|preventDefault={handleImportOrModify}>
+			<form onsubmit={preventDefault(handleImportOrModify)}>
 				{#if schemasSelected.length === 0}
 					<SchemaSelector {schemasList} on:schemaSelected={handleSchemasSelected} />
 				{:else}
 					<div class="card variant-ghost-primary m-4 p-4">
-						<form on:submit|preventDefault={handleImportOrModify}>
+						<form onsubmit={preventDefault(handleImportOrModify)}>
 							<div class="font-medium">
 								{isModifyMode ? 'Modify the batch' : 'Import a new batch'}
 							</div>
@@ -324,7 +335,7 @@
 								<button
 									type="button"
 									class="btn font-semibold md:btn-lg variant-filled-secondary"
-									on:click={resetForm}
+									onclick={resetForm}
 									disabled={isLoading}>Reset</button
 								>
 							</div>
