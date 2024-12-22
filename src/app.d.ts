@@ -12,7 +12,7 @@ declare global {
 			} | null;
 			isAuthenticated: boolean;
 		}
-		interface PageData {}
+		// interface PageData {}
 		// interface Platform {}
 	}
 

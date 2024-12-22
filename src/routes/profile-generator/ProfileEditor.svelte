@@ -18,7 +18,7 @@
 		currentCuid: string;
 		schemasReset: () => void;
 		profileUpdated: () => void;
-		profileEditorErrorOccurred: (error: any) => void;
+		profileEditorErrorOccurred: (error: string | null) => void;
 	}
 
 	let {
@@ -124,7 +124,7 @@
 		}
 	});
 
-	async function saveAndPostProfile(event: SubmitEvent) {
+	async function saveAndPostProfile(event: SubmitEvent): Promise<void> {
 		event.preventDefault();
 		serviceError = '';
 

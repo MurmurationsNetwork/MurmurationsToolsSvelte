@@ -85,13 +85,13 @@
 	});
 
 	let profileErrorMessage: string | null = $state(null);
-	function handleProfileErrorOccurred(event: CustomEvent<string>) {
-		profileErrorMessage = event.detail;
+	function handleProfileErrorOccurred(error: string | null) {
+		profileErrorMessage = error;
 	}
 
 	let profileEditorErrorMessage: string | null = $state(null);
 
-	function handleProfileEditorErrorOccurred(error: any) {
+	function handleProfileEditorErrorOccurred(error: string | null) {
 		profileEditorErrorMessage = error;
 	}
 

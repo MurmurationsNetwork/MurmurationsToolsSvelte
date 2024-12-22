@@ -10,7 +10,7 @@
 		status: string;
 		last_updated: string;
 		schemas: string[];
-		profileErrorOccurred: (error: any) => void;
+		profileErrorOccurred: (error: string | null) => void;
 		profileUpdated: () => void;
 		profileModify: (cuid: string) => void;
 	}
@@ -60,7 +60,7 @@
 	}
 
 	// Handle fetch error
-	function handleFetchError(response: Response, data: any) {
+	function handleFetchError(response: Response, data: { error?: string }) {
 		if (response.status === 404) {
 			return 'Not found';
 		}
