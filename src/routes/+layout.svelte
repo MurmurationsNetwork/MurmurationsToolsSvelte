@@ -133,7 +133,7 @@
 </svelte:head>
 
 <AppShell>
-	<div slot="header">
+	<svelte:fragment slot="header">
 		{#if !isOnline}
 			<div class="variant-filled-error font-bold text-lg text-center">
 				O F F L I N E - Check your network connection
@@ -187,9 +187,9 @@
 				{/if}
 			</div>
 		</AppBar>
-	</div>
+	</svelte:fragment>
 
-	<div slot="sidebarLeft">
+	<svelte:fragment slot="sidebarLeft">
 		<AppRail>
 			<AppRailAnchor
 				id="profile-generator"
@@ -239,7 +239,7 @@
 				</svelte:fragment>
 			</AppRailAnchor>
 		</AppRail>
-	</div>
+	</svelte:fragment>
 
 	{@render children()}
 </AppShell>
