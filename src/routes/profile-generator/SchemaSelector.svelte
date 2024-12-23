@@ -1,10 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	let selectedSchemas: string[] = $state([]);
-
-	function selectSchemas() {
-		schemaSelected(selectedSchemas);
-	}
 
 	interface Props {
 		schemasList: string[];
@@ -12,6 +7,12 @@
 	}
 
 	let { schemasList, schemaSelected }: Props = $props();
+
+	let selectedSchemas: string[] = $state([]);
+
+	function selectSchemas() {
+		schemaSelected(selectedSchemas);
+	}
 </script>
 
 <div class="card variant-ghost-primary border-0 m-4 p-4">

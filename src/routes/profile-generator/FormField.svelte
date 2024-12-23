@@ -51,13 +51,13 @@
 		fieldValue[fieldName] = fieldValue[fieldName] || [];
 	}
 
-	function addItem() {
+	function addItem(): void {
 		items.update((currentItems) => {
 			return [...currentItems, {}];
 		});
 	}
 
-	function removeItem(index: number) {
+	function removeItem(index: number): void {
 		items.update((currentItems) => {
 			return currentItems.filter((_, i) => i !== index);
 		});

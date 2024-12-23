@@ -30,14 +30,33 @@
 		profileUpdated,
 		profileEditorErrorOccurred
 	}: Props = $props();
+
 	let profilePreview: boolean = $state(false);
 	let validationErrors: string[] = $state([]);
 	let serviceError: string = $state('');
 	let isSubmitting: boolean = $state(false);
-
 	let top: HTMLDivElement | undefined = $state();
 
-	function scrollToTop() {
+	let isDbOnline: boolean = $state(get(dbStatus));
+	let schemas: Schema | null = $state(null);
+
+	// Subscribe to dbStatus changes
+	dbStatus.subscribe((value) => {
+		isDbOnline = value;
+	});
+
+	// Use parseRef to retrieve the schema based on schemasSelected
+	onMount(async () => {
+		try {
+			profileEditorErrorOccurred(null);
+			schemas = await ParseRef(schemasSelected);
+		} catch (error) {
+			profileEditorErrorOccurred(error as string | null);
+			resetSchemas();
+		}
+	});
+
+	function scrollToTop(): void {
 		top?.scrollIntoView();
 	}
 
@@ -111,21 +130,9 @@
 		isSubmitting = false;
 	}
 
-	let schemas: Schema | null = $state(null);
-
-	// Use parseRef to retrieve the schema based on schemasSelected
-	onMount(async () => {
-		try {
-			profileEditorErrorOccurred(null);
-			schemas = await ParseRef(schemasSelected);
-		} catch (error) {
-			profileEditorErrorOccurred(error);
-			resetSchemas();
-		}
-	});
-
 	async function saveAndPostProfile(event: SubmitEvent): Promise<void> {
 		event.preventDefault();
+		isSubmitting = true;
 		serviceError = '';
 
 		if (!get(isAuthenticatedStore)) {
@@ -243,10 +250,11 @@
 			resetSchemas();
 		} catch (error) {
 			console.error('Error saving and posting profile:', error);
-			profileEditorErrorOccurred(error);
+			profileEditorErrorOccurred(error as string | null);
 		}
 
 		profileUpdated();
+		isSubmitting = false;
 	}
 
 	async function postProfileToIndex(cuid: string): Promise<string> {
@@ -270,13 +278,6 @@
 			throw error;
 		}
 	}
-
-	let isDbOnline: boolean = $state(get(dbStatus));
-
-	// Subscribe to dbStatus changes
-	dbStatus.subscribe((value) => {
-		isDbOnline = value;
-	});
 </script>
 
 <div class="md:basis-2/3 md:order-first">
@@ -346,6 +347,7 @@
 			<div class="flex justify-around mt-4 md:mt-8">
 				<button
 					onclick={() => (profilePreview = false)}
+					disabled={isSubmitting}
 					class="btn font-semibold md:btn-lg variant-filled-primary">Continue Editing</button
 				>
 			</div>
@@ -365,8 +367,9 @@
 						</label>
 					</div>
 				</div>
-				<button class="btn font-semibold md:btn-lg variant-filled-primary" disabled={!isDbOnline}
-					>Save & Post</button
+				<button
+					class="btn font-semibold md:btn-lg variant-filled-primary"
+					disabled={!isDbOnline || isSubmitting}>Save & Post</button
 				>
 			</form>
 		{/if}

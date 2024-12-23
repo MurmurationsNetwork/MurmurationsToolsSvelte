@@ -3,6 +3,8 @@
 	import { dbStatus } from '$lib/stores/dbStatus';
 	import { get } from 'svelte/store';
 
+	const queryClient = new QueryClient();
+
 	interface Props {
 		cuid: string;
 		title: string;
@@ -12,7 +14,7 @@
 		schemas: string[];
 		profileErrorOccurred: (error: string | null) => void;
 		profileUpdated: () => void;
-		profileModify: (cuid: string) => void;
+		profileModify: (cuid: string) => Promise<void>;
 	}
 
 	let {
@@ -29,11 +31,22 @@
 
 	let errorMessage: string = $state('');
 	let statusColor: string = $state('variant-filled-success');
-	const queryClient = new QueryClient();
 	let isDbOnline: boolean = $state(get(dbStatus));
 
 	// Subscribe to dbStatus changes
 	dbStatus.subscribe((value) => (isDbOnline = value));
+
+	// Use svelte-query to fetch status
+	const statusQuery = createQuery({
+		queryKey: ['status', node_id],
+		queryFn: fetchStatus,
+		refetchInterval: 5000
+	});
+
+	$effect(() => {
+		status = $statusQuery.data ?? status;
+		statusColor = getStatusColor(status);
+	});
 
 	// Function to fetch status
 	async function fetchStatus(): Promise<string> {
@@ -71,18 +84,6 @@
 		profileErrorOccurred(errorMessage);
 	}
 
-	// Use svelte-query to fetch status
-	const statusQuery = createQuery({
-		queryKey: ['status', node_id],
-		queryFn: fetchStatus,
-		refetchInterval: 5000
-	});
-
-	$effect(() => {
-		status = $statusQuery.data ?? status;
-		statusColor = getStatusColor(status);
-	});
-
 	// Get status color
 	function getStatusColor(status: string): string {
 		switch (status) {
@@ -96,13 +97,13 @@
 		}
 	}
 
-	function handleDelete() {
+	function handleDelete(): void {
 		if (confirm('Are you sure you want to delete this profile?')) {
 			deleteProfile();
 		}
 	}
 
-	async function deleteProfile() {
+	async function deleteProfile(): Promise<void> {
 		try {
 			await performDelete(`/profile-generator/${cuid}`);
 			if (node_id) {
@@ -115,7 +116,7 @@
 	}
 
 	// Perform delete operation
-	async function performDelete(url: string) {
+	async function performDelete(url: string): Promise<void> {
 		const response = await fetch(url, {
 			method: 'DELETE',
 			headers: { 'Content-Type': 'application/json' }
@@ -126,7 +127,7 @@
 		}
 	}
 
-	function handleModify() {
+	function handleModify(): void {
 		profileModify(cuid);
 	}
 </script>

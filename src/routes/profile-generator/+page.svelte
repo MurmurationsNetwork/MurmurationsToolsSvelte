@@ -11,31 +11,6 @@
 
 	const queryClient = new QueryClient();
 
-	interface PageData {
-		schemasList: string[];
-		errorMessage: string | null;
-	}
-
-	let {
-		data
-	}: {
-		data: PageData;
-	} = $props();
-
-	// Set selected schema in the parent component
-	let schemasSelected: string[] = $state([]);
-
-	function handleSchemasSelected(schemas: string[]) {
-		schemasSelected = schemas;
-	}
-
-	function handleSchemasReset() {
-		schemasSelected = [];
-		currentProfile = {};
-		currentTitle = '';
-		currentCuid = '';
-	}
-
 	interface ProfileCardType {
 		cuid: string;
 		node_id: string;
@@ -45,13 +20,58 @@
 		schemas: string[];
 	}
 
-	function handleProfileUpdated() {
+	interface PageData {
+		schemasList: string[];
+		errorMessage: string | null;
+	}
+
+	let { data }: { data: PageData } = $props();
+
+	// Set selected schema in the parent component
+	let schemasSelected: string[] = $state([]);
+	let profileCards: ProfileCardType[] = $state([]);
+	let profileErrorMessage: string | null = $state(null);
+	let profileEditorErrorMessage: string | null = $state(null);
+	let currentProfile: ProfileObject = $state({});
+	let currentTitle: string = $state('');
+	let currentCuid: string = $state('');
+	let isDbOnline = $state(true);
+	let isLoggedIn: boolean = $state(true);
+
+	// Subscribe to dbStatus changes
+	dbStatus.subscribe((value) => (isDbOnline = value));
+
+	onMount(() => {
+		if (isLoggedIn) {
+			fetchProfiles();
+		}
+	});
+
+	// Fetch profiles when dbStatus is online and user is logged in
+	$effect(() => {
+		if (isDbOnline && isLoggedIn) {
+			fetchProfiles();
+		}
+	});
+
+	function handleSchemasSelected(schemas: string[]): void {
+		schemasSelected = schemas;
+	}
+
+	function handleSchemasReset(): void {
+		schemasSelected = [];
+		currentProfile = {};
+		currentTitle = '';
+		currentCuid = '';
+	}
+
+	function handleProfileUpdated(): void {
 		if (isLoggedIn) {
 			fetchProfiles();
 		}
 	}
 
-	async function fetchProfiles() {
+	async function fetchProfiles(): Promise<void> {
 		try {
 			const response = await fetch(`${PUBLIC_TOOLS_URL}/profile-generator`);
 			if (response.ok) {
@@ -76,30 +96,16 @@
 		}
 	}
 
-	let profileCards: ProfileCardType[] = $state([]);
-
-	onMount(() => {
-		if (isLoggedIn) {
-			fetchProfiles();
-		}
-	});
-
-	let profileErrorMessage: string | null = $state(null);
-	function handleProfileErrorOccurred(error: string | null) {
+	function handleProfileErrorOccurred(error: string | null): void {
 		profileErrorMessage = error;
 	}
 
-	let profileEditorErrorMessage: string | null = $state(null);
-
-	function handleProfileEditorErrorOccurred(error: string | null) {
+	function handleProfileEditorErrorOccurred(error: string | null): void {
 		profileEditorErrorMessage = error;
 	}
 
-	let currentProfile: ProfileObject = $state({});
-	let currentTitle: string = $state('');
-	let currentCuid: string = $state('');
-
-	async function handleProfileModify(cuid: string) {
+	async function handleProfileModify(cuid: string): Promise<void> {
+		handleSchemasReset();
 		try {
 			const response = await fetch(`/profile-generator/${cuid}`);
 			if (!response.ok) {
@@ -122,19 +128,6 @@
 			console.error('Error fetching profile details:', error);
 		}
 	}
-
-	let isDbOnline = $state(true);
-	let isLoggedIn: boolean = $state(true);
-
-	$effect(() => {
-		dbStatus.subscribe((value) => {
-			isDbOnline = value;
-		});
-
-		if (isDbOnline && isLoggedIn) {
-			fetchProfiles();
-		}
-	});
 </script>
 
 <QueryClientProvider client={queryClient}>
@@ -167,12 +160,7 @@
 				{/if}
 				{#each profileCards as profileCard}
 					<ProfileCard
-						cuid={profileCard.cuid}
-						title={profileCard.title}
-						node_id={profileCard.node_id}
-						status={profileCard.status}
-						last_updated={profileCard.last_updated}
-						schemas={profileCard.schemas}
+						{...profileCard}
 						profileUpdated={handleProfileUpdated}
 						profileModify={handleProfileModify}
 						profileErrorOccurred={handleProfileErrorOccurred}
@@ -196,10 +184,10 @@
 					<SchemaSelector schemasList={data.schemasList} schemaSelected={handleSchemasSelected} />
 				{:else}
 					<ProfileEditor
-						bind:schemasSelected
-						bind:currentProfile
-						bind:currentTitle
-						bind:currentCuid
+						{schemasSelected}
+						{currentProfile}
+						{currentTitle}
+						{currentCuid}
 						schemasReset={handleSchemasReset}
 						profileUpdated={handleProfileUpdated}
 						profileEditorErrorOccurred={handleProfileEditorErrorOccurred}
