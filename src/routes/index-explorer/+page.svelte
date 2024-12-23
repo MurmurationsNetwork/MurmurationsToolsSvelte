@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import { onMount, tick } from 'svelte';
 	import { timestampToDatetime } from '$lib/datetime';
 	import SortableColumn from './SortableColumn.svelte';
@@ -8,18 +6,14 @@
 	import { pushState } from '$app/navigation';
 
 	// Fetch the list of schemas and countries
-	type Data = {
+	type Props = {
 		schemasList: string[];
 		countries: string[];
 		errorMessage: string | null;
+		loadSearchParams: URLSearchParams;
 	};
 
-	interface Props {
-		data: Data;
-	}
-
-	let { data }: Props = $props();
-	let { schemasList, countries, errorMessage } = $derived(data);
+	let { data }: { data: Props } = $props();
 
 	let error: string | null = $state(null);
 
@@ -92,28 +86,32 @@
 		page: '1'
 	});
 
-	let searchParams: URLSearchParams = $state();
+	let searchParams: URLSearchParams = $state(data.loadSearchParams);
 	let isLoading: boolean = $state(false);
 
 	let tagsFilterChecked: boolean = $state(false);
 	let tagsExactChecked: boolean = $state(false);
 
-	run(() => {
-		searchParamsObj.tags_filter = tagsFilterChecked ? 'or' : 'and';
-	});
-	run(() => {
-		searchParamsObj.tags_exact = tagsExactChecked ? 'true' : 'false';
-	});
-
 	onMount(async () => {
-		searchParams = new URLSearchParams(window.location.search);
 		if (searchParams.toString()) {
 			await performSearch();
 		}
 	});
 
+	$effect(() => {
+		if (searchParams.has('tags_filter')) {
+			tagsFilterChecked = searchParams.get('tags_filter') === 'or';
+		}
+		if (searchParams.has('tags_exact')) {
+			tagsExactChecked = searchParams.get('tags_exact') === 'true';
+		}
+		searchParamsObj.tags_filter = tagsFilterChecked ? 'or' : 'and';
+		searchParamsObj.tags_exact = tagsExactChecked ? 'true' : 'false';
+	});
+
 	async function performSearch() {
 		isLoading = true;
+
 		for (const [key] of Object.entries(searchParamsObj)) {
 			if (searchParams.has(key) && searchParams.get(key)) {
 				if (key === 'last_updated') {
@@ -152,7 +150,6 @@
 
 		const response = await fetch(`/index-explorer?${searchParams.toString()}`);
 		const result = await response.json();
-		console.log('result', result);
 		if (response.ok) {
 			sortedNodes = Array.isArray(result.data) ? result.data : [];
 			links = result.links;
@@ -160,8 +157,6 @@
 		} else {
 			error = result?.error ?? 'Error fetching data';
 		}
-		console.log('sortedNodes', sortedNodes);
-
 		isLoading = false;
 	}
 
@@ -220,17 +215,16 @@
 		}
 	}
 
-	function handlePageChange(event: CustomEvent) {
-		page = event.detail;
+	function handlePageChange(page: number): void {
 		searchParams.set('page', page.toString());
 		performSearch();
 	}
 </script>
 
 <div class="mx-auto p-2 md:p-4">
-	{#if errorMessage || error}
+	{#if data.errorMessage || error}
 		<div class="variant-filled-error py-2 px-4 mb-2 rounded-md">
-			Error: {errorMessage || error}
+			Error: {data.errorMessage || error}
 		</div>
 	{/if}
 	<div class="mb-4 sm:flex sm:items-center">
@@ -259,7 +253,7 @@
 				>
 					<option value="">Select a schema</option>
 					<option value="all">All schemas</option>
-					{#each schemasList as schema}
+					{#each data.schemasList as schema}
 						<option value={schema}>{schema}</option>
 					{/each}
 				</select>
@@ -332,7 +326,7 @@
 					name="country"
 				>
 					<option value="">Select a Country</option>
-					{#each countries as country}
+					{#each data.countries as country}
 						<option value={country} selected={searchParamsObj.country === country}>{country}</option
 						>
 					{/each}
@@ -564,7 +558,7 @@
 								{links}
 								{meta}
 								searchParams={searchParamsObj}
-								on:pageChange={handlePageChange}
+								onPageChange={handlePageChange}
 							/>
 						{/if}
 					</div>
