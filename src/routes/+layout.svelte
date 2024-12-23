@@ -120,7 +120,7 @@
 
 <!-- Sync system light/dark mode -->
 <svelte:head>
-	<!-- eslint-disable-next-line --><!-- svelte-ignore hydration_html_changed -->
+	<!-- svelte-ignore hydration_html_changed -->
 	{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}
 	<title>Murmurations Tools</title>
 	<script

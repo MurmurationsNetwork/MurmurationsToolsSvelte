@@ -25,6 +25,10 @@ export default [
 			parserOptions: {
 				parser: ts.parser
 			}
+		},
+		rules: {
+			'svelte/no-at-html-tags': 'off',
+			'svelte/no-unused-svelte-ignore': 'off'
 		}
 	},
 	{
