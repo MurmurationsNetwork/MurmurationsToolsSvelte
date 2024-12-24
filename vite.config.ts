@@ -3,8 +3,5 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-	plugins: [sveltekit(), purgeCss()],
-	test: {
-		exclude: ['node_modules/**', 'temp-volume/**']
-	}
+	plugins: [sveltekit(), purgeCss()]
 });
