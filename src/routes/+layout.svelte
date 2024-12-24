@@ -53,8 +53,47 @@
 		placement: 'bottom'
 	};
 
+	// Define routes that do not require DB status check
+	const routesWithoutDbCheck = ['/index-explorer', '/index-updater'];
+
+	let { data, children } = $props();
+	let isDbOnline = $state(false);
+	let isOnline = $state(true);
+
+	// Subscribe to dbStatus only if the route requires it
+	if (!routesWithoutDbCheck.includes(page.url.pathname)) {
+		dbStatus.subscribe((value) => {
+			isDbOnline = value;
+		});
+	}
+
+	onMount(() => {
+		if (!routesWithoutDbCheck.includes(page.url.pathname)) {
+			checkDbStatus();
+		}
+	});
+
+	onMount(() => {
+		isOnline = navigator.onLine;
+
+		// Add event listeners for online/offline events
+		const updateOnlineStatus = () => (isOnline = navigator.onLine);
+		window.addEventListener('online', updateOnlineStatus);
+		window.addEventListener('offline', updateOnlineStatus);
+
+		// Cleanup event listeners on component unmount
+		return () => {
+			window.removeEventListener('online', updateOnlineStatus);
+			window.removeEventListener('offline', updateOnlineStatus);
+		};
+	});
+
+	$effect(() => {
+		isAuthenticatedStore.set(data.isAuthenticated);
+	});
+
 	// Logout
-	async function logout() {
+	async function logout(): Promise<void> {
 		try {
 			const response = await fetch('/logout', {
 				method: 'POST',
@@ -76,46 +115,6 @@
 			console.error('Failed to logout:', error);
 		}
 	}
-
-	// Define routes that do not require DB status check
-	const routesWithoutDbCheck = ['/index-explorer', '/index-updater'];
-
-	let isDbOnline = $state(false);
-
-	// Subscribe to dbStatus only if the route requires it
-	if (!routesWithoutDbCheck.includes(page.url.pathname)) {
-		dbStatus.subscribe((value) => {
-			isDbOnline = value;
-		});
-	}
-
-	onMount(() => {
-		if (!routesWithoutDbCheck.includes(page.url.pathname)) {
-			checkDbStatus();
-		}
-	});
-
-	let isOnline = $state(true);
-
-	onMount(() => {
-		isOnline = navigator.onLine;
-
-		// Add event listeners for online/offline events
-		const updateOnlineStatus = () => (isOnline = navigator.onLine);
-		window.addEventListener('online', updateOnlineStatus);
-		window.addEventListener('offline', updateOnlineStatus);
-
-		// Cleanup event listeners on component unmount
-		return () => {
-			window.removeEventListener('online', updateOnlineStatus);
-			window.removeEventListener('offline', updateOnlineStatus);
-		};
-	});
-
-	let { data, children } = $props();
-	$effect(() => {
-		isAuthenticatedStore.set(data.isAuthenticated);
-	});
 </script>
 
 <!-- Sync system light/dark mode -->

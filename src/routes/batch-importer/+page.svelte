@@ -9,6 +9,13 @@
 		schemasList: string[];
 		errorMessage: string | null;
 	}
+
+	interface Batch {
+		title: string;
+		batch_id: string;
+		schemas: string[];
+	}
+
 	let { data }: { data: PageData } = $props();
 
 	let title = $state('');
@@ -20,13 +27,17 @@
 	let isLoading = $state(false);
 	let isModifyMode = $state(false);
 	let currentBatchId: string | null = null;
-	let isLoggedIn: boolean = $state(false);
+	let isLoggedIn: boolean = $state(true);
+	let isDbOnline = $state(true);
 
-	interface Batch {
-		title: string;
-		batch_id: string;
-		schemas: string[];
-	}
+	// Subscribe to dbStatus changes
+	dbStatus.subscribe((value) => (isDbOnline = value));
+
+	onMount(async () => {
+		if (isLoggedIn) {
+			await fetchBatches();
+		}
+	});
 
 	async function handleImportOrModify(event: SubmitEvent): Promise<void> {
 		event.preventDefault();
@@ -128,6 +139,7 @@
 				'An error occurred while processing your request, please try again later';
 		} finally {
 			isLoading = false;
+			resetForm();
 		}
 	}
 
@@ -146,7 +158,7 @@
 		currentBatchId = null;
 	}
 
-	async function fetchBatches() {
+	async function fetchBatches(): Promise<void> {
 		try {
 			const response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`);
 			if (response.ok) {
@@ -168,24 +180,12 @@
 		}
 	}
 
-	function handleModify(batch: Batch) {
+	function handleModify(batch: Batch): void {
 		title = batch.title;
 		schemasSelected = batch.schemas;
 		currentBatchId = batch.batch_id;
 		isModifyMode = true;
 	}
-
-	onMount(async () => {
-		await fetchBatches();
-	});
-
-	let isDbOnline = $state(true);
-
-	$effect(() => {
-		dbStatus.subscribe((value) => {
-			isDbOnline = value;
-		});
-	});
 </script>
 
 <div class="container mx-auto flex justify-center items-top">

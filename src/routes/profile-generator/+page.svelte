@@ -41,9 +41,9 @@
 	// Subscribe to dbStatus changes
 	dbStatus.subscribe((value) => (isDbOnline = value));
 
-	onMount(() => {
+	onMount(async () => {
 		if (isLoggedIn) {
-			fetchProfiles();
+			await fetchProfiles();
 		}
 	});
 
