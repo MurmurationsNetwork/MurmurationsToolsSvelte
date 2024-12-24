@@ -21,7 +21,7 @@
 		cuid,
 		title,
 		node_id,
-		status = $bindable(),
+		status,
 		last_updated,
 		schemas,
 		profileErrorOccurred,

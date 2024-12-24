@@ -22,10 +22,10 @@
 	}
 
 	let {
-		schemasSelected = $bindable(),
-		currentProfile = $bindable({}),
-		currentTitle = $bindable(''),
-		currentCuid = $bindable(''),
+		schemasSelected,
+		currentProfile = {},
+		currentTitle = '',
+		currentCuid = '',
 		schemasReset,
 		profileUpdated,
 		profileEditorErrorOccurred
