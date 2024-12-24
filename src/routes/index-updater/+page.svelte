@@ -12,7 +12,7 @@
 	let isSubmittingCheck = $state(false);
 	let isSubmittingDelete = $state(false);
 
-	async function postProfile() {
+	async function postProfile(): Promise<void> {
 		isSubmittingPost = true;
 		const response = await fetch('/index-updater', {
 			method: 'POST',
