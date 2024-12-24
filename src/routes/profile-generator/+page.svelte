@@ -11,19 +11,19 @@
 
 	const queryClient = new QueryClient();
 
-	interface ProfileCardType {
+	interface PageData {
+		schemasList: string[];
+		errorMessage: string | null;
+	}
+
+	type ProfileCardType = {
 		cuid: string;
 		node_id: string;
 		title: string;
 		status: 'posted' | 'received' | 'validated' | 'deleted' | 'validation_failed' | 'post_failed';
 		last_updated: string; // TODO - change to Unix timestamp (number) and convert into local date string
 		schemas: string[];
-	}
-
-	interface PageData {
-		schemasList: string[];
-		errorMessage: string | null;
-	}
+	};
 
 	let { data }: { data: PageData } = $props();
 

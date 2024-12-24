@@ -6,16 +6,12 @@
 	import { pushState } from '$app/navigation';
 
 	// Fetch the list of schemas and countries
-	type Props = {
+	interface PageData {
 		schemasList: string[];
 		countries: string[];
 		errorMessage: string | null;
 		loadSearchParams: URLSearchParams;
-	};
-
-	let { data }: { data: Props } = $props();
-
-	let error: string | null = $state(null);
+	}
 
 	type Node = {
 		primary_url: string;
@@ -61,12 +57,14 @@
 		page: string;
 	};
 
+	let { data }: { data: PageData } = $props();
+
+	let error: string | null = $state(null);
 	let sortedNodes: Node[] = $state([]);
 	let links: Links | null = $state(null);
 	let meta: Meta | null = $state(null);
 	let page: number = $state(1);
 	let pageSize: number = $state(30);
-
 	let searchParamsObj: SearchParamsObj = $state({
 		schema: '',
 		name: '',
@@ -85,12 +83,12 @@
 		page_size: '30',
 		page: '1'
 	});
-
 	let searchParams: URLSearchParams = $state(data.loadSearchParams);
 	let isLoading: boolean = $state(false);
-
 	let tagsFilterChecked: boolean = $state(false);
 	let tagsExactChecked: boolean = $state(false);
+	let sortProp: string = $state('');
+	let sortOrder: 'asc' | 'desc' | null = $state(null);
 
 	onMount(async () => {
 		if (searchParams.toString()) {
@@ -109,7 +107,7 @@
 		searchParamsObj.tags_exact = tagsExactChecked ? 'true' : 'false';
 	});
 
-	async function performSearch() {
+	async function performSearch(): Promise<void> {
 		isLoading = true;
 
 		for (const [key] of Object.entries(searchParamsObj)) {
@@ -160,7 +158,7 @@
 		isLoading = false;
 	}
 
-	async function handleSearch(event: Event) {
+	async function handleSearch(event: Event): Promise<void> {
 		event.preventDefault();
 		isLoading = true;
 		searchParams = new URLSearchParams();
@@ -184,10 +182,7 @@
 		await performSearch();
 	}
 
-	let sortProp: string = $state('');
-	let sortOrder: 'asc' | 'desc' | null = $state(null);
-
-	function handleSort(key: string, order: 'asc' | 'desc') {
+	function handleSort(key: string, order: 'asc' | 'desc'): void {
 		sortProp = key;
 		sortOrder = order;
 

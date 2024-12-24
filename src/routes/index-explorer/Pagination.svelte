@@ -25,7 +25,7 @@
 		url = url.substring(url.indexOf('?') + 1);
 	}
 
-	const createPageLink = (page: number) => {
+	const createPageLink = (page: number): string => {
 		const pageRegex = /page=\d+/;
 		return url.replace(pageRegex, `page=${page}`);
 	};
@@ -46,7 +46,7 @@
 		}
 	}
 
-	function handlePageChange(page: number) {
+	function handlePageChange(page: number): void {
 		onPageChange(page);
 	}
 </script>

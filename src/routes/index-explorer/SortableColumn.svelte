@@ -1,15 +1,17 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
+
 	interface Props {
 		prop: string;
 		currentSortProp: string;
 		currentSortOrder: 'asc' | 'desc' | null;
 		onSort: (key: string, order: 'asc' | 'desc') => void;
-		children?: import('svelte').Snippet;
+		children?: Snippet;
 	}
 
 	let { prop, currentSortProp, currentSortOrder, onSort, children }: Props = $props();
 
-	function handleSort() {
+	function handleSort(): void {
 		let newOrder: 'asc' | 'desc' = 'asc';
 		if (currentSortProp === prop) {
 			newOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
