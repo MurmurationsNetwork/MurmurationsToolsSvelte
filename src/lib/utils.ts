@@ -5,5 +5,5 @@ export const generateCuid = (): string => {
 	return cuid();
 };
 
-export const jsonError = (error: string, status: number) =>
+export const jsonError = (error: string, status: number): Response =>
 	json({ success: false, error }, { status });

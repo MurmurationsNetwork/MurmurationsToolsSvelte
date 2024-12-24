@@ -1,6 +1,6 @@
 import { dbStatus } from './stores/dbStatus';
 
-export function checkDbStatus() {
+export function checkDbStatus(): void {
 	const checkStatus = async () => {
 		try {
 			const response = await fetch('/api/health-check/db');

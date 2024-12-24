@@ -32,7 +32,7 @@
 		isSubmittingPost = false;
 	}
 
-	async function checkProfileStatus() {
+	async function checkProfileStatus(): Promise<void> {
 		isSubmittingCheck = true;
 		const response = await fetch(`/index-updater?url=${checkProfileUrl}`);
 		const data = await response.json();
@@ -46,7 +46,7 @@
 		isSubmittingCheck = false;
 	}
 
-	async function deleteProfile() {
+	async function deleteProfile(): Promise<void> {
 		isSubmittingDelete = true;
 		const response = await fetch('/index-updater', {
 			method: 'DELETE',
