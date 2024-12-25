@@ -1,6 +1,6 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
-import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
+import { connectToDatabase } from '$lib/db';
 import { jsonError } from '$lib/utils';
+import { json, type RequestHandler } from '@sveltejs/kit';
 
 // Update node_id for a profile
 export const PUT: RequestHandler = async ({ request, params }) => {
@@ -24,7 +24,5 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 	} catch (err) {
 		console.error(`Profile update failed: ${err}`);
 		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
-	} finally {
-		await closeDatabaseConnection();
 	}
 };

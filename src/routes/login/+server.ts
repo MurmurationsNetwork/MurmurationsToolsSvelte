@@ -1,12 +1,12 @@
+import { PUBLIC_ENV } from '$env/static/public';
 import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
+import { generateCuid, jsonError } from '$lib/utils';
 import type { RequestHandler } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-import { v4 as uuidv4 } from 'uuid';
 import { serialize } from 'cookie';
-import { PUBLIC_ENV } from '$env/static/public';
-import { generateCuid, jsonError } from '$lib/utils';
+import crypto from 'crypto';
 import type { Db } from 'mongodb';
+import { v4 as uuidv4 } from 'uuid';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {

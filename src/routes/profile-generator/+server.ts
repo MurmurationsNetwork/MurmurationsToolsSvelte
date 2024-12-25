@@ -1,8 +1,8 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
-import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
-import type { Profile } from '$lib/types/Profile';
+import { connectToDatabase } from '$lib/db';
 import { validateProfile } from '$lib/server/server-utils';
+import type { Profile } from '$lib/types/Profile';
 import { jsonError } from '$lib/utils';
+import { json, type RequestHandler } from '@sveltejs/kit';
 
 // Get all profiles
 export const GET: RequestHandler = async ({ locals }) => {
@@ -40,8 +40,6 @@ export const GET: RequestHandler = async ({ locals }) => {
 	} catch (err) {
 		console.error(`Failed to fetch user profiles: ${err}`);
 		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
-	} finally {
-		await closeDatabaseConnection();
 	}
 };
 
@@ -80,7 +78,8 @@ async function saveProfile(profile: Profile): Promise<void> {
 			...profile,
 			last_updated: Date.now()
 		});
-	} finally {
-		await closeDatabaseConnection();
+	} catch (error) {
+		console.error('Failed to save profile', error);
+		throw error;
 	}
 }

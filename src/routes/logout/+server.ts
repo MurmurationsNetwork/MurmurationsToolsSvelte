@@ -1,7 +1,7 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
-import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
-import { serialize } from 'cookie';
 import { PUBLIC_ENV } from '$env/static/public';
+import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { serialize } from 'cookie';
 
 export const POST: RequestHandler = async ({ cookies, locals }) => {
 	try {
