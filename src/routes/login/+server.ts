@@ -1,5 +1,5 @@
 import { PUBLIC_ENV } from '$env/static/public';
-import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
+import { connectToDatabase } from '$lib/db';
 import { generateCuid, jsonError } from '$lib/utils';
 import type { RequestHandler } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
@@ -54,7 +54,6 @@ const handleRegistration = async (db: Db, emailHash: string, password: string, e
 	await db.collection('users').insertOne(newUser);
 
 	const sessionToken = await createSession(db, emailHash);
-	await closeDatabaseConnection();
 
 	return createSuccessResponse(email, sessionToken, 'Registration successful');
 };
@@ -69,7 +68,6 @@ const handleLogin = async (db: Db, emailHash: string, password: string, email: s
 		.collection('users')
 		.updateOne({ email_hash: emailHash }, { $set: { last_login: Date.now() } });
 	const sessionToken = await createSession(db, emailHash);
-	await closeDatabaseConnection();
 
 	return createSuccessResponse(email, sessionToken, 'Login successful');
 };
