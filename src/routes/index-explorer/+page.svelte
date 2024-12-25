@@ -6,16 +6,12 @@
 	import { pushState } from '$app/navigation';
 
 	// Fetch the list of schemas and countries
-	type Data = {
+	interface PageData {
 		schemasList: string[];
 		countries: string[];
 		errorMessage: string | null;
-	};
-
-	export let data: Data;
-	$: ({ schemasList, countries, errorMessage } = data);
-
-	let error: string | null = null;
+		loadSearchParams: URLSearchParams;
+	}
 
 	type Node = {
 		primary_url: string;
@@ -61,13 +57,15 @@
 		page: string;
 	};
 
-	let sortedNodes: Node[] = [];
-	let links: Links | null = null;
-	let meta: Meta | null = null;
-	let page: number = 1;
-	let pageSize: number = 30;
+	let { data }: { data: PageData } = $props();
 
-	let searchParamsObj: SearchParamsObj = {
+	let error: string | null = $state(null);
+	let sortedNodes: Node[] = $state([]);
+	let links: Links | null = $state(null);
+	let meta: Meta | null = $state(null);
+	let page: number = $state(1);
+	let pageSize: number = $state(30);
+	let searchParamsObj: SearchParamsObj = $state({
 		schema: '',
 		name: '',
 		tags: '',
@@ -84,26 +82,34 @@
 		tags_exact: 'false',
 		page_size: '30',
 		page: '1'
-	};
-
-	let searchParams: URLSearchParams;
-	let isLoading: boolean = false;
-
-	let tagsFilterChecked: boolean = false;
-	let tagsExactChecked: boolean = false;
-
-	$: searchParamsObj.tags_filter = tagsFilterChecked ? 'or' : 'and';
-	$: searchParamsObj.tags_exact = tagsExactChecked ? 'true' : 'false';
+	});
+	let searchParams: URLSearchParams = $state(data.loadSearchParams);
+	let isLoading: boolean = $state(false);
+	let tagsFilterChecked: boolean = $state(false);
+	let tagsExactChecked: boolean = $state(false);
+	let sortProp: string = $state('');
+	let sortOrder: 'asc' | 'desc' | null = $state(null);
 
 	onMount(async () => {
-		searchParams = new URLSearchParams(window.location.search);
 		if (searchParams.toString()) {
 			await performSearch();
 		}
 	});
 
-	async function performSearch() {
+	$effect(() => {
+		if (searchParams.has('tags_filter')) {
+			tagsFilterChecked = searchParams.get('tags_filter') === 'or';
+		}
+		if (searchParams.has('tags_exact')) {
+			tagsExactChecked = searchParams.get('tags_exact') === 'true';
+		}
+		searchParamsObj.tags_filter = tagsFilterChecked ? 'or' : 'and';
+		searchParamsObj.tags_exact = tagsExactChecked ? 'true' : 'false';
+	});
+
+	async function performSearch(): Promise<void> {
 		isLoading = true;
+
 		for (const [key] of Object.entries(searchParamsObj)) {
 			if (searchParams.has(key) && searchParams.get(key)) {
 				if (key === 'last_updated') {
@@ -142,7 +148,6 @@
 
 		const response = await fetch(`/index-explorer?${searchParams.toString()}`);
 		const result = await response.json();
-		console.log('result', result);
 		if (response.ok) {
 			sortedNodes = Array.isArray(result.data) ? result.data : [];
 			links = result.links;
@@ -150,12 +155,10 @@
 		} else {
 			error = result?.error ?? 'Error fetching data';
 		}
-		console.log('sortedNodes', sortedNodes);
-
 		isLoading = false;
 	}
 
-	async function handleSearch(event: Event) {
+	async function handleSearch(event: Event): Promise<void> {
 		event.preventDefault();
 		isLoading = true;
 		searchParams = new URLSearchParams();
@@ -179,10 +182,7 @@
 		await performSearch();
 	}
 
-	let sortProp: string = '';
-	let sortOrder: 'asc' | 'desc' | null = null;
-
-	function handleSort(key: string, order: 'asc' | 'desc') {
+	function handleSort(key: string, order: 'asc' | 'desc'): void {
 		sortProp = key;
 		sortOrder = order;
 
@@ -210,17 +210,16 @@
 		}
 	}
 
-	function handlePageChange(event: CustomEvent) {
-		page = event.detail;
+	function handlePageChange(page: number): void {
 		searchParams.set('page', page.toString());
 		performSearch();
 	}
 </script>
 
 <div class="mx-auto p-2 md:p-4">
-	{#if errorMessage || error}
+	{#if data.errorMessage || error}
 		<div class="variant-filled-error py-2 px-4 mb-2 rounded-md">
-			Error: {errorMessage || error}
+			Error: {data.errorMessage || error}
 		</div>
 	{/if}
 	<div class="mb-4 sm:flex sm:items-center">
@@ -239,7 +238,7 @@
 			</p>
 		</div>
 	</div>
-	<form on:submit={handleSearch} class="mb-2">
+	<form onsubmit={handleSearch} class="mb-2">
 		<div class="card flex flex-row flex-wrap justify-center gap-2 p-2 md:p-4 variant-ghost-primary">
 			<div class="flex flex-row flex-wrap items-center gap-2 justify-center">
 				<select
@@ -249,7 +248,7 @@
 				>
 					<option value="">Select a schema</option>
 					<option value="all">All schemas</option>
-					{#each schemasList as schema}
+					{#each data.schemasList as schema}
 						<option value={schema}>{schema}</option>
 					{/each}
 				</select>
@@ -322,7 +321,7 @@
 					name="country"
 				>
 					<option value="">Select a Country</option>
-					{#each countries as country}
+					{#each data.countries as country}
 						<option value={country} selected={searchParamsObj.country === country}>{country}</option
 						>
 					{/each}
@@ -360,7 +359,7 @@
 				class="font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/2 md:w-1/4 max-w-32 md:max-w-48"
 				type="submit"
 				disabled={isLoading}
-				on:click={() => {
+				onclick={() => {
 					window.goatcounter.count({
 						path: (p) => p + '?search',
 						title: 'IE search',
@@ -554,7 +553,7 @@
 								{links}
 								{meta}
 								searchParams={searchParamsObj}
-								on:pageChange={handlePageChange}
+								onPageChange={handlePageChange}
 							/>
 						{/if}
 					</div>

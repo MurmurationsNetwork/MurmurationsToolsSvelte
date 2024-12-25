@@ -1,12 +1,12 @@
-import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
+import { PUBLIC_ENV } from '$env/static/public';
+import { connectToDatabase } from '$lib/db';
+import { generateCuid, jsonError } from '$lib/utils';
 import type { RequestHandler } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-import { v4 as uuidv4 } from 'uuid';
 import { serialize } from 'cookie';
-import { PUBLIC_ENV } from '$env/static/public';
-import { generateCuid, jsonError } from '$lib/utils';
+import crypto from 'crypto';
 import type { Db } from 'mongodb';
+import { v4 as uuidv4 } from 'uuid';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -54,7 +54,6 @@ const handleRegistration = async (db: Db, emailHash: string, password: string, e
 	await db.collection('users').insertOne(newUser);
 
 	const sessionToken = await createSession(db, emailHash);
-	await closeDatabaseConnection();
 
 	return createSuccessResponse(email, sessionToken, 'Registration successful');
 };
@@ -69,7 +68,6 @@ const handleLogin = async (db: Db, emailHash: string, password: string, email: s
 		.collection('users')
 		.updateOne({ email_hash: emailHash }, { $set: { last_login: Date.now() } });
 	const sessionToken = await createSession(db, emailHash);
-	await closeDatabaseConnection();
 
 	return createSuccessResponse(email, sessionToken, 'Login successful');
 };

@@ -34,7 +34,7 @@
 	import map0 from 'svelte-awesome/icons/mapO';
 
 	// Page store
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	// Floating UI for popups
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
@@ -53,8 +53,47 @@
 		placement: 'bottom'
 	};
 
+	// Define routes that do not require DB status check
+	const routesWithoutDbCheck = ['/index-explorer', '/index-updater'];
+
+	let { data, children } = $props();
+	let isDbOnline = $state(false);
+	let isOnline = $state(true);
+
+	// Subscribe to dbStatus only if the route requires it
+	if (!routesWithoutDbCheck.includes(page.url.pathname)) {
+		dbStatus.subscribe((value) => {
+			isDbOnline = value;
+		});
+	}
+
+	onMount(() => {
+		if (!routesWithoutDbCheck.includes(page.url.pathname)) {
+			checkDbStatus();
+		}
+	});
+
+	onMount(() => {
+		isOnline = navigator.onLine;
+
+		// Add event listeners for online/offline events
+		const updateOnlineStatus = () => (isOnline = navigator.onLine);
+		window.addEventListener('online', updateOnlineStatus);
+		window.addEventListener('offline', updateOnlineStatus);
+
+		// Cleanup event listeners on component unmount
+		return () => {
+			window.removeEventListener('online', updateOnlineStatus);
+			window.removeEventListener('offline', updateOnlineStatus);
+		};
+	});
+
+	$effect(() => {
+		isAuthenticatedStore.set(data.isAuthenticated);
+	});
+
 	// Logout
-	async function logout() {
+	async function logout(): Promise<void> {
 		try {
 			const response = await fetch('/logout', {
 				method: 'POST',
@@ -76,49 +115,11 @@
 			console.error('Failed to logout:', error);
 		}
 	}
-
-	// Define routes that do not require DB status check
-	const routesWithoutDbCheck = ['/index-explorer', '/index-updater'];
-
-	let isDbOnline = false;
-
-	// Subscribe to dbStatus only if the route requires it
-	if (!routesWithoutDbCheck.includes($page.url.pathname)) {
-		dbStatus.subscribe((value) => {
-			isDbOnline = value;
-		});
-	}
-
-	onMount(() => {
-		if (!routesWithoutDbCheck.includes($page.url.pathname)) {
-			checkDbStatus();
-		}
-	});
-
-	let isOnline = true;
-
-	onMount(() => {
-		isOnline = navigator.onLine;
-
-		// Add event listeners for online/offline events
-		const updateOnlineStatus = () => (isOnline = navigator.onLine);
-		window.addEventListener('online', updateOnlineStatus);
-		window.addEventListener('offline', updateOnlineStatus);
-
-		// Cleanup event listeners on component unmount
-		return () => {
-			window.removeEventListener('online', updateOnlineStatus);
-			window.removeEventListener('offline', updateOnlineStatus);
-		};
-	});
-
-	export let data: { isAuthenticated: boolean };
-	$: isAuthenticatedStore.set(data.isAuthenticated);
 </script>
 
 <!-- Sync system light/dark mode -->
 <svelte:head>
-	<!-- eslint-disable-next-line -->
+	<!-- svelte-ignore hydration_html_changed -->
 	{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}
 	<title>Murmurations Tools</title>
 	<script
@@ -137,18 +138,18 @@
 				O F F L I N E - Check your network connection
 			</div>
 		{/if}
-		{#if !routesWithoutDbCheck.includes($page.url.pathname) && !isDbOnline}
+		{#if !routesWithoutDbCheck.includes(page.url.pathname) && !isDbOnline}
 			<div class="bg-yellow-200 border-l-4 border-yellow-500 text-yellow-700 p-4 text-center">
 				<p>Unable to connect to the database, please try again in a few minutes</p>
 			</div>
 		{/if}
 		<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
-			<svelte:fragment slot="lead">
+			<div slot="lead">
 				<a class="text-xl font-bold" href="/" id="site-logo"
 					><span class="md:hidden">Tools</span><span class="max-md:hidden">Murmurations Tools</span
 					></a
 				>
-			</svelte:fragment>
+			</div>
 			<!-- TODO - link to test/prod based on site third-level domain -->
 			<span>
 				<span class="md:hidden">Test</span><span class="max-md:hidden">Test Site</span> -
@@ -161,10 +162,10 @@
 				We offer both test and live sites so you can experiment in our test environment before
 				posting data to the live one.
 			</div>
-			<svelte:fragment slot="trail">
+			<div slot="trail">
 				{#if $isAuthenticatedStore}
 					<button
-						on:click={logout}
+						onclick={logout}
 						class="btn btn-sm variant-filled-primary"
 						id="logout"
 						disabled={!isDbOnline}
@@ -183,16 +184,16 @@
 						Login
 					</a>
 				{/if}
-			</svelte:fragment>
+			</div>
 		</AppBar>
 	</svelte:fragment>
 
 	<svelte:fragment slot="sidebarLeft">
-		<AppRail slot="lead">
+		<AppRail>
 			<AppRailAnchor
 				id="profile-generator"
 				href="/profile-generator"
-				selected={$page.url.pathname === '/profile-generator'}
+				selected={page.url.pathname === '/profile-generator'}
 			>
 				<svelte:fragment>
 					<Icon data={fileO} />
@@ -202,7 +203,7 @@
 			<AppRailAnchor
 				id="batch-importer"
 				href="/batch-importer"
-				selected={$page.url.pathname === '/batch-importer'}
+				selected={page.url.pathname === '/batch-importer'}
 			>
 				<svelte:fragment>
 					<Icon data={copy} />
@@ -212,7 +213,7 @@
 			<AppRailAnchor
 				id="index-explorer"
 				href="/index-explorer"
-				selected={$page.url.pathname === '/index-explorer'}
+				selected={page.url.pathname === '/index-explorer'}
 			>
 				<svelte:fragment>
 					<Icon data={search} />
@@ -222,7 +223,7 @@
 			<AppRailAnchor
 				id="index-updater"
 				href="/index-updater"
-				selected={$page.url.pathname === '/index-updater'}
+				selected={page.url.pathname === '/index-updater'}
 			>
 				<svelte:fragment>
 					<Icon data={edit} />
@@ -239,5 +240,5 @@
 		</AppRail>
 	</svelte:fragment>
 
-	<slot />
+	{@render children()}
 </AppShell>

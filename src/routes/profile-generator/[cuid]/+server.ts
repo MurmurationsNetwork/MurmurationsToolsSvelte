@@ -1,8 +1,8 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
-import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
-import type { Profile } from '$lib/types/Profile';
+import { connectToDatabase } from '$lib/db';
 import { validateProfile } from '$lib/server/server-utils';
+import type { Profile } from '$lib/types/Profile';
 import { jsonError } from '$lib/utils';
+import { json, type RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	try {
@@ -50,8 +50,9 @@ async function getProfileByCuid(cuid: string): Promise<Profile | null> {
 			profile: profile.profile,
 			title: profile.title
 		} as Profile;
-	} finally {
-		await closeDatabaseConnection();
+	} catch (err) {
+		console.error('Failed to get profile', err);
+		throw err;
 	}
 }
 
@@ -93,8 +94,9 @@ async function updateUserProfiles(emailHash: string, profileCuid: string): Promi
 			return false;
 		}
 		return true;
-	} finally {
-		await closeDatabaseConnection();
+	} catch (err) {
+		console.error('Failed to update user profiles', err);
+		throw err;
 	}
 }
 
@@ -160,8 +162,9 @@ async function updateProfile(
 		}
 
 		return true;
-	} finally {
-		await closeDatabaseConnection();
+	} catch (err) {
+		console.error('Failed to update profile', err);
+		throw err;
 	}
 }
 
@@ -221,7 +224,8 @@ async function deleteProfile(emailHash: string, profileCuid: string): Promise<bo
 
 		console.log('Profile deleted successfully');
 		return true;
-	} finally {
-		await closeDatabaseConnection();
+	} catch (err) {
+		console.error('Failed to delete profile', err);
+		throw err;
 	}
 }

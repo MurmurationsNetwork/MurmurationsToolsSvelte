@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import { ParseRef } from '$lib/parser';
 	import { onMount } from 'svelte';
 	import DynamicForm from './DynamicForm.svelte';
@@ -12,26 +11,57 @@
 	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
 	import { dbStatus } from '$lib/stores/dbStatus';
 
-	const dispatch = createEventDispatcher();
+	interface Props {
+		schemasSelected: string[];
+		currentProfile: ProfileObject;
+		currentTitle: string;
+		currentCuid: string;
+		schemasReset: () => void;
+		profileUpdated: () => void;
+		profileEditorErrorOccurred: (error: string | null) => void;
+	}
 
-	export let schemasSelected: string[] = [];
+	let {
+		schemasSelected,
+		currentProfile = {},
+		currentTitle = '',
+		currentCuid = '',
+		schemasReset,
+		profileUpdated,
+		profileEditorErrorOccurred
+	}: Props = $props();
 
-	export let currentProfile: ProfileObject = {};
-	export let currentTitle: string = '';
-	export let currentCuid: string = '';
-	let profilePreview: boolean = false;
-	let validationErrors: string[] = [];
-	let serviceError: string = '';
-	let isSubmitting: boolean = false;
+	let profilePreview: boolean = $state(false);
+	let validationErrors: string[] = $state([]);
+	let serviceError: string = $state('');
+	let isSubmitting: boolean = $state(false);
+	let top: HTMLDivElement | undefined = $state();
 
-	let top: HTMLDivElement;
+	let isDbOnline: boolean = $state(get(dbStatus));
+	let schemas: Schema | null = $state(null);
 
-	function scrollToTop() {
-		top.scrollIntoView();
+	// Subscribe to dbStatus changes
+	dbStatus.subscribe((value) => {
+		isDbOnline = value;
+	});
+
+	// Use parseRef to retrieve the schema based on schemasSelected
+	onMount(async () => {
+		try {
+			profileEditorErrorOccurred(null);
+			schemas = await ParseRef(schemasSelected);
+		} catch (error) {
+			profileEditorErrorOccurred(error as string | null);
+			resetSchemas();
+		}
+	});
+
+	function scrollToTop(): void {
+		top?.scrollIntoView();
 	}
 
 	function resetSchemas(): void {
-		dispatch('schemasReset');
+		schemasReset();
 	}
 
 	async function handleSubmit(event: SubmitEvent): Promise<void> {
@@ -100,21 +130,9 @@
 		isSubmitting = false;
 	}
 
-	let schemas: Schema | null = null;
-
-	// Use parseRef to retrieve the schema based on schemasSelected
-	onMount(async () => {
-		try {
-			dispatch('profileEditorErrorOccurred', null);
-			schemas = await ParseRef(schemasSelected);
-		} catch (error) {
-			dispatch('profileEditorErrorOccurred', error);
-			resetSchemas();
-		}
-	});
-
-	async function saveAndPostProfile(event: SubmitEvent) {
+	async function saveAndPostProfile(event: SubmitEvent): Promise<void> {
 		event.preventDefault();
+		isSubmitting = true;
 		serviceError = '';
 
 		if (!get(isAuthenticatedStore)) {
@@ -228,14 +246,15 @@
 
 			// Reset to initial state
 			profilePreview = false;
-			dispatch('profileEditorErrorOccurred', null);
+			profileEditorErrorOccurred(null);
 			resetSchemas();
 		} catch (error) {
 			console.error('Error saving and posting profile:', error);
-			dispatch('profileEditorErrorOccurred', error);
+			profileEditorErrorOccurred(error as string | null);
 		}
 
-		dispatch('profileUpdated');
+		profileUpdated();
+		isSubmitting = false;
 	}
 
 	async function postProfileToIndex(cuid: string): Promise<string> {
@@ -259,13 +278,6 @@
 			throw error;
 		}
 	}
-
-	let isDbOnline: boolean = get(dbStatus);
-
-	// Subscribe to dbStatus changes
-	dbStatus.subscribe((value) => {
-		isDbOnline = value;
-	});
 </script>
 
 <div class="md:basis-2/3 md:order-first">
@@ -293,10 +305,10 @@
 				<span class="badge variant-ghost-primary font-medium text-sm mx-4 mb-2">{schema}</span>
 			{/each}
 
-			<form on:submit|preventDefault={handleSubmit}>
+			<form onsubmit={handleSubmit}>
 				<div class="m-4 flex flex-col text-left">
 					{#if schemas !== null}
-						<DynamicForm {schemas} bind:currentProfile />
+						<DynamicForm {schemas} {currentProfile} />
 					{/if}
 				</div>
 				<div class="flex justify-around mt-0">
@@ -313,7 +325,7 @@
 					</button>
 					<button
 						type="button"
-						on:click={resetSchemas}
+						onclick={resetSchemas}
 						class="btn font-semibold md:btn-lg variant-filled-secondary">Reset</button
 					>
 				</div>
@@ -334,11 +346,12 @@
 			</div>
 			<div class="flex justify-around mt-4 md:mt-8">
 				<button
-					on:click={() => (profilePreview = false)}
+					onclick={() => (profilePreview = false)}
+					disabled={isSubmitting}
 					class="btn font-semibold md:btn-lg variant-filled-primary">Continue Editing</button
 				>
 			</div>
-			<form on:submit|preventDefault={saveAndPostProfile}>
+			<form onsubmit={saveAndPostProfile}>
 				<div class="mt-4 md:mt-8">
 					<div class="m-4 flex flex-col text-left">
 						<label>
@@ -354,8 +367,9 @@
 						</label>
 					</div>
 				</div>
-				<button class="btn font-semibold md:btn-lg variant-filled-primary" disabled={!isDbOnline}
-					>Save & Post</button
+				<button
+					class="btn font-semibold md:btn-lg variant-filled-primary"
+					disabled={!isDbOnline || isSubmitting}>Save & Post</button
 				>
 			</form>
 		{/if}

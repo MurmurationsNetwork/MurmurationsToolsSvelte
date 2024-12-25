@@ -1,18 +1,18 @@
 <script lang="ts">
-	let postProfileUrl = '';
-	let checkProfileUrl = '';
-	let deleteProfileUrl = '';
-	let postResponse = '';
-	let statusResponse = '';
-	let deleteResponse = '';
-	let postResponseOk = true;
-	let statusResponseOk = true;
-	let deleteResponseOk = true;
-	let isSubmittingPost = false;
-	let isSubmittingCheck = false;
-	let isSubmittingDelete = false;
+	let postProfileUrl = $state('');
+	let checkProfileUrl = $state('');
+	let deleteProfileUrl = $state('');
+	let postResponse = $state('');
+	let statusResponse = $state('');
+	let deleteResponse = $state('');
+	let postResponseOk = $state(true);
+	let statusResponseOk = $state(true);
+	let deleteResponseOk = $state(true);
+	let isSubmittingPost = $state(false);
+	let isSubmittingCheck = $state(false);
+	let isSubmittingDelete = $state(false);
 
-	async function postProfile() {
+	async function postProfile(): Promise<void> {
 		isSubmittingPost = true;
 		const response = await fetch('/index-updater', {
 			method: 'POST',
@@ -32,7 +32,7 @@
 		isSubmittingPost = false;
 	}
 
-	async function checkProfileStatus() {
+	async function checkProfileStatus(): Promise<void> {
 		isSubmittingCheck = true;
 		const response = await fetch(`/index-updater?url=${checkProfileUrl}`);
 		const data = await response.json();
@@ -46,7 +46,7 @@
 		isSubmittingCheck = false;
 	}
 
-	async function deleteProfile() {
+	async function deleteProfile(): Promise<void> {
 		isSubmittingDelete = true;
 		const response = await fetch('/index-updater', {
 			method: 'DELETE',
@@ -84,7 +84,7 @@
 				/>
 				<button
 					class="btn font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/3"
-					on:click={postProfile}
+					onclick={postProfile}
 					disabled={isSubmittingPost}
 				>
 					{isSubmittingPost ? 'Posting...' : 'Post'}
@@ -93,14 +93,10 @@
 			{#if postResponse}
 				<div
 					class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {postResponseOk
-						? 'bg-green-200 dark:bg-green-700'
-						: 'bg-red-200 dark:bg-red-700'}"
+						? 'variant-filled-success'
+						: 'variant-filled-error'}"
 				>
-					<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
-							JSON.parse(postResponse),
-							null,
-							2
-						)}</pre>
+					<pre>{JSON.stringify(JSON.parse(postResponse), null, 2)}</pre>
 				</div>
 			{/if}
 		</div>
@@ -121,7 +117,7 @@
 				/>
 				<button
 					class="btn font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/3"
-					on:click={checkProfileStatus}
+					onclick={checkProfileStatus}
 					disabled={isSubmittingCheck}
 				>
 					{isSubmittingCheck ? 'Checking...' : 'Check'}
@@ -130,14 +126,10 @@
 			{#if statusResponse}
 				<div
 					class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {statusResponseOk
-						? 'bg-green-200 dark:bg-green-700'
-						: 'bg-red-200 dark:bg-red-700'}"
+						? 'variant-filled-success'
+						: 'variant-filled-error'}"
 				>
-					<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
-							JSON.parse(statusResponse),
-							null,
-							2
-						)}</pre>
+					<pre>{JSON.stringify(JSON.parse(statusResponse), null, 2)}</pre>
 				</div>
 			{/if}
 		</div>
@@ -159,7 +151,7 @@
 				/>
 				<button
 					class="btn font-semibold md:btn-lg variant-filled-primary rounded-3xl w-1/3"
-					on:click={deleteProfile}
+					onclick={deleteProfile}
 					disabled={isSubmittingDelete}
 				>
 					{isSubmittingDelete ? 'Deleting...' : 'Delete'}
@@ -168,14 +160,10 @@
 			{#if deleteResponse}
 				<div
 					class="my-2 overflow-auto rounded-xl p-2 text-sm md:my-4 md:p-4 {deleteResponseOk
-						? 'bg-green-200 dark:bg-green-700'
-						: 'bg-red-200 dark:bg-red-700'}"
+						? 'variant-filled-success'
+						: 'variant-filled-error'}"
 				>
-					<pre class="text-gray-900 dark:text-gray-100">{JSON.stringify(
-							JSON.parse(deleteResponse),
-							null,
-							2
-						)}</pre>
+					<pre>{JSON.stringify(JSON.parse(deleteResponse), null, 2)}</pre>
 				</div>
 			{/if}
 		</div>

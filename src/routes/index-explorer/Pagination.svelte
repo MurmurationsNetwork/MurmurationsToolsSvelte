@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	interface Props {
+		links: { self: string };
+		meta: { total_pages: number };
+		searchParams: { page: string; page_size: string; schema: string };
+		onPageChange: (page: number) => void;
+	}
 
-	export let links: { self: string };
-	export let meta: { total_pages: number };
-	export let searchParams: { page: string; page_size: string; schema: string };
-
-	const dispatch = createEventDispatcher();
+	let { links, meta, searchParams, onPageChange }: Props = $props();
 
 	// Get current link
 	let url = links.self;
@@ -24,7 +25,7 @@
 		url = url.substring(url.indexOf('?') + 1);
 	}
 
-	const createPageLink = (page: number) => {
+	const createPageLink = (page: number): string => {
 		const pageRegex = /page=\d+/;
 		return url.replace(pageRegex, `page=${page}`);
 	};
@@ -45,8 +46,8 @@
 		}
 	}
 
-	function handlePageChange(page: number) {
-		dispatch('pageChange', page);
+	function handlePageChange(page: number): void {
+		onPageChange(page);
 	}
 </script>
 
@@ -57,7 +58,7 @@
 				<a
 					href={`/index-explorer?${createPageLink(currentPage - 1)}`}
 					class="ml-0 rounded-l-lg border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-					on:click|preventDefault={() => handlePageChange(currentPage - 1)}
+					onclick={() => handlePageChange(currentPage - 1)}
 				>
 					Previous
 				</a>
@@ -78,7 +79,7 @@
 						currentPage
 							? 'bg-primary-500 text-white'
 							: 'bg-white text-gray-500 dark:bg-gray-800 dark:text-gray-400'}"
-						on:click|preventDefault={() => handlePageChange(Number(page))}
+						onclick={() => handlePageChange(Number(page))}
 					>
 						{page}
 					</a>
@@ -90,7 +91,7 @@
 				<a
 					href={`/index-explorer?${createPageLink(currentPage + 1)}`}
 					class="rounded-r-lg border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-					on:click|preventDefault={() => handlePageChange(currentPage + 1)}
+					onclick={() => handlePageChange(currentPage + 1)}
 				>
 					Next
 				</a>

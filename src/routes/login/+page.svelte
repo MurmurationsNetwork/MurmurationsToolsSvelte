@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
-	import { backInOut } from 'svelte/easing';
 	import { goto } from '$app/navigation';
 	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
 
-	let loginType = 'login';
-	let email = '';
-	let password = '';
-	let errorMessage = '';
-	let isSubmitting = false;
+	let loginType = $state('login');
+	let email = $state('');
+	let password = $state('');
+	let errorMessage = $state('');
+	let isSubmitting = $state(false);
 
-	async function handleSubmit() {
+	async function onsubmit(event: SubmitEvent): Promise<void> {
+		event.preventDefault();
 		isSubmitting = true;
 		const res = await fetch('/login', {
 			method: 'POST',
@@ -36,6 +36,10 @@
 		password = '';
 		isSubmitting = false;
 	}
+
+	function updateLoginType(newLoginType: string): void {
+		loginType = newLoginType;
+	}
 </script>
 
 <div class="container mx-auto flex justify-center items-center md:p-4">
@@ -44,7 +48,7 @@
 			<div class="variant-filled-error py-2 px-4 rounded-md">{errorMessage}</div>
 		{/if}
 		<div class="card variant-ghost-primary m-4 p-4 w-3/4 md:w-1/2">
-			<form on:submit|preventDefault={handleSubmit}>
+			<form {onsubmit}>
 				<fieldset class="flex my-3 justify-center">
 					<label class="mr-3">
 						<input
@@ -53,7 +57,7 @@
 							name="login-type"
 							value="login"
 							checked
-							on:click={() => (loginType = 'login')}
+							onclick={() => updateLoginType('login')}
 						/>
 						Login
 					</label>
@@ -63,7 +67,7 @@
 							type="radio"
 							name="login-type"
 							value="register"
-							on:click={() => (loginType = 'register')}
+							onclick={() => updateLoginType('register')}
 						/>
 						Register
 					</label>
@@ -99,17 +103,11 @@
 						disabled={isSubmitting}
 					>
 						{#if isSubmitting}
-							<span transition:slide={{ delay: 50, duration: 100, easing: backInOut, axis: 'x' }}
-								>Loading...</span
-							>
+							<span transition:slide={{ delay: 50, duration: 100, axis: 'x' }}>Loading...</span>
 						{:else if loginType === 'login'}
-							<span transition:slide={{ delay: 50, duration: 100, easing: backInOut, axis: 'x' }}
-								>Login</span
-							>
+							<span transition:slide={{ delay: 50, duration: 100, axis: 'x' }}>Login</span>
 						{:else}
-							<span transition:slide={{ delay: 50, duration: 100, easing: backInOut, axis: 'x' }}
-								>Register</span
-							>
+							<span transition:slide={{ delay: 50, duration: 100, axis: 'x' }}>Register</span>
 						{/if}
 					</button>
 				</div>

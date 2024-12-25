@@ -11,51 +11,72 @@
 
 	const queryClient = new QueryClient();
 
-	// Fetch the list of schemas
-	type Data = {
+	interface PageData {
 		schemasList: string[];
 		errorMessage: string | null;
-	};
-
-	export let data: Data;
-	$: ({ schemasList, errorMessage } = data);
-
-	// Set selected schema in the parent component
-	let schemasSelected: string[] = [];
-	let isLoggedIn: boolean = false;
-
-	function handleSchemasSelected(event: CustomEvent<string[]>) {
-		schemasSelected = event.detail;
 	}
 
-	function handleSchemasReset() {
-		schemasSelected = [];
-		currentProfile = {};
-		currentTitle = '';
-		currentCuid = '';
-	}
-
-	interface ProfileCard {
+	type ProfileCardType = {
 		cuid: string;
 		node_id: string;
 		title: string;
 		status: 'posted' | 'received' | 'validated' | 'deleted' | 'validation_failed' | 'post_failed';
 		last_updated: string; // TODO - change to Unix timestamp (number) and convert into local date string
 		schemas: string[];
+	};
+
+	let { data }: { data: PageData } = $props();
+
+	// Set selected schema in the parent component
+	let schemasSelected: string[] = $state([]);
+	let profileCards: ProfileCardType[] = $state([]);
+	let profileErrorMessage: string | null = $state(null);
+	let profileEditorErrorMessage: string | null = $state(null);
+	let currentProfile: ProfileObject = $state({});
+	let currentTitle: string = $state('');
+	let currentCuid: string = $state('');
+	let isDbOnline = $state(true);
+	let isLoggedIn: boolean = $state(true);
+
+	// Subscribe to dbStatus changes
+	dbStatus.subscribe((value) => (isDbOnline = value));
+
+	onMount(async () => {
+		if (isLoggedIn) {
+			await fetchProfiles();
+		}
+	});
+
+	// Fetch profiles when dbStatus is online and user is logged in
+	$effect(() => {
+		if (isDbOnline && isLoggedIn) {
+			fetchProfiles();
+		}
+	});
+
+	function handleSchemasSelected(schemas: string[]): void {
+		schemasSelected = schemas;
 	}
 
-	function handleProfileUpdated() {
+	function handleSchemasReset(): void {
+		schemasSelected = [];
+		currentProfile = {};
+		currentTitle = '';
+		currentCuid = '';
+	}
+
+	function handleProfileUpdated(): void {
 		if (isLoggedIn) {
 			fetchProfiles();
 		}
 	}
 
-	async function fetchProfiles() {
+	async function fetchProfiles(): Promise<void> {
 		try {
 			const response = await fetch(`${PUBLIC_TOOLS_URL}/profile-generator`);
 			if (response.ok) {
-				const data = await response.json();
-				profileCards = data.profiles.map((profile: Profile) => ({
+				const responseData = await response.json();
+				profileCards = responseData.profiles.map((profile: Profile) => ({
 					cuid: profile.cuid,
 					title: profile.title,
 					node_id: profile.node_id,
@@ -75,44 +96,29 @@
 		}
 	}
 
-	let profileCards: ProfileCard[] = [];
-	onMount(() => {
-		if (isLoggedIn) {
-			fetchProfiles();
-		}
-	});
-
-	let profileErrorMessage: string | null = null;
-	function handleProfileErrorOccurred(event: CustomEvent<string>) {
-		profileErrorMessage = event.detail;
+	function handleProfileErrorOccurred(error: string | null): void {
+		profileErrorMessage = error;
 	}
 
-	let profileEditorErrorMessage: string | null = null;
-
-	function handleProfileEditorErrorOccurred(event: CustomEvent<string>) {
-		profileEditorErrorMessage = event.detail;
+	function handleProfileEditorErrorOccurred(error: string | null): void {
+		profileEditorErrorMessage = error;
 	}
 
-	let currentProfile: ProfileObject = {};
-	let currentTitle: string = '';
-	let currentCuid: string = '';
-
-	async function handleProfileModify(event: CustomEvent<ProfileCard>) {
-		const { cuid } = event.detail;
-
+	async function handleProfileModify(cuid: string): Promise<void> {
+		handleSchemasReset();
 		try {
 			const response = await fetch(`/profile-generator/${cuid}`);
 			if (!response.ok) {
 				throw new Error(`Failed to fetch profile details: ${response.statusText}`);
 			}
 
-			const data = await response.json();
-			if (!data.success) {
-				console.log(data);
+			const responseData = await response.json();
+			if (!responseData.success) {
+				console.log(responseData);
 				throw new Error('Profile fetch was not successful');
 			}
 
-			const profileData = data.profile;
+			const profileData = responseData.profile;
 
 			currentProfile = JSON.parse(profileData.profile);
 			schemasSelected = profileData.linked_schemas;
@@ -121,16 +127,6 @@
 		} catch (error) {
 			console.error('Error fetching profile details:', error);
 		}
-	}
-
-	let isDbOnline = true;
-
-	$: dbStatus.subscribe((value) => {
-		isDbOnline = value;
-	});
-
-	$: if (isDbOnline && isLoggedIn) {
-		fetchProfiles();
 	}
 </script>
 
@@ -164,15 +160,10 @@
 				{/if}
 				{#each profileCards as profileCard}
 					<ProfileCard
-						cuid={profileCard.cuid}
-						title={profileCard.title}
-						node_id={profileCard.node_id}
-						status={profileCard.status}
-						last_updated={profileCard.last_updated}
-						schemas={profileCard.schemas}
-						on:profileUpdated={handleProfileUpdated}
-						on:profileModify={handleProfileModify}
-						on:profileErrorOccurred={handleProfileErrorOccurred}
+						{...profileCard}
+						profileUpdated={handleProfileUpdated}
+						profileModify={handleProfileModify}
+						profileErrorOccurred={handleProfileErrorOccurred}
 					/>
 				{/each}
 			</div>
@@ -184,22 +175,22 @@
 						<p class="font-medium">{profileErrorMessage || profileEditorErrorMessage}</p>
 					</div>
 				{/if}
-				{#if errorMessage}
+				{#if data.errorMessage}
 					<div class="variant-filled-error py-2 px-4 m-4 rounded-md">
-						<p class="font-medium">{errorMessage}</p>
+						<p class="font-medium">{data.errorMessage}</p>
 					</div>
 				{/if}
 				{#if schemasSelected.length === 0}
-					<SchemaSelector {schemasList} on:schemaSelected={handleSchemasSelected} />
+					<SchemaSelector schemasList={data.schemasList} schemaSelected={handleSchemasSelected} />
 				{:else}
 					<ProfileEditor
 						{schemasSelected}
 						{currentProfile}
 						{currentTitle}
 						{currentCuid}
-						on:schemasReset={handleSchemasReset}
-						on:profileUpdated={handleProfileUpdated}
-						on:profileEditorErrorOccurred={handleProfileEditorErrorOccurred}
+						schemasReset={handleSchemasReset}
+						profileUpdated={handleProfileUpdated}
+						profileEditorErrorOccurred={handleProfileEditorErrorOccurred}
 					/>
 				{/if}
 			</div>

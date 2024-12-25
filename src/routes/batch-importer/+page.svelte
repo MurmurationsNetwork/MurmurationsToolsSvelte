@@ -5,24 +5,10 @@
 	import { dbStatus } from '$lib/stores/dbStatus';
 
 	// Fetch the list of schemas
-	type Data = {
+	interface PageData {
 		schemasList: string[];
 		errorMessage: string | null;
-	};
-
-	export let data: Data;
-	$: ({ schemasList, errorMessage } = data);
-
-	let title = '';
-	let file: FileList | null = null;
-	let batches: Batch[] = [];
-	let schemasSelected: string[] = [];
-	let errorsMessage: string[] | null = null;
-	let successMessage: string | null = null;
-	let isLoading = false;
-	let isModifyMode = false;
-	let currentBatchId: string | null = null;
-	let isLoggedIn: boolean = false;
+	}
 
 	interface Batch {
 		title: string;
@@ -30,16 +16,40 @@
 		schemas: string[];
 	}
 
-	async function handleImportOrModify() {
+	let { data }: { data: PageData } = $props();
+
+	let title = $state('');
+	let file: FileList | null = $state(null);
+	let batches: Batch[] = $state([]);
+	let schemasSelected: string[] = $state([]);
+	let errorsMessage: string[] | null = $state(null);
+	let successMessage: string | null = $state(null);
+	let isLoading = $state(false);
+	let isModifyMode = $state(false);
+	let currentBatchId: string | null = null;
+	let isLoggedIn: boolean = $state(true);
+	let isDbOnline = $state(true);
+
+	// Subscribe to dbStatus changes
+	dbStatus.subscribe((value) => (isDbOnline = value));
+
+	onMount(async () => {
+		if (isLoggedIn) {
+			await fetchBatches();
+		}
+	});
+
+	async function handleImportOrModify(event: SubmitEvent): Promise<void> {
+		event.preventDefault();
 		try {
 			isLoading = true;
 			if (!file || !title || schemasSelected.length === 0) {
-				errorMessage = 'Title, file, and at least one schema are required';
+				data.errorMessage = 'Title, file, and at least one schema are required';
 				return;
 			}
 
 			if (file[0].type !== 'text/csv') {
-				errorMessage = 'Only CSV files are allowed';
+				data.errorMessage = 'Only CSV files are allowed';
 				return;
 			}
 
@@ -83,7 +93,7 @@
 						}
 					);
 				} else {
-					errorMessage = res.error || 'Failed to import/modify batch';
+					data.errorMessage = res.error || 'Failed to import/modify batch';
 				}
 				return;
 			}
@@ -95,7 +105,7 @@
 				? 'Batch modified successfully'
 				: 'Batch imported successfully';
 		} catch (error) {
-			errorMessage =
+			data.errorMessage =
 				(error as Error).message ||
 				'An error occurred while processing your request, please try again later';
 		} finally {
@@ -103,7 +113,7 @@
 		}
 	}
 
-	async function handleDelete(batch_id: string) {
+	async function handleDelete(batch_id: string): Promise<void> {
 		try {
 			isLoading = true;
 
@@ -117,37 +127,38 @@
 
 			if (!response.ok) {
 				const res = await response.json();
-				errorMessage = res.message || 'Failed to delete batch';
+				data.errorMessage = res.message || 'Failed to delete batch';
 				return;
 			}
 
 			await fetchBatches();
 			successMessage = 'Batch deleted successfully';
 		} catch (error) {
-			errorMessage =
+			data.errorMessage =
 				(error as Error).message ||
 				'An error occurred while processing your request, please try again later';
 		} finally {
 			isLoading = false;
+			resetForm();
 		}
 	}
 
-	function handleSchemasSelected(event: CustomEvent<string[]>) {
-		schemasSelected = event.detail;
+	function handleSchemasSelected(schemas: string[]): void {
+		schemasSelected = schemas;
 	}
 
-	function resetForm() {
+	function resetForm(): void {
 		schemasSelected = [];
 		title = '';
 		file = null;
-		errorMessage = null;
+		data.errorMessage = null;
 		errorsMessage = null;
 		successMessage = null;
 		isModifyMode = false;
 		currentBatchId = null;
 	}
 
-	async function fetchBatches() {
+	async function fetchBatches(): Promise<void> {
 		try {
 			const response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`);
 			if (response.ok) {
@@ -162,29 +173,19 @@
 				isLoggedIn = false;
 			} else {
 				isLoggedIn = true;
-				errorMessage = 'Failed to fetch batches: ' + response.status;
+				data.errorMessage = 'Failed to fetch batches: ' + response.status;
 			}
 		} catch (error) {
-			errorMessage = 'Error fetching batches: ' + (error as Error).message;
+			data.errorMessage = 'Error fetching batches: ' + (error as Error).message;
 		}
 	}
 
-	function handleModify(batch: Batch) {
+	function handleModify(batch: Batch): void {
 		title = batch.title;
 		schemasSelected = batch.schemas;
 		currentBatchId = batch.batch_id;
 		isModifyMode = true;
 	}
-
-	onMount(async () => {
-		await fetchBatches();
-	});
-
-	let isDbOnline = true;
-
-	$: dbStatus.subscribe((value) => {
-		isDbOnline = value;
-	});
 </script>
 
 <div class="container mx-auto flex justify-center items-top">
@@ -229,14 +230,14 @@
 					</div>
 					<div class="flex justify-around mt-4 md:mt-8">
 						<button
-							on:click={() => handleModify(batch)}
+							onclick={() => handleModify(batch)}
 							class="btn font-semibold md:btn-lg variant-filled-primary"
-							disabled={!!errorMessage || !isDbOnline || isLoading}>Modify</button
+							disabled={!!data.errorMessage || !isDbOnline || isLoading}>Modify</button
 						>
 						<button
-							on:click={() => handleDelete(batch.batch_id)}
+							onclick={() => handleDelete(batch.batch_id)}
 							class="btn font-semibold md:btn-lg variant-filled-secondary"
-							disabled={!!errorMessage || !isDbOnline || isLoading}>Delete</button
+							disabled={!!data.errorMessage || !isDbOnline || isLoading}>Delete</button
 						>
 					</div>
 				</div>
@@ -245,9 +246,9 @@
 		<!-- END: List of batches -->
 		<!-- BEGIN: Schema selection box and import form -->
 		<div class="md:basis-2/3 md:order-first">
-			{#if errorMessage}
+			{#if data.errorMessage}
 				<div class="variant-filled-error m-4 py-2 px-4 rounded-md">
-					<p class="font-medium">{errorMessage}</p>
+					<p class="font-medium">{data.errorMessage}</p>
 				</div>
 			{/if}
 			{#if errorsMessage !== null}
@@ -265,73 +266,71 @@
 					<p class="font-medium">{successMessage}</p>
 				</div>
 			{/if}
-			<form on:submit|preventDefault={handleImportOrModify}>
-				{#if schemasSelected.length === 0}
-					<SchemaSelector {schemasList} on:schemaSelected={handleSchemasSelected} />
-				{:else}
-					<div class="card variant-ghost-primary m-4 p-4">
-						<form on:submit|preventDefault={handleImportOrModify}>
-							<div class="font-medium">
-								{isModifyMode ? 'Modify the batch' : 'Import a new batch'}
-							</div>
-							<h3 class="mt-8 text-left">
-								Schemas selected:
-								<ol>
-									{#each schemasSelected as schemaName}
-										<li>
-											<code>{schemaName}</code>
-										</li>
-									{/each}
-								</ol>
-							</h3>
-							<div class="my-2">
-								<label for="title">
-									<div class="my-2 font-bold text-left">
-										Title:<span class="ml-1 text-red-500">*</span>
-									</div>
-									<input
-										class="w-full bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-										type="text"
-										id="title"
-										name="title"
-										bind:value={title}
-										required
-									/>
-								</label>
-							</div>
-							<div class="my-2">
-								<label for="file">
-									<div class="my-2 font-bold text-left">
-										Upload File:<span class="ml-1 text-red-500">*</span>
-									</div>
-									<input
-										class="w-full bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-										type="file"
-										id="file"
-										name="file"
-										bind:files={file}
-										required
-										multiple={false}
-									/>
-								</label>
-							</div>
-							<div class="flex justify-around mt-4 md:mt-8">
-								<button
-									type="submit"
-									class="btn font-semibold md:btn-lg variant-filled-primary"
-									disabled={isLoading}>{isModifyMode ? 'Modify' : 'Import'}</button
-								>
-								<button
-									type="button"
-									class="btn font-semibold md:btn-lg variant-filled-secondary"
-									on:click={resetForm}
-									disabled={isLoading}>Reset</button
-								>
-							</div>
-						</form>
-					</div>
-				{/if}
-			</form>
+			{#if schemasSelected.length === 0}
+				<SchemaSelector schemasList={data.schemasList} schemaSelected={handleSchemasSelected} />
+			{:else}
+				<div class="card variant-ghost-primary m-4 p-4">
+					<form onsubmit={handleImportOrModify}>
+						<div class="font-medium">
+							{isModifyMode ? 'Modify the batch' : 'Import a new batch'}
+						</div>
+						<h3 class="mt-8 text-left">
+							Schemas selected:
+							<ol>
+								{#each schemasSelected as schemaName}
+									<li>
+										<code>{schemaName}</code>
+									</li>
+								{/each}
+							</ol>
+						</h3>
+						<div class="my-2">
+							<label for="title">
+								<div class="my-2 font-bold text-left">
+									Title:<span class="ml-1 text-red-500">*</span>
+								</div>
+								<input
+									class="w-full bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+									type="text"
+									id="title"
+									name="title"
+									bind:value={title}
+									required
+								/>
+							</label>
+						</div>
+						<div class="my-2">
+							<label for="file">
+								<div class="my-2 font-bold text-left">
+									Upload File:<span class="ml-1 text-red-500">*</span>
+								</div>
+								<input
+									class="w-full bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+									type="file"
+									id="file"
+									name="file"
+									bind:files={file}
+									required
+									multiple={false}
+								/>
+							</label>
+						</div>
+						<div class="flex justify-around mt-4 md:mt-8">
+							<button
+								type="submit"
+								class="btn font-semibold md:btn-lg variant-filled-primary"
+								disabled={isLoading}>{isModifyMode ? 'Modify' : 'Import'}</button
+							>
+							<button
+								type="button"
+								class="btn font-semibold md:btn-lg variant-filled-secondary"
+								onclick={resetForm}
+								disabled={isLoading}>Reset</button
+							>
+						</div>
+					</form>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>

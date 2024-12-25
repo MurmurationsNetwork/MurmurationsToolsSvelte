@@ -1,3 +1,3 @@
-import { writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 
-export const isAuthenticatedStore = writable<boolean>(false);
+export const isAuthenticatedStore: Writable<boolean> = writable<boolean>(false);

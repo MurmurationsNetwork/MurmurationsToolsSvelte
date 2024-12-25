@@ -1,27 +1,30 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { createEventDispatcher } from 'svelte';
+	import { page } from '$app/state';
 
-	const dispatch = createEventDispatcher();
-	let schemasSelected: string[] = [];
-
-	function selectSchemas() {
-		dispatch('schemaSelected', schemasSelected);
+	interface Props {
+		schemasList: string[];
+		schemaSelected: (schemas: string[]) => void;
 	}
 
-	export let schemasList: string[];
+	let { schemasList, schemaSelected }: Props = $props();
+
+	let selectedSchemas: string[] = $state([]);
+
+	function selectSchemas() {
+		schemaSelected(selectedSchemas);
+	}
 </script>
 
 <div class="card variant-ghost-primary border-0 m-4 p-4">
-	<form on:submit|preventDefault={selectSchemas}>
+	<form onsubmit={selectSchemas}>
 		<div class="font-medium">
-			Select one or more schemas to {$page.url.pathname === '/batch-importer'
+			Select one or more schemas to {page.url.pathname === '/batch-importer'
 				? 'create a new batch of profiles'
 				: 'create a new profile'}
 		</div>
 		<div class="m-4">
 			<select
-				bind:value={schemasSelected}
+				bind:value={selectedSchemas}
 				multiple
 				required
 				size="6"
