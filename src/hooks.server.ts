@@ -46,12 +46,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-process.on('SIGINT', async () => {
-	await closeDatabaseConnection();
-	process.exit(0);
-});
-
-process.on('SIGTERM', async () => {
+process.on('sveltekit:shutdown', async () => {
 	await closeDatabaseConnection();
 	process.exit(0);
 });
