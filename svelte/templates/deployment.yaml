@@ -13,13 +13,13 @@ spec:
         app: {{ .Values.name }}
     spec:
       initContainers:
-        - name: init-npm-install
+        - name: init-pnpm-install
           image: {{ .Values.image }}
           command: [ "sh", "-c" ]
           args:
             - |
-              echo "Running npm install"
-              cd /app && npm install
+              echo "Running pnpm install"
+              cd /app && pnpm install
           volumeMounts:
             - name: node-modules-storage
               mountPath: /app/node_modules
