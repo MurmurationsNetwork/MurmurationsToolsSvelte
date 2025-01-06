@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@floating-ui/dom": "1.6.12",
 		"@paralleldrive/cuid2": "^2.2.2",
-		"@tanstack/svelte-query": "^5.62.9",
+		"@tanstack/svelte-query": "^5.62.16",
 		"bcryptjs": "^2.4.3",
 		"highlight.js": "11.11.1",
 		"mongodb": "^6.12.0",
