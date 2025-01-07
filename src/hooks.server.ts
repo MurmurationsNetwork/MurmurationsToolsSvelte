@@ -14,7 +14,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	if (sessionToken) {
 		try {
-			const db = getDB(platform?.env);
+			const db = getDB(platform.env);
 			const session = await db
 				.select()
 				.from(sessions)

@@ -32,8 +32,7 @@ export const profiles = sqliteTable(
 		node_id: text(),
 		title: text(),
 		profile: text(),
-		last_updated: int({ mode: 'timestamp' }).notNull(),
-		created_at: int({ mode: 'timestamp' }).notNull()
+		last_updated: int({ mode: 'timestamp' }).notNull()
 	},
 	(t) => [index('profiles_cuid_index').on(t.cuid)]
 );

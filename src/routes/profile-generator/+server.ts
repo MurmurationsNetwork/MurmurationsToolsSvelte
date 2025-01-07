@@ -1,11 +1,17 @@
-import { connectToDatabase } from '$lib/db';
+import { getDB } from '$lib/db/db';
+import { profiles, users } from '$lib/db/migrations/schema';
 import { validateProfile } from '$lib/server/server-utils';
 import type { Profile } from '$lib/types/Profile';
 import { jsonError } from '$lib/utils';
+import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { eq, inArray } from 'drizzle-orm';
 
 // Get all profiles
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({
+	locals,
+	platform = { env: { DB: {} as D1Database } }
+}) => {
 	try {
 		// Check if the user is authenticated
 		if (!locals.user) {
@@ -19,24 +25,36 @@ export const GET: RequestHandler = async ({ locals }) => {
 			return jsonError('Missing email_hash parameter', 400);
 		}
 
-		const db = await connectToDatabase();
+		const db = getDB(platform.env);
 
 		// Find the user and their profiles
-		const user = await db.collection('users').findOne({ email_hash });
+		const user = await db
+			.select({
+				profiles: users.profiles
+			})
+			.from(users)
+			.where(eq(users.email_hash, email_hash))
+			.limit(1);
 
-		if (!user) {
+		if (user.length === 0) {
 			return jsonError('User not found', 404);
 		}
 
-		const profileCuids = user.profiles || [];
+		const profileCuids = JSON.parse(user[0].profiles) || [];
 
-		const profiles = await db
-			.collection('profiles')
-			.find({ cuid: { $in: profileCuids } })
-			.toArray();
+		const profilesList = await db
+			.select()
+			.from(profiles)
+			.where(inArray(profiles.cuid, profileCuids))
+			.all();
+
+		for (const profile of profilesList) {
+			profile.ipfs = JSON.parse(profile.ipfs || '[]');
+			profile.linked_schemas = JSON.parse(profile.linked_schemas || '[]');
+		}
 
 		// Return the profiles as JSON
-		return json({ profiles });
+		return json({ profiles: profilesList });
 	} catch (err) {
 		console.error(`Failed to fetch user profiles: ${err}`);
 		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
@@ -44,7 +62,10 @@ export const GET: RequestHandler = async ({ locals }) => {
 };
 
 // Save a single profile
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({
+	request,
+	platform = { env: { DB: {} as D1Database } }
+}) => {
 	try {
 		const profile = await request.json();
 
@@ -61,7 +82,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}
 
-		await saveProfile(profile);
+		await saveProfile(profile, platform);
 
 		return json({ success: true });
 	} catch (err) {
@@ -70,14 +91,22 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 };
 
-async function saveProfile(profile: Profile): Promise<void> {
-	const db = await connectToDatabase();
+async function saveProfile(profile: Profile, platform: { env: { DB: D1Database } }): Promise<void> {
+	const db = getDB(platform.env);
 
 	try {
-		await db.collection('profiles').insertOne({
-			...profile,
-			last_updated: Date.now()
-		});
+		await db
+			.insert(profiles)
+			.values({
+				cuid: profile.cuid,
+				ipfs: JSON.stringify(profile.ipfs),
+				linked_schemas: JSON.stringify(profile.linked_schemas),
+				node_id: profile.node_id,
+				title: profile.title,
+				profile: profile.profile,
+				last_updated: new Date(profile.last_updated)
+			})
+			.run();
 	} catch (error) {
 		console.error('Failed to save profile', error);
 		throw error;

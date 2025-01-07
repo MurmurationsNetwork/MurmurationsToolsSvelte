@@ -23,7 +23,7 @@ export const POST: RequestHandler = async ({
 		}
 
 		const emailHash = crypto.createHash('sha256').update(email).digest('hex');
-		const db = getDB(platform?.env);
+		const db = getDB(platform.env);
 
 		switch (loginType) {
 			case 'register':

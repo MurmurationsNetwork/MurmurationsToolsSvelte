@@ -1,10 +1,17 @@
-import { connectToDatabase } from '$lib/db';
+import { getDB } from '$lib/db/db';
+import { profiles, users } from '$lib/db/migrations/schema';
 import { validateProfile } from '$lib/server/server-utils';
 import type { Profile } from '$lib/types/Profile';
 import { jsonError } from '$lib/utils';
+import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({
+	params,
+	locals,
+	platform = { env: { DB: {} as D1Database } }
+}) => {
 	try {
 		const { cuid } = params;
 
@@ -16,7 +23,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			return jsonError('Missing required fields or user not authenticated', 400);
 		}
 
-		const profile = await getProfileByCuid(cuid);
+		const profile = await getProfileByCuid(cuid, platform);
 
 		if (!profile) {
 			return jsonError('Profile not found', 404);
@@ -29,26 +36,27 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 	}
 };
 
-async function getProfileByCuid(cuid: string): Promise<Profile | null> {
-	const db = await connectToDatabase();
+async function getProfileByCuid(
+	cuid: string,
+	platform: { env: { DB: D1Database } }
+): Promise<Profile | null> {
+	const db = getDB(platform.env);
 
 	try {
-		const profile = await db.collection('profiles').findOne({ cuid });
+		const profile = await db.select().from(profiles).where(eq(profiles.cuid, cuid)).limit(1);
 
-		if (!profile) {
+		if (profile.length === 0) {
 			return null;
 		}
 
 		return {
-			cuid: profile.cuid,
-			ipfs: profile.ipfs,
-			last_updated: profile.last_updated,
-			linked_schemas: profile.linked_schemas,
-			created_at: profile.created_at,
-			updated_at: profile.updated_at,
-			node_id: profile.node_id,
-			profile: profile.profile,
-			title: profile.title
+			cuid: profile[0].cuid,
+			ipfs: profile[0].ipfs ? JSON.parse(profile[0].ipfs) : [],
+			last_updated: profile[0].last_updated.getTime(),
+			linked_schemas: parseStringArray(profile[0].linked_schemas),
+			node_id: profile[0].node_id,
+			profile: profile[0].profile ? JSON.parse(profile[0].profile) : {},
+			title: profile[0].title
 		} as Profile;
 	} catch (err) {
 		console.error('Failed to get profile', err);
@@ -57,7 +65,11 @@ async function getProfileByCuid(cuid: string): Promise<Profile | null> {
 }
 
 // Update profile to user's profiles
-export const PUT: RequestHandler = async ({ params, locals }) => {
+export const PUT: RequestHandler = async ({
+	params,
+	locals,
+	platform = { env: { DB: {} as D1Database } }
+}) => {
 	try {
 		const { cuid } = params;
 
@@ -69,7 +81,7 @@ export const PUT: RequestHandler = async ({ params, locals }) => {
 			return jsonError('Missing required fields or user not authenticated', 400);
 		}
 
-		const isUpdated = await updateUserProfiles(locals.user.email_hash, cuid);
+		const isUpdated = await updateUserProfiles(locals.user.email_hash, cuid, platform);
 		if (!isUpdated) {
 			return jsonError('Failed to update profile', 404);
 		}
@@ -81,18 +93,39 @@ export const PUT: RequestHandler = async ({ params, locals }) => {
 	}
 };
 
-async function updateUserProfiles(emailHash: string, profileCuid: string): Promise<boolean> {
-	const db = await connectToDatabase();
+async function updateUserProfiles(
+	emailHash: string,
+	profileCuid: string,
+	platform: { env: { DB: D1Database } }
+): Promise<boolean> {
+	const db = getDB(platform.env);
 
 	try {
-		const result = await db
-			.collection('users')
-			.updateOne({ email_hash: emailHash }, { $addToSet: { profiles: profileCuid } });
+		const user = await db
+			.select({ profiles: users.profiles })
+			.from(users)
+			.where(eq(users.email_hash, emailHash))
+			.limit(1);
 
-		if (result.modifiedCount === 0) {
+		if (user.length === 0) {
+			console.error('User not found');
+			return false;
+		}
+
+		const currentProfiles = JSON.parse(user[0].profiles || '[]');
+		currentProfiles.push(profileCuid);
+
+		const result = await db
+			.update(users)
+			.set({ profiles: JSON.stringify(currentProfiles) })
+			.where(eq(users.email_hash, emailHash))
+			.run();
+
+		if (result.rowCount === 0) {
 			console.error('Failed to add profile to user profiles');
 			return false;
 		}
+
 		return true;
 	} catch (err) {
 		console.error('Failed to update user profiles', err);
@@ -100,8 +133,26 @@ async function updateUserProfiles(emailHash: string, profileCuid: string): Promi
 	}
 }
 
+function parseStringArray(json: string | null): string[] {
+	try {
+		const parsed = JSON.parse(json || '[]');
+		if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
+			return parsed;
+		}
+		return [];
+	} catch {
+		console.warn('Failed to parse linked_schemas as string[]');
+		return [];
+	}
+}
+
 // Update profile data
-export const PATCH: RequestHandler = async ({ params, request, locals }) => {
+export const PATCH: RequestHandler = async ({
+	params,
+	request,
+	locals,
+	platform = { env: { DB: {} as D1Database } }
+}) => {
 	try {
 		const { cuid } = params;
 		const { title, last_updated, profile } = await request.json();
@@ -123,7 +174,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals }) => {
 			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}
 
-		const isUpdated = await updateProfile(cuid, title, last_updated, profile);
+		const isUpdated = await updateProfile(cuid, title, last_updated, profile, platform);
 
 		if (!isUpdated) {
 			return jsonError('Failed to update profile', 404);
@@ -140,23 +191,23 @@ async function updateProfile(
 	cuid: string,
 	title: string,
 	lastUpdated: number,
-	profile: string
+	profile: string,
+	platform: { env: { DB: D1Database } }
 ): Promise<boolean> {
-	const db = await connectToDatabase();
+	const db = getDB(platform.env);
 
 	try {
-		const updateResult = await db.collection('profiles').updateOne(
-			{ cuid },
-			{
-				$set: {
-					title,
-					last_updated: lastUpdated,
-					profile
-				}
-			}
-		);
+		const updateResult = await db
+			.update(profiles)
+			.set({
+				title,
+				last_updated: new Date(lastUpdated),
+				profile
+			})
+			.where(eq(profiles.cuid, cuid))
+			.run();
 
-		if (updateResult.modifiedCount === 0) {
+		if (updateResult.rowCount === 0) {
 			console.log('Failed to update profile');
 			return false;
 		}
@@ -169,7 +220,11 @@ async function updateProfile(
 }
 
 // Delete profile from user's profiles
-export const DELETE: RequestHandler = async ({ params, locals }) => {
+export const DELETE: RequestHandler = async ({
+	params,
+	locals,
+	platform = { env: { DB: {} as D1Database } }
+}) => {
 	try {
 		const { cuid } = params;
 		const email_hash = locals.user?.email_hash;
@@ -178,7 +233,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 			return jsonError('Missing cuid or user not authenticated', 400);
 		}
 
-		const isDeleted = await deleteProfile(email_hash, cuid);
+		const isDeleted = await deleteProfile(email_hash, cuid, platform);
 
 		if (!isDeleted) {
 			return jsonError('Failed to delete profile', 404);
@@ -191,33 +246,39 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	}
 };
 
-async function deleteProfile(emailHash: string, profileCuid: string): Promise<boolean> {
-	const db = await connectToDatabase();
+async function deleteProfile(
+	emailHash: string,
+	profileCuid: string,
+	platform: { env: { DB: D1Database } }
+): Promise<boolean> {
+	const db = getDB(platform.env);
 
 	try {
-		const user = await db.collection('users').findOne({ email_hash: emailHash });
+		const user = await db.select().from(users).where(eq(users.email_hash, emailHash)).limit(1);
 
-		if (!user || !user.profiles || !user.profiles.includes(profileCuid)) {
+		if (user.length === 0 || !user[0].profiles || !user[0].profiles.includes(profileCuid)) {
 			console.log("Profile not found in user's profiles");
 			return false;
 		}
 
-		if (Array.isArray(user.profiles)) {
-			const updatedProfiles = user.profiles.filter((profile) => profile !== profileCuid);
+		const updatedProfiles = JSON.parse(user[0].profiles).filter(
+			(profile: string) => profile !== profileCuid
+		);
 
-			const updateResult = await db
-				.collection('users')
-				.updateOne({ email_hash: emailHash }, { $set: { profiles: updatedProfiles } });
+		const updateResult = await db
+			.update(users)
+			.set({ profiles: JSON.stringify(updatedProfiles) })
+			.where(eq(users.email_hash, emailHash))
+			.run();
 
-			if (updateResult.modifiedCount === 0) {
-				console.log("Failed to remove profile from user's profiles");
-				return false;
-			}
+		if (updateResult.rowCount === 0) {
+			console.log("Failed to remove profile from user's profiles");
+			return false;
 		}
 
-		const deleteResult = await db.collection('profiles').deleteOne({ cuid: profileCuid });
+		const deleteResult = await db.delete(profiles).where(eq(profiles.cuid, profileCuid)).run();
 
-		if (deleteResult.deletedCount === 0) {
+		if (deleteResult.rowCount === 0) {
 			console.error('Failed to delete profile from profiles collection');
 			return false;
 		}

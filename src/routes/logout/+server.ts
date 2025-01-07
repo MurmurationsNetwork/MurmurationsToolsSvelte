@@ -14,10 +14,8 @@ export const POST: RequestHandler = async ({
 	try {
 		const sessionToken = cookies.get('murmurations_tools_session');
 
-		console.log('sessionToken', sessionToken);
-
 		if (sessionToken) {
-			const db = getDB(platform?.env);
+			const db = getDB(platform.env);
 			await db.delete(sessions).where(eq(sessions.session_token, sessionToken)).run();
 		}
 
