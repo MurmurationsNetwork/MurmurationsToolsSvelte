@@ -54,7 +54,7 @@ async function getProfileByCuid(
 			ipfs: profile[0].ipfs ? JSON.parse(profile[0].ipfs) : [],
 			last_updated: profile[0].last_updated.getTime(),
 			linked_schemas: parseStringArray(profile[0].linked_schemas),
-			node_id: profile[0].node_id,
+			node_id: profile[0].node_id || '',
 			profile: profile[0].profile ? JSON.parse(profile[0].profile) : {},
 			title: profile[0].title
 		} as Profile;

@@ -1,9 +1,16 @@
-import { connectToDatabase } from '$lib/db';
+import { getDB } from '$lib/db/db';
+import { profiles } from '$lib/db/migrations/schema';
 import { jsonError } from '$lib/utils';
+import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 
 // Update node_id for a profile
-export const PUT: RequestHandler = async ({ request, params }) => {
+export const PUT: RequestHandler = async ({
+	request,
+	params,
+	platform = { env: { DB: {} as D1Database } }
+}) => {
 	try {
 		const { cuid } = params;
 		const { node_id } = await request.json();
@@ -12,11 +19,15 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 			return jsonError('Missing required fields', 400);
 		}
 
-		const db = await connectToDatabase();
+		const db = getDB(platform.env);
 
-		const result = await db.collection('profiles').updateOne({ cuid: cuid }, { $set: { node_id } });
+		const updateResult = await db
+			.update(profiles)
+			.set({ node_id })
+			.where(eq(profiles.cuid, cuid))
+			.run();
 
-		if (result.matchedCount === 0) {
+		if (updateResult.rowCount === 0) {
 			return jsonError('Profile not found', 404);
 		}
 

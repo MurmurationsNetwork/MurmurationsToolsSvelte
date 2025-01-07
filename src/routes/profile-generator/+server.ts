@@ -101,7 +101,7 @@ async function saveProfile(profile: Profile, platform: { env: { DB: D1Database }
 				cuid: profile.cuid,
 				ipfs: JSON.stringify(profile.ipfs),
 				linked_schemas: JSON.stringify(profile.linked_schemas),
-				node_id: profile.node_id,
+				node_id: null,
 				title: profile.title,
 				profile: profile.profile,
 				last_updated: new Date(profile.last_updated)
