@@ -30,7 +30,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 				event.locals.user = {
 					cuid: currentUser.cuid,
 					email_hash: currentUser.email_hash,
-					profiles: []
+					profiles: JSON.parse(currentUser.profiles)
 				};
 				event.locals.isAuthenticated = true;
 			} else {

@@ -64,8 +64,7 @@ const handleRegistration = async (
 		ipfs: null,
 		ipns: null,
 		last_login: new Date(),
-		created_at: new Date(),
-		updated_at: new Date()
+		profiles: JSON.stringify([])
 	};
 	await db.insert(users).values(newUser).run();
 
