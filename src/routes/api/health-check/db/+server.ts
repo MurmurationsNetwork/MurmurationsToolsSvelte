@@ -1,13 +1,17 @@
-import { connectToDatabase } from '$lib/db';
+import { getDB } from '$lib/db/db';
+import type { D1Database } from '@cloudflare/workers-types';
 import type { RequestHandler } from '@sveltejs/kit';
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ platform = { env: { DB: {} as D1Database } } }) => {
 	try {
-		const db = await connectToDatabase();
-		await db.command({ ping: 1 });
+		if (!platform?.env?.DB) {
+			throw new Error('DB is not defined');
+		}
+		const db = getDB(platform?.env);
+		await db.run('SELECT 1');
 		return new Response(JSON.stringify({ status: 'ok' }), { status: 200 });
-	} catch (error) {
-		console.error('Error checking DB status:', error);
+	} catch (err) {
+		console.error('Error checking DB status:', err);
 		return new Response(JSON.stringify({ status: 'down' }), { status: 500 });
 	}
 };

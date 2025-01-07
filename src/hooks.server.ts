@@ -1,25 +1,37 @@
-import { closeDatabaseConnection, connectToDatabase } from '$lib/db';
+import { getDB } from '$lib/db/db';
+import { sessions, users } from '$lib/db/migrations/schema';
 import { dbStatus } from '$lib/stores/dbStatus';
+import type { D1Database } from '@cloudflare/workers-types';
 import type { Handle } from '@sveltejs/kit';
 import { parse } from 'cookie';
+import { eq } from 'drizzle-orm';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const cookieHeader = event.request.headers.get('cookie') || '';
 	const cookies = parse(cookieHeader);
 	const sessionToken = cookies['murmurations_tools_session'];
+	const platform = event.platform ?? { env: { DB: {} as D1Database } };
 
 	if (sessionToken) {
 		try {
-			const db = await connectToDatabase();
-			const session = await db.collection('sessions').findOne({ session_token: sessionToken });
-			if (session) {
+			const db = getDB(platform?.env);
+			const session = await db
+				.select()
+				.from(sessions)
+				.where(eq(sessions.session_token, sessionToken))
+				.limit(1);
+			if (session.length > 0) {
 				const user = await db
-					.collection('users')
-					.findOne(
-						{ email_hash: session.email_hash },
-						{ projection: { _id: 0, cuid: 1, email_hash: 1, profiles: 1 } }
-					);
-				event.locals.user = user as { cuid: string; email_hash: string; profiles: string[] } | null;
+					.select()
+					.from(users)
+					.where(eq(users.email_hash, session[0].email_hash))
+					.limit(1);
+				const currentUser = user[0];
+				event.locals.user = {
+					cuid: currentUser.cuid,
+					email_hash: currentUser.email_hash,
+					profiles: []
+				};
 				event.locals.isAuthenticated = true;
 			} else {
 				event.locals.user = null;
@@ -34,8 +46,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 					}
 				});
 			}
-		} catch (error) {
-			console.error(`MongoDB connection failed: ${error}`);
+		} catch (err) {
+			console.error(`Database connection failed: ${err}`);
 			dbStatus.set(false);
 			event.locals.isAuthenticated = true;
 		}
@@ -45,8 +57,3 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	return resolve(event);
 };
-
-process.on('sveltekit:shutdown', async () => {
-	await closeDatabaseConnection();
-	process.exit(0);
-});

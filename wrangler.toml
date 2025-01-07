@@ -1,0 +1,8 @@
+name = "murmurations_tools"
+compatibility_date = "2025-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "local-tools"
+database_id = "25ab3048-29d7-45f9-a342-66d24ff8c84e"
+migrations_dir = "drizzle"

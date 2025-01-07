@@ -27,3 +27,7 @@ vite.config.ts.timestamp-*
 
 # Tests
 test-results
+
+# Drizzle and D1
+.wrangler
+drizzle

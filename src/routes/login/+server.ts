@@ -1,14 +1,20 @@
 import { PUBLIC_ENV } from '$env/static/public';
-import { connectToDatabase } from '$lib/db';
+import { getDB } from '$lib/db/db';
+import { sessions, users } from '$lib/db/migrations/schema';
 import { generateCuid, jsonError } from '$lib/utils';
+import type { D1Database } from '@cloudflare/workers-types';
 import type { RequestHandler } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
 import { serialize } from 'cookie';
 import crypto from 'crypto';
-import type { Db } from 'mongodb';
+import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import { v4 as uuidv4 } from 'uuid';
+import { eq } from 'drizzle-orm';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({
+	request,
+	platform = { env: { DB: {} as D1Database } }
+}) => {
 	try {
 		const { email, password, loginType } = await request.json();
 
@@ -17,7 +23,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		const emailHash = crypto.createHash('sha256').update(email).digest('hex');
-		const db = await connectToDatabase();
+		const db = getDB(platform?.env);
 
 		switch (loginType) {
 			case 'register':
@@ -33,52 +39,73 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 };
 
-const handleRegistration = async (db: Db, emailHash: string, password: string, email: string) => {
-	const existingUser = await db.collection('users').findOne({ email_hash: emailHash });
-	if (existingUser) {
+const handleRegistration = async (
+	db: DrizzleD1Database,
+	emailHash: string,
+	password: string,
+	email: string
+) => {
+	const existingUser = await db
+		.select()
+		.from(users)
+		.where(eq(users.email_hash, emailHash))
+		.limit(1);
+	if (existingUser.length > 0) {
 		return jsonError('User already exists', 400);
 	}
 
 	const hashedPassword = await bcrypt.hash(password, 10);
 	const cuid = generateCuid();
 
-	const newUser = {
+	const newUser: typeof users.$inferInsert = {
 		cuid,
 		email_hash: emailHash,
 		password: hashedPassword,
-		ipfs: '',
-		ipns: '',
-		last_login: Date.now(),
-		profiles: []
+		ipfs: null,
+		ipns: null,
+		last_login: new Date(),
+		created_at: new Date(),
+		updated_at: new Date()
 	};
-	await db.collection('users').insertOne(newUser);
+	await db.insert(users).values(newUser).run();
 
 	const sessionToken = await createSession(db, emailHash);
 
 	return createSuccessResponse(email, sessionToken, 'Registration successful');
 };
 
-const handleLogin = async (db: Db, emailHash: string, password: string, email: string) => {
-	const user = await db.collection('users').findOne({ email_hash: emailHash });
-	if (!user || !(await bcrypt.compare(password, user.password))) {
+const handleLogin = async (
+	db: DrizzleD1Database,
+	emailHash: string,
+	password: string,
+	email: string
+) => {
+	const user = await db.select().from(users).where(eq(users.email_hash, emailHash)).limit(1);
+	const currentUser = user[0];
+	if (!currentUser || !(await bcrypt.compare(password, currentUser.password))) {
 		return jsonError('Invalid credentials', 401);
 	}
 
 	await db
-		.collection('users')
-		.updateOne({ email_hash: emailHash }, { $set: { last_login: Date.now() } });
+		.update(users)
+		.set({ last_login: new Date() })
+		.where(eq(users.email_hash, emailHash))
+		.run();
 	const sessionToken = await createSession(db, emailHash);
 
 	return createSuccessResponse(email, sessionToken, 'Login successful');
 };
 
-const createSession = async (db: Db, emailHash: string) => {
+const createSession = async (db: DrizzleD1Database, emailHash: string) => {
 	const sessionToken = uuidv4();
-	await db.collection('sessions').insertOne({
-		session_token: sessionToken,
-		email_hash: emailHash,
-		created_at: new Date()
-	});
+	await db
+		.insert(sessions)
+		.values({
+			session_token: sessionToken,
+			email_hash: emailHash,
+			created_at: new Date()
+		})
+		.run();
 	return sessionToken;
 };
 
