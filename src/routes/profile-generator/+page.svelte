@@ -120,7 +120,7 @@
 
 			const profileData = responseData.profile;
 
-			currentProfile = JSON.parse(profileData.profile);
+			currentProfile = profileData.profile;
 			schemasSelected = profileData.linked_schemas;
 			currentTitle = profileData.title;
 			currentCuid = cuid;
