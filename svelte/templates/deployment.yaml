@@ -23,12 +23,16 @@ spec:
           volumeMounts:
             - name: node-modules-storage
               mountPath: /app/node_modules
+            - name: d1-storage
+              mountPath: /app/.wrangler
       containers:
         - name: {{ .Values.name }}
           image: {{ .Values.image }}
           volumeMounts:
             - mountPath: /app/node_modules
               name: node-modules-storage
+            - mountPath: /app/.wrangler
+              name: d1-storage
           command: [ "sh", "-c" ]
           args:
             - |
@@ -37,3 +41,7 @@ spec:
         - name: node-modules-storage
           hostPath:
             path: {{ .Values.sourcepath }}/temp-volume
+        - name: d1-storage
+          hostPath:
+            path: {{ .Values.sourcepath }}/d1-storage
+            type: DirectoryOrCreate

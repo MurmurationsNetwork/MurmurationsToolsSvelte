@@ -30,4 +30,5 @@ test-results
 
 # Drizzle and D1
 .wrangler
+d1-storage
 drizzle
