@@ -32,7 +32,6 @@
 		"bcryptjs": "^2.4.3",
 		"drizzle-orm": "^0.38.3",
 		"highlight.js": "11.11.1",
-		"mongodb": "^6.12.0",
 		"sqlite3": "^5.1.7",
 		"svelte-awesome": "^3.3.5",
 		"uuid": "^11.0.4"

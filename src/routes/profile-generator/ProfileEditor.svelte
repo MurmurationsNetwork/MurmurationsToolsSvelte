@@ -222,7 +222,7 @@
 				// Post profile URL to index and get node_id
 				const node_id = await postProfileToIndex(cuid);
 
-				// Update profile with node_id in MongoDB
+				// Update profile with node_id in DB
 				const updateNodeIdResponse = await fetch(`/profile-generator/${cuid}/update-node-id`, {
 					method: 'PUT',
 					headers: {
