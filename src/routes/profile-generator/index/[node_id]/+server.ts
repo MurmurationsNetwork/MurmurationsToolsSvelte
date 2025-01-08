@@ -20,8 +20,8 @@ export const GET: RequestHandler = async ({ params }) => {
 			console.error('Failed to fetch status:', response.statusText);
 			return json(data, { status: response.status });
 		}
-	} catch (error) {
-		console.error('Error fetching status:', error);
+	} catch (err) {
+		console.error('Error fetching status:', err);
 		return jsonError(
 			'Unable to connect to the Index service, please try again in a few minutes',
 			500
@@ -64,8 +64,8 @@ export const POST: RequestHandler = async ({ params }) => {
 
 		const result = await response.json();
 		return json({ node_id: result.data.node_id });
-	} catch (error) {
-		console.error('Error posting profile to index:', error);
+	} catch (err) {
+		console.error('Error posting profile to index:', err);
 		return jsonError(
 			'Unable to connect to the Index service, please try again in a few minutes',
 			500
@@ -92,8 +92,8 @@ export const DELETE: RequestHandler = async ({ params }) => {
 		}
 
 		return json({ success: true, message: 'Profile successfully deleted from index' });
-	} catch (error) {
-		console.error('Error deleting profile from index:', error);
+	} catch (err) {
+		console.error('Error deleting profile from index:', err);
 		return jsonError(
 			'Unable to connect to the Index service, please try again in a few minutes',
 			500

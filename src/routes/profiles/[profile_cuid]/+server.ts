@@ -30,8 +30,8 @@ export const GET: RequestHandler = async ({
 		const parsedProfile = JSON.parse(profile[0].profile ?? '{}');
 
 		return json(parsedProfile);
-	} catch (error) {
-		console.error('Error fetching profile:', error);
+	} catch (err) {
+		console.error('Error fetching profile:', err);
 		return json({ success: false, error: 'Internal server error' }, { status: 500 });
 	}
 };

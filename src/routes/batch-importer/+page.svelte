@@ -104,9 +104,9 @@
 			successMessage = wasModifyMode
 				? 'Batch modified successfully'
 				: 'Batch imported successfully';
-		} catch (error) {
+		} catch (err) {
 			data.errorMessage =
-				(error as Error).message ||
+				(err as Error).message ||
 				'An error occurred while processing your request, please try again later';
 		} finally {
 			isLoading = false;
@@ -133,9 +133,9 @@
 
 			await fetchBatches();
 			successMessage = 'Batch deleted successfully';
-		} catch (error) {
+		} catch (err) {
 			data.errorMessage =
-				(error as Error).message ||
+				(err as Error).message ||
 				'An error occurred while processing your request, please try again later';
 		} finally {
 			isLoading = false;
@@ -175,8 +175,8 @@
 				isLoggedIn = true;
 				data.errorMessage = 'Failed to fetch batches: ' + response.status;
 			}
-		} catch (error) {
-			data.errorMessage = 'Error fetching batches: ' + (error as Error).message;
+		} catch (err) {
+			data.errorMessage = 'Error fetching batches: ' + (err as Error).message;
 		}
 	}
 

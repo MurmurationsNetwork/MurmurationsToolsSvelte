@@ -107,8 +107,8 @@ async function saveProfile(profile: Profile, platform: { env: { DB: D1Database }
 				last_updated: new Date(profile.last_updated)
 			})
 			.run();
-	} catch (error) {
-		console.error('Failed to save profile', error);
-		throw error;
+	} catch (err) {
+		console.error('Failed to save profile', err);
+		throw err;
 	}
 }

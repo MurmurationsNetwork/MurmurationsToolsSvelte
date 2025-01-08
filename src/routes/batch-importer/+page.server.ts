@@ -34,15 +34,15 @@ const getSchemas = async (fetch: (input: RequestInfo, init?: RequestInit) => Pro
 		}
 		const result = await response.json();
 		return { schemas: result.data.map((schema: Schema) => schema.name), error: null };
-	} catch (error) {
-		if (error instanceof Error) {
+	} catch (err) {
+		if (err instanceof Error) {
 			return {
 				schemas: [],
-				error: `Unable to connect to the Library service, please try again in a few minutes: ${error?.message || 'Unknown error'}`
+				error: `Unable to connect to the Library service, please try again in a few minutes: ${err?.message || 'Unknown error'}`
 			};
 		}
 
-		const errorDetails = JSON.stringify(error, Object.getOwnPropertyNames(error));
+		const errorDetails = JSON.stringify(err, Object.getOwnPropertyNames(err));
 		console.error('Error fetching schemas:', errorDetails);
 		return {
 			schemas: [],

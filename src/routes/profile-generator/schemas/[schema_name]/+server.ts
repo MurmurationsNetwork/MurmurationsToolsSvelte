@@ -18,8 +18,8 @@ export const GET: RequestHandler = async ({ params }) => {
 			console.error('Failed to fetch status:', response.statusText);
 			return json(data, { status: response.status });
 		}
-	} catch (error) {
-		console.error('Error fetching status:', error);
+	} catch (err) {
+		console.error('Error fetching status:', err);
 		return jsonError(
 			'Unable to connect to the Library service, please try again in a few minutes',
 			500

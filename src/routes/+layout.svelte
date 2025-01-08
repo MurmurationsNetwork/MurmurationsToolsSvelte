@@ -111,8 +111,8 @@
 				const result = await response.json();
 				console.error('Failed to logout: ' + result.error);
 			}
-		} catch (error) {
-			console.error('Failed to logout:', error);
+		} catch (err) {
+			console.error('Failed to logout:', err);
 		}
 	}
 </script>

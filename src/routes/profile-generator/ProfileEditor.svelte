@@ -50,8 +50,8 @@
 		try {
 			profileEditorErrorOccurred(null);
 			schemas = await ParseRef(schemasSelected);
-		} catch (error) {
-			profileEditorErrorOccurred(error as string | null);
+		} catch (err) {
+			profileEditorErrorOccurred(err as string | null);
 			resetSchemas();
 		}
 	});
@@ -248,9 +248,9 @@
 			profilePreview = false;
 			profileEditorErrorOccurred(null);
 			resetSchemas();
-		} catch (error) {
-			console.error('Error saving and posting profile:', error);
-			profileEditorErrorOccurred(error as string | null);
+		} catch (err) {
+			console.error('Error saving and posting profile:', err);
+			profileEditorErrorOccurred(err as string | null);
 		}
 
 		profileUpdated();
@@ -273,9 +273,9 @@
 
 			const result = await response.json();
 			return result.node_id;
-		} catch (error) {
-			console.error('Error posting profile to index:', error);
-			throw error;
+		} catch (err) {
+			console.error('Error posting profile to index:', err);
+			throw err;
 		}
 	}
 </script>

@@ -38,8 +38,8 @@ export const POST: RequestHandler = async ({
 				}
 			}
 		);
-	} catch (error) {
-		console.error('Logout error:', error);
+	} catch (err) {
+		console.error('Logout error:', err);
 		return json({ success: false, error: 'Logout failed' }, { status: 500 });
 	}
 };

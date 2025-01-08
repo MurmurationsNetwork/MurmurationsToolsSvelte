@@ -29,8 +29,8 @@ export async function validateProfile(
 		}
 
 		return { success: true };
-	} catch (error) {
-		console.error('Fetch failed:', error);
+	} catch (err) {
+		console.error('Fetch failed:', err);
 		return {
 			success: false,
 			errors: 'Unable to connect to the Index service, please try again in a few minutes'

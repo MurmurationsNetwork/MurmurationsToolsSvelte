@@ -53,8 +53,8 @@ export const GET: RequestHandler = async ({ url }) => {
 			meta: nodes?.meta,
 			status: response.status
 		});
-	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+	} catch (err) {
+		const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
 		console.error(`Failed to load nodes: ${errorMessage}`);
 		return json({ error: `Failed to load nodes: ${errorMessage}` }, { status: 500 });
 	}

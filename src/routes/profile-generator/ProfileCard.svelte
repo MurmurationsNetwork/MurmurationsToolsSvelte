@@ -66,8 +66,8 @@
 				handleFetchError(response, data);
 				return 'unknown';
 			}
-		} catch (error) {
-			console.error('Error fetching status:', error);
+		} catch (err) {
+			console.error('Error fetching status:', err);
 			return 'unknown';
 		}
 	}
@@ -110,8 +110,8 @@
 				await performDelete(`/profile-generator/index/${node_id}`);
 			}
 			profileUpdated();
-		} catch (error) {
-			console.error('Error deleting profile:', error);
+		} catch (err) {
+			console.error('Error deleting profile:', err);
 		}
 	}
 
