@@ -1,3 +1,5 @@
 node_modules
 temp-volume
 d1-storage
+.wrangler
+drizzle

@@ -20,6 +20,7 @@ spec:
             - |
               echo "Running pnpm install"
               cd /app && pnpm install
+              cd /app && pnpm run db:generate && pnpm run db:migrate
           volumeMounts:
             - name: node-modules-storage
               mountPath: /app/node_modules
