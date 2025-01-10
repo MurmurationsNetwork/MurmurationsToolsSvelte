@@ -21,16 +21,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 				.where(eq(sessions.session_token, sessionToken))
 				.limit(1);
 			if (session.length > 0) {
-				const user = await db
-					.select()
-					.from(users)
-					.where(eq(users.email_hash, session[0].email_hash))
-					.limit(1);
+				const user = await db.select().from(users).where(eq(users.id, session[0].user_id)).limit(1);
 				const currentUser = user[0];
 				event.locals.user = {
-					cuid: currentUser.cuid,
-					email_hash: currentUser.email_hash,
-					profiles: JSON.parse(currentUser.profiles)
+					id: currentUser.id,
+					cuid: currentUser.cuid
 				};
 				event.locals.isAuthenticated = true;
 			} else {

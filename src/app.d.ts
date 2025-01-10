@@ -8,9 +8,8 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			user: {
+				id: number;
 				cuid: string;
-				email_hash: string;
-				profiles: string[];
 			} | null;
 			isAuthenticated: boolean;
 		}

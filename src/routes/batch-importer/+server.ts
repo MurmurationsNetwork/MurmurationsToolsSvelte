@@ -42,12 +42,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const file = formData.get('file');
 	const schemas = formData.get('schemas');
 	const title = formData.get('title');
-	const userId = locals.user?.cuid;
+	const cuid = locals.user?.cuid;
 
-	formData.append('user_id', userId);
+	formData.append('user_id', cuid);
 	formData.append('schemas', '[' + schemas + ']');
 
-	if (!file || !schemas || !title) {
+	if (!file || !schemas || !title || !cuid) {
 		return jsonError('Missing required fields', 400);
 	}
 
@@ -94,12 +94,12 @@ export const PUT: RequestHandler = async ({ request, locals }) => {
 	const schemas = formData.get('schemas');
 	const title = formData.get('title');
 	const batchId = formData.get('batch_id');
-	const userId = locals.user?.cuid;
+	const cuid = locals.user?.cuid;
 
-	formData.append('user_id', userId);
+	formData.append('user_id', cuid);
 	formData.append('schemas', '[' + schemas + ']');
 
-	if (!file || !schemas || !title || !batchId) {
+	if (!file || !schemas || !title || !batchId || !cuid) {
 		return jsonError('Missing required fields', 400);
 	}
 
@@ -143,12 +143,12 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
 
 	const formData = await request.formData();
 	const batchId = formData.get('batch_id');
-	const userId = locals.user?.cuid;
+	const cuid = locals.user?.cuid;
 
-	formData.append('user_id', userId);
+	formData.append('user_id', cuid);
 
-	if (!batchId) {
-		return jsonError('Missing batch_id', 400);
+	if (!batchId || !cuid) {
+		return jsonError('Missing batch_id or user_id', 400);
 	}
 
 	try {

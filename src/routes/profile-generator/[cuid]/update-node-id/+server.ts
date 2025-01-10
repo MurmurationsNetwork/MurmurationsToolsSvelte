@@ -3,12 +3,13 @@ import { profiles } from '$lib/db/migrations/schema';
 import { jsonError } from '$lib/utils';
 import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 
 // Update node_id for a profile
 export const PUT: RequestHandler = async ({
 	request,
 	params,
+	locals,
 	platform = { env: { DB: {} as D1Database } }
 }) => {
 	try {
@@ -19,12 +20,18 @@ export const PUT: RequestHandler = async ({
 			return jsonError('Missing required fields', 400);
 		}
 
+		const userId = locals.user?.id;
+
+		if (!userId) {
+			return jsonError('Please log in first', 401);
+		}
+
 		const db = getDB(platform.env);
 
 		const updateResult = await db
 			.update(profiles)
-			.set({ node_id })
-			.where(eq(profiles.cuid, cuid))
+			.set({ node_id, updated_at: sql`CURRENT_TIMESTAMP` })
+			.where(and(eq(profiles.cuid, cuid), eq(profiles.user_id, userId)))
 			.run();
 
 		if (updateResult.rowCount === 0) {

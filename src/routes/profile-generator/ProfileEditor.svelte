@@ -199,26 +199,6 @@
 				const node_id = await postProfileToIndex(cuid);
 				console.log('Profile updated to index with node_id:', node_id);
 			} else {
-				// Update user's profiles list
-				const updateResponse = await fetch(`/profile-generator/${cuid}`, {
-					method: 'PUT',
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				});
-
-				if (!updateResponse.ok) {
-					const updateErrorData = await updateResponse.json();
-					throw new Error(updateErrorData.error || 'Error updating user profiles list');
-				}
-
-				const updateResult = await updateResponse.json();
-				if (updateResult.success) {
-					console.log('User profiles list updated successfully');
-				} else {
-					throw new Error('Unknown error occurred while updating user profiles list');
-				}
-
 				// Post profile URL to index and get node_id
 				const node_id = await postProfileToIndex(cuid);
 

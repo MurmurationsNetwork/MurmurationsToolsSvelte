@@ -1,11 +1,11 @@
 import { getDB } from '$lib/db/db';
-import { profiles, users } from '$lib/db/migrations/schema';
+import { profiles } from '$lib/db/migrations/schema';
 import { validateProfile } from '$lib/server/server-utils';
 import type { Profile } from '$lib/types/Profile';
 import { jsonError } from '$lib/utils';
 import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { eq, inArray } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 // Get all profiles
 export const GET: RequestHandler = async ({
@@ -18,39 +18,19 @@ export const GET: RequestHandler = async ({
 			return jsonError('Authentication required', 401);
 		}
 
-		const email_hash = locals.user.email_hash;
+		const userId = locals.user.id;
 
-		// Validate the email_hash
-		if (!email_hash) {
-			return jsonError('Missing email_hash parameter', 400);
+		if (!userId) {
+			return jsonError('Please log in first', 401);
 		}
 
 		const db = getDB(platform.env);
 
-		// Find the user and their profiles
-		const user = await db
-			.select({
-				profiles: users.profiles
-			})
-			.from(users)
-			.where(eq(users.email_hash, email_hash))
-			.limit(1);
-
-		if (user.length === 0) {
-			return jsonError('User not found', 404);
-		}
-
-		const profileCuids = JSON.parse(user[0].profiles) || [];
-
-		const profilesList = await db
-			.select()
-			.from(profiles)
-			.where(inArray(profiles.cuid, profileCuids))
-			.all();
+		const profilesList = await db.select().from(profiles).where(eq(profiles.user_id, userId)).all();
 
 		for (const profile of profilesList) {
-			profile.ipfs = JSON.parse(profile.ipfs || '[]');
 			profile.linked_schemas = JSON.parse(profile.linked_schemas || '[]');
+			profile.profile = JSON.parse(profile.profile || '{}');
 		}
 
 		// Return the profiles as JSON
@@ -64,12 +44,14 @@ export const GET: RequestHandler = async ({
 // Save a single profile
 export const POST: RequestHandler = async ({
 	request,
+	locals,
 	platform = { env: { DB: {} as D1Database } }
 }) => {
 	try {
 		const profile = await request.json();
+		const userId = locals.user?.id;
 
-		if (!profile) {
+		if (!profile || !userId) {
 			return jsonError('Missing required fields', 400);
 		}
 
@@ -82,7 +64,7 @@ export const POST: RequestHandler = async ({
 			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}
 
-		await saveProfile(profile, platform);
+		await saveProfile(profile, userId, platform);
 
 		return json({ success: true });
 	} catch (err) {
@@ -91,7 +73,11 @@ export const POST: RequestHandler = async ({
 	}
 };
 
-async function saveProfile(profile: Profile, platform: { env: { DB: D1Database } }): Promise<void> {
+async function saveProfile(
+	profile: Profile,
+	userId: number,
+	platform: { env: { DB: D1Database } }
+): Promise<void> {
 	const db = getDB(platform.env);
 
 	try {
@@ -99,7 +85,7 @@ async function saveProfile(profile: Profile, platform: { env: { DB: D1Database }
 			.insert(profiles)
 			.values({
 				cuid: profile.cuid,
-				ipfs: JSON.stringify(profile.ipfs),
+				user_id: userId,
 				linked_schemas: JSON.stringify(profile.linked_schemas),
 				node_id: null,
 				title: profile.title,
