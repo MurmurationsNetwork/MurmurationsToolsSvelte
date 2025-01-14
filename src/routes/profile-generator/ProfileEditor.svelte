@@ -50,8 +50,8 @@
 		try {
 			profileEditorErrorOccurred(null);
 			schemas = await ParseRef(schemasSelected);
-		} catch (error) {
-			profileEditorErrorOccurred(error as string | null);
+		} catch (err) {
+			profileEditorErrorOccurred(err as string | null);
 			resetSchemas();
 		}
 	});
@@ -199,30 +199,10 @@
 				const node_id = await postProfileToIndex(cuid);
 				console.log('Profile updated to index with node_id:', node_id);
 			} else {
-				// Update user's profiles list
-				const updateResponse = await fetch(`/profile-generator/${cuid}`, {
-					method: 'PUT',
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				});
-
-				if (!updateResponse.ok) {
-					const updateErrorData = await updateResponse.json();
-					throw new Error(updateErrorData.error || 'Error updating user profiles list');
-				}
-
-				const updateResult = await updateResponse.json();
-				if (updateResult.success) {
-					console.log('User profiles list updated successfully');
-				} else {
-					throw new Error('Unknown error occurred while updating user profiles list');
-				}
-
 				// Post profile URL to index and get node_id
 				const node_id = await postProfileToIndex(cuid);
 
-				// Update profile with node_id in MongoDB
+				// Update profile with node_id in DB
 				const updateNodeIdResponse = await fetch(`/profile-generator/${cuid}/update-node-id`, {
 					method: 'PUT',
 					headers: {
@@ -248,9 +228,9 @@
 			profilePreview = false;
 			profileEditorErrorOccurred(null);
 			resetSchemas();
-		} catch (error) {
-			console.error('Error saving and posting profile:', error);
-			profileEditorErrorOccurred(error as string | null);
+		} catch (err) {
+			console.error('Error saving and posting profile:', err);
+			profileEditorErrorOccurred(err as string | null);
 		}
 
 		profileUpdated();
@@ -273,9 +253,9 @@
 
 			const result = await response.json();
 			return result.node_id;
-		} catch (error) {
-			console.error('Error posting profile to index:', error);
-			throw error;
+		} catch (err) {
+			console.error('Error posting profile to index:', err);
+			throw err;
 		}
 	}
 </script>

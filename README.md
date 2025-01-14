@@ -2,6 +2,20 @@
 
 > _This project is licensed under the terms of the GNU General Public License v3.0_
 
+## Local Development with Cloudflare D1 and Drizzle
+
+1. Generate migrations
+
+   ```bash
+   npm run db:generate
+   ```
+
+2. Run migrations
+
+   ```bash
+   npm run db:migrate
+   ```
+
 ## Local Development with Murmurations Services and Mongo Operator
 
 1. Install dependencies:

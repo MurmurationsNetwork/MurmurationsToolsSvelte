@@ -5,8 +5,8 @@ export function checkDbStatus(): void {
 		try {
 			const response = await fetch('/api/health-check/db');
 			dbStatus.set(response.ok);
-		} catch (error) {
-			console.error('Error checking DB status:', error);
+		} catch (err) {
+			console.error('Error checking DB status:', err);
 			dbStatus.set(false);
 		}
 	};

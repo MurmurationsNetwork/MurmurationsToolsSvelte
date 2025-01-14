@@ -91,8 +91,8 @@
 				isLoggedIn = true;
 				console.error('Failed to fetch profiles:', response.statusText);
 			}
-		} catch (error) {
-			console.error('Error fetching profiles:', error);
+		} catch (err) {
+			console.error('Error fetching profiles:', err);
 		}
 	}
 
@@ -120,12 +120,12 @@
 
 			const profileData = responseData.profile;
 
-			currentProfile = JSON.parse(profileData.profile);
+			currentProfile = profileData.profile;
 			schemasSelected = profileData.linked_schemas;
 			currentTitle = profileData.title;
 			currentCuid = cuid;
-		} catch (error) {
-			console.error('Error fetching profile details:', error);
+		} catch (err) {
+			console.error('Error fetching profile details:', err);
 		}
 	}
 </script>

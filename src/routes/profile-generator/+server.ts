@@ -1,42 +1,40 @@
-import { connectToDatabase } from '$lib/db';
+import { getDB } from '$lib/db/db';
+import { profiles } from '$lib/db/migrations/schema';
 import { validateProfile } from '$lib/server/server-utils';
 import type { Profile } from '$lib/types/Profile';
 import { jsonError } from '$lib/utils';
+import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 
 // Get all profiles
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({
+	locals,
+	platform = { env: { DB: {} as D1Database } }
+}) => {
 	try {
 		// Check if the user is authenticated
 		if (!locals.user) {
 			return jsonError('Authentication required', 401);
 		}
 
-		const email_hash = locals.user.email_hash;
+		const userId = locals.user.id;
 
-		// Validate the email_hash
-		if (!email_hash) {
-			return jsonError('Missing email_hash parameter', 400);
+		if (!userId) {
+			return jsonError('Please log in first', 401);
 		}
 
-		const db = await connectToDatabase();
+		const db = getDB(platform.env);
 
-		// Find the user and their profiles
-		const user = await db.collection('users').findOne({ email_hash });
+		const profilesList = await db.select().from(profiles).where(eq(profiles.user_id, userId)).all();
 
-		if (!user) {
-			return jsonError('User not found', 404);
+		for (const profile of profilesList) {
+			profile.linked_schemas = JSON.parse(profile.linked_schemas || '[]');
+			profile.profile = JSON.parse(profile.profile || '{}');
 		}
-
-		const profileCuids = user.profiles || [];
-
-		const profiles = await db
-			.collection('profiles')
-			.find({ cuid: { $in: profileCuids } })
-			.toArray();
 
 		// Return the profiles as JSON
-		return json({ profiles });
+		return json({ profiles: profilesList });
 	} catch (err) {
 		console.error(`Failed to fetch user profiles: ${err}`);
 		return jsonError('Unable to connect to the database, please try again in a few minutes', 500);
@@ -44,11 +42,16 @@ export const GET: RequestHandler = async ({ locals }) => {
 };
 
 // Save a single profile
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({
+	request,
+	locals,
+	platform = { env: { DB: {} as D1Database } }
+}) => {
 	try {
 		const profile = await request.json();
+		const userId = locals.user?.id;
 
-		if (!profile) {
+		if (!profile || !userId) {
 			return jsonError('Missing required fields', 400);
 		}
 
@@ -61,7 +64,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ success: false, errors: validationResponse.errors }, { status: 422 });
 		}
 
-		await saveProfile(profile);
+		await saveProfile(profile, userId, platform);
 
 		return json({ success: true });
 	} catch (err) {
@@ -70,16 +73,28 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 };
 
-async function saveProfile(profile: Profile): Promise<void> {
-	const db = await connectToDatabase();
+async function saveProfile(
+	profile: Profile,
+	userId: number,
+	platform: { env: { DB: D1Database } }
+): Promise<void> {
+	const db = getDB(platform.env);
 
 	try {
-		await db.collection('profiles').insertOne({
-			...profile,
-			last_updated: Date.now()
-		});
-	} catch (error) {
-		console.error('Failed to save profile', error);
-		throw error;
+		await db
+			.insert(profiles)
+			.values({
+				cuid: profile.cuid,
+				user_id: userId,
+				linked_schemas: JSON.stringify(profile.linked_schemas),
+				node_id: null,
+				title: profile.title,
+				profile: profile.profile,
+				last_updated: new Date(profile.last_updated)
+			})
+			.run();
+	} catch (err) {
+		console.error('Failed to save profile', err);
+		throw err;
 	}
 }

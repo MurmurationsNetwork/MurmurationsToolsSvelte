@@ -1,15 +1,22 @@
 import { PUBLIC_ENV } from '$env/static/public';
-import { connectToDatabase } from '$lib/db';
+import { getDB } from '$lib/db/db';
+import { sessions } from '$lib/db/migrations/schema';
+import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { serialize } from 'cookie';
+import { eq } from 'drizzle-orm';
 
-export const POST: RequestHandler = async ({ cookies, locals }) => {
+export const POST: RequestHandler = async ({
+	cookies,
+	locals,
+	platform = { env: { DB: {} as D1Database } }
+}) => {
 	try {
 		const sessionToken = cookies.get('murmurations_tools_session');
 
 		if (sessionToken) {
-			const db = await connectToDatabase();
-			await db.collection('sessions').deleteOne({ session_token: sessionToken });
+			const db = getDB(platform.env);
+			await db.delete(sessions).where(eq(sessions.session_token, sessionToken)).run();
 		}
 
 		const cookieHeader = serialize('murmurations_tools_session', '', {
@@ -31,8 +38,8 @@ export const POST: RequestHandler = async ({ cookies, locals }) => {
 				}
 			}
 		);
-	} catch (error) {
-		console.error('Logout error:', error);
+	} catch (err) {
+		console.error('Logout error:', err);
 		return json({ success: false, error: 'Logout failed' }, { status: 500 });
 	}
 };

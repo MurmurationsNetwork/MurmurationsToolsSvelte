@@ -21,8 +21,8 @@ export const GET: RequestHandler = async ({ url }) => {
 		const data = await response.json();
 
 		return json(data);
-	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+	} catch (err) {
+		const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
 		console.error(errorMessage);
 		return json(
 			{ error: 'The index service is currently not available. Please try again in a few minutes.' },
@@ -49,8 +49,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		const data = await response.json();
 
 		return json(data);
-	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+	} catch (err) {
+		const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
 		console.error(errorMessage);
 		return json(
 			{ error: 'The index service is currently not available. Please try again in a few minutes.' },
@@ -82,8 +82,8 @@ export const DELETE: RequestHandler = async ({ request }) => {
 		}
 
 		return json(data);
-	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+	} catch (err) {
+		const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
 		console.error(errorMessage);
 		return json(
 			{ error: 'The index service is currently not available. Please try again in a few minutes.' },

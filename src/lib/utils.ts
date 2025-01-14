@@ -1,5 +1,9 @@
-import { createId } from '@paralleldrive/cuid2';
+import { init } from '@paralleldrive/cuid2';
 import { json } from '@sveltejs/kit';
+
+const createId = init({
+	length: 25
+});
 
 export const generateCuid = (): string => {
 	return createId();
