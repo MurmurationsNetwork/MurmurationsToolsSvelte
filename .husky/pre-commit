@@ -1,1 +1,1 @@
-pnpm run format && pnpm run lint && git add -A . & pnpm run test
+pnpm format && pnpm lint && git add -A . & pnpm test
