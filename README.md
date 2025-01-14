@@ -7,13 +7,13 @@
 1. Generate migrations
 
    ```bash
-   npm run db:generate
+   pnpm run db:generate
    ```
 
 2. Run migrations
 
    ```bash
-   npm run db:migrate
+   pnpm run db:migrate
    ```
 
 ## Local Development with Murmurations Services and Mongo Operator
