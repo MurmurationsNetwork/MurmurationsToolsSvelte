@@ -1,6 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { PUBLIC_INDEX_URL } from '$env/static/public';
-import * as crypto from 'crypto';
+import crypto from 'crypto-browserify';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const profileUrl = url.searchParams.get('url');
