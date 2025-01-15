@@ -30,7 +30,7 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
         env:
-          PUBLIC_LOCAL_TOOLS_URL: ${{ secrets.PUBLIC_LOCAL_TOOLS_URL }}
+          PRIVATE_LOCAL_TOOLS_URL: ${{ secrets.PRIVATE_LOCAL_TOOLS_URL }}
           PUBLIC_ENV: ${{ secrets.PUBLIC_ENV }}
           PUBLIC_TOOLS_URL: ${{ secrets.PUBLIC_TOOLS_URL }}
           PUBLIC_INDEX_URL: ${{ secrets.PUBLIC_INDEX_URL }}
