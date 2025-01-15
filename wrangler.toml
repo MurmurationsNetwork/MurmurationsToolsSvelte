@@ -6,3 +6,10 @@ binding = "DB"
 database_name = "local-tools"
 database_id = "25ab3048-29d7-45f9-a342-66d24ff8c84e"
 migrations_dir = "drizzle"
+
+[env.preview]
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "test-tools"
+database_id = "976e0cc7-a78c-4c20-8c54-6cfecbc8b380"
+migrations_dir = "drizzle"

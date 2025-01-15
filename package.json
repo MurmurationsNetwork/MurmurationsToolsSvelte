@@ -22,8 +22,8 @@
 		"db:list:preview": "wrangler d1 migrations list test-tools --env preview",
 		"db:list:production": "wrangler d1 migrations list production-tools --env production",
 		"db:migrate": "wrangler d1 migrations apply local-tools --local",
-		"db:migrate:preview": "wrangler d1 migrations apply test-tools --env preview",
-		"db:migrate:production": "wrangler d1 migrations apply production-tools --env production"
+		"db:migrate:preview": "wrangler d1 migrations apply test-tools --env preview --remote",
+		"db:migrate:production": "wrangler d1 migrations apply production-tools --env production --remote"
 	},
 	"dependencies": {
 		"@floating-ui/dom": "1.6.12",
