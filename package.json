@@ -30,7 +30,6 @@
 		"@paralleldrive/cuid2": "^2.2.2",
 		"@tanstack/svelte-query": "^5.64.1",
 		"bcryptjs": "^2.4.3",
-		"crypto-browserify": "^3.12.1",
 		"drizzle-orm": "^0.38.3",
 		"highlight.js": "11.11.1",
 		"svelte-awesome": "^3.3.5",
