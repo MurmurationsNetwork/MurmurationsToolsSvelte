@@ -114,12 +114,16 @@
 			console.error('Failed to logout:', err);
 		}
 	}
+
+	export const ssr = false;
+
+	onMount(() => {
+		autoModeWatcher();
+	});
 </script>
 
 <!-- Sync system light/dark mode -->
 <svelte:head>
-	<!-- svelte-ignore hydration_html_changed -->
-	{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}
 	<title>Murmurations Tools</title>
 	<script
 		data-goatcounter={import.meta.env.PROD
