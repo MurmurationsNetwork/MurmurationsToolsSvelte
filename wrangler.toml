@@ -1,8 +1,22 @@
 name = "murmurations_tools"
-compatibility_date = "2025-01-01"
+compatibility_date = "2025-01-14"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "local-tools"
 database_id = "25ab3048-29d7-45f9-a342-66d24ff8c84e"
+migrations_dir = "drizzle"
+
+[env.preview]
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "test-tools"
+database_id = "976e0cc7-a78c-4c20-8c54-6cfecbc8b380"
+migrations_dir = "drizzle"
+
+[env.production]
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "tools"
+database_id = "6513bd79-3a8f-4ae0-9a70-b0dfb0583568"
 migrations_dir = "drizzle"

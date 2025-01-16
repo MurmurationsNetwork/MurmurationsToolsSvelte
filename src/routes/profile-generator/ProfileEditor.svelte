@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { ParseRef } from '$lib/parser';
-	import { onMount } from 'svelte';
-	import DynamicForm from './DynamicForm.svelte';
 	import { GenerateSchemaInstance } from '$lib/generator';
-	import type { Schema } from '$lib/types/Schema';
-	import type { ProfileObject } from '$lib/types/ProfileObject';
-	import { generateCuid } from '$lib/utils';
-	import type { Profile } from '$lib/types/Profile';
-	import { get } from 'svelte/store';
-	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
+	import { ParseRef } from '$lib/parser';
 	import { dbStatus } from '$lib/stores/dbStatus';
+	import { isAuthenticatedStore } from '$lib/stores/isAuthenticatedStore';
+	import type { Profile } from '$lib/types/Profile';
+	import type { ProfileObject } from '$lib/types/ProfileObject';
+	import type { Schema } from '$lib/types/Schema';
+	import { generateCuid } from '$lib/utils';
+	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
+	import DynamicForm from './DynamicForm.svelte';
 
 	interface Props {
 		schemasSelected: string[];
