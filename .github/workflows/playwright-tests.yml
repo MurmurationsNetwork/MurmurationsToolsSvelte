@@ -32,6 +32,7 @@ jobs:
         env:
           PRIVATE_LOCAL_TOOLS_URL: ${{ secrets.PRIVATE_LOCAL_TOOLS_URL }}
           PUBLIC_ENV: ${{ secrets.PUBLIC_ENV }}
+          PUBLIC_TOOLS_URL: ${{ secrets.PUBLIC_TOOLS_URL }}
           PUBLIC_INDEX_URL: ${{ secrets.PUBLIC_INDEX_URL }}
           PUBLIC_LIBRARY_URL: ${{ secrets.PUBLIC_LIBRARY_URL }}
           PUBLIC_DATA_PROXY_URL: ${{ secrets.PUBLIC_DATA_PROXY_URL }}

@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { dbStatus } from '$lib/stores/dbStatus';
-	import type { Profile } from '$lib/types/Profile';
-	import type { ProfileObject } from '$lib/types/ProfileObject';
-	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import { onMount } from 'svelte';
 	import ProfileCard from './ProfileCard.svelte';
 	import ProfileEditor from './ProfileEditor.svelte';
 	import SchemaSelector from './SchemaSelector.svelte';
+	import type { Profile } from '$lib/types/Profile';
+	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	import type { ProfileObject } from '$lib/types/ProfileObject';
+	import { dbStatus } from '$lib/stores/dbStatus';
+	import { PUBLIC_TOOLS_URL } from '$env/static/public';
 
 	const queryClient = new QueryClient();
 
@@ -72,7 +73,7 @@
 
 	async function fetchProfiles(): Promise<void> {
 		try {
-			const response = await fetch(`/profile-generator`);
+			const response = await fetch(`${PUBLIC_TOOLS_URL}/profile-generator`);
 			if (response.ok) {
 				const responseData = await response.json();
 				profileCards = responseData.profiles.map((profile: Profile) => ({
