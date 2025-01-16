@@ -59,7 +59,7 @@ export const POST: RequestHandler = async ({ params }) => {
 		if (!response.ok) {
 			const errorData = await response.json();
 			return json(
-				{ error: errorData.error || 'Error posting profile to index' },
+				{ error: errorData.error || 'Error posting profile to index', profileUrl },
 				{ status: response.status }
 			);
 		}
