@@ -151,7 +151,7 @@
 				>
 			</div>
 			<!-- TODO - link to test/prod based on site third-level domain -->
-			<span>
+			<!-- <span>
 				<span class="md:hidden">Test</span><span class="max-md:hidden">Test Site</span> -
 				<a href="https://tools.murmurations.network/" class="underline text-primary-500">
 					<span class="md:hidden">Live</span><span class="max-md:hidden">switch to Live</span>
@@ -161,7 +161,7 @@
 			<div class="card p-4 w-72 shadow-xl variant-filled-primary text-sm" data-popup="hoverSiteEnv">
 				We offer both test and live sites so you can experiment in our test environment before
 				posting data to the live one.
-			</div>
+			</div> -->
 			<div slot="trail">
 				{#if $isAuthenticatedStore}
 					<button
