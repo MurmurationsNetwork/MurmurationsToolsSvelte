@@ -115,8 +115,6 @@
 		}
 	}
 
-	export const ssr = false;
-
 	onMount(() => {
 		autoModeWatcher();
 	});
