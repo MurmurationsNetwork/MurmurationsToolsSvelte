@@ -46,8 +46,6 @@ export const POST: RequestHandler = async ({ params }) => {
 			profileUrl = `${PRIVATE_LOCAL_TOOLS_URL}/profiles/${node_id}`;
 		}
 
-		console.log('profileUrl', profileUrl);
-
 		const response = await fetch(`${PUBLIC_INDEX_URL}/v2/nodes`, {
 			method: 'POST',
 			headers: {
@@ -59,7 +57,7 @@ export const POST: RequestHandler = async ({ params }) => {
 		if (!response.ok) {
 			const errorData = await response.json();
 			return json(
-				{ error: errorData.error || 'Error posting profile to index', profileUrl },
+				{ error: errorData.error || 'Error posting profile to index' },
 				{ status: response.status }
 			);
 		}
