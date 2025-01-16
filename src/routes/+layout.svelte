@@ -7,8 +7,7 @@
 		AppRailAnchor,
 		AppShell,
 		AppBar,
-		autoModeWatcher,
-		popup
+		autoModeWatcher
 	} from '@skeletonlabs/skeleton';
 
 	import hljs from 'highlight.js/lib/core';
@@ -42,16 +41,16 @@
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
 	// Popup for site environment
-	import type { PopupSettings } from '@skeletonlabs/skeleton';
+	// import type { PopupSettings } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { checkDbStatus } from '$lib/checkDbStatus';
 	import { dbStatus } from '$lib/stores/dbStatus';
 
-	const hoverSiteEnv: PopupSettings = {
-		event: 'hover',
-		target: 'hoverSiteEnv',
-		placement: 'bottom'
-	};
+	// const hoverSiteEnv: PopupSettings = {
+	// 	event: 'hover',
+	// 	target: 'hoverSiteEnv',
+	// 	placement: 'bottom'
+	// };
 
 	// Define routes that do not require DB status check
 	const routesWithoutDbCheck = ['/index-explorer', '/index-updater'];
@@ -115,12 +114,14 @@
 			console.error('Failed to logout:', err);
 		}
 	}
+
+	onMount(() => {
+		autoModeWatcher();
+	});
 </script>
 
 <!-- Sync system light/dark mode -->
 <svelte:head>
-	<!-- svelte-ignore hydration_html_changed -->
-	{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}
 	<title>Murmurations Tools</title>
 	<script
 		data-goatcounter={import.meta.env.PROD
@@ -151,7 +152,7 @@
 				>
 			</div>
 			<!-- TODO - link to test/prod based on site third-level domain -->
-			<span>
+			<!-- <span>
 				<span class="md:hidden">Test</span><span class="max-md:hidden">Test Site</span> -
 				<a href="https://tools.murmurations.network/" class="underline text-primary-500">
 					<span class="md:hidden">Live</span><span class="max-md:hidden">switch to Live</span>
@@ -161,7 +162,7 @@
 			<div class="card p-4 w-72 shadow-xl variant-filled-primary text-sm" data-popup="hoverSiteEnv">
 				We offer both test and live sites so you can experiment in our test environment before
 				posting data to the live one.
-			</div>
+			</div> -->
 			<div slot="trail">
 				{#if $isAuthenticatedStore}
 					<button
