@@ -13,3 +13,10 @@ binding = "DB"
 database_name = "test-tools"
 database_id = "976e0cc7-a78c-4c20-8c54-6cfecbc8b380"
 migrations_dir = "drizzle"
+
+[env.production]
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "tools"
+database_id = "6513bd79-3a8f-4ae0-9a70-b0dfb0583568"
+migrations_dir = "drizzle"
