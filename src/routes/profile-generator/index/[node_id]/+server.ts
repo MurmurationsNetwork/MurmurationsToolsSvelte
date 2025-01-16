@@ -1,7 +1,7 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
-import { PUBLIC_ENV, PUBLIC_INDEX_URL, PUBLIC_TOOLS_URL } from '$env/static/public';
 import { PRIVATE_LOCAL_TOOLS_URL } from '$env/static/private';
+import { PUBLIC_ENV, PUBLIC_INDEX_URL } from '$env/static/public';
 import { jsonError } from '$lib/utils';
+import { json, type RequestHandler } from '@sveltejs/kit';
 
 // Get the status of a profile in the index
 export const GET: RequestHandler = async ({ params }) => {
@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ params }) => {
 			return jsonError('Missing cuid', 400);
 		}
 
-		let profileUrl = `${PUBLIC_TOOLS_URL}/profiles/${node_id}`;
+		let profileUrl = `/profiles/${node_id}`;
 
 		// Due to external URLs being inaccessible within k8s, causing the Index Service to fail to read the profile correctly.
 		// If the environment is local, use the PRIVATE_LOCAL_TOOLS_URL, which is usually the internal k8s URL.

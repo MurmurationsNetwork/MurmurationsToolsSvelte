@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { PUBLIC_TOOLS_URL } from '$env/static/public';
-	import SchemaSelector from '../profile-generator/SchemaSelector.svelte';
 	import { dbStatus } from '$lib/stores/dbStatus';
+	import { onMount } from 'svelte';
+	import SchemaSelector from '../profile-generator/SchemaSelector.svelte';
 
 	// Fetch the list of schemas
 	interface PageData {
@@ -61,12 +60,12 @@
 			let response;
 			if (isModifyMode && currentBatchId) {
 				formData.append('batch_id', currentBatchId);
-				response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`, {
+				response = await fetch(`/batch-importer`, {
 					method: 'PUT',
 					body: formData
 				});
 			} else {
-				response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`, {
+				response = await fetch(`/batch-importer`, {
 					method: 'POST',
 					body: formData
 				});
@@ -120,7 +119,7 @@
 			const formData = new FormData();
 			formData.append('batch_id', batch_id);
 
-			const response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`, {
+			const response = await fetch(`/batch-importer`, {
 				method: 'DELETE',
 				body: formData
 			});
@@ -160,7 +159,7 @@
 
 	async function fetchBatches(): Promise<void> {
 		try {
-			const response = await fetch(`${PUBLIC_TOOLS_URL}/batch-importer`);
+			const response = await fetch(`/batch-importer`);
 			if (response.ok) {
 				const data = await response.json();
 				batches = data.data.map((batch: Batch) => ({
