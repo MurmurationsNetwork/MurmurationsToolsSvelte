@@ -7,8 +7,7 @@
 		AppRailAnchor,
 		AppShell,
 		AppBar,
-		autoModeWatcher,
-		popup
+		autoModeWatcher
 	} from '@skeletonlabs/skeleton';
 
 	import hljs from 'highlight.js/lib/core';
@@ -42,16 +41,16 @@
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
 	// Popup for site environment
-	import type { PopupSettings } from '@skeletonlabs/skeleton';
+	// import type { PopupSettings } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { checkDbStatus } from '$lib/checkDbStatus';
 	import { dbStatus } from '$lib/stores/dbStatus';
 
-	const hoverSiteEnv: PopupSettings = {
-		event: 'hover',
-		target: 'hoverSiteEnv',
-		placement: 'bottom'
-	};
+	// const hoverSiteEnv: PopupSettings = {
+	// 	event: 'hover',
+	// 	target: 'hoverSiteEnv',
+	// 	placement: 'bottom'
+	// };
 
 	// Define routes that do not require DB status check
 	const routesWithoutDbCheck = ['/index-explorer', '/index-updater'];
