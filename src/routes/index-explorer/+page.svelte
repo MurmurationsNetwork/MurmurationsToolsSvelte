@@ -559,7 +559,7 @@
 						</div>
 					</div>
 					<div class="my-4 text-center">
-						{#if links && meta && searchParams.has('page') && searchParams.has('page_size') && searchParams.has('schema')}
+						{#if links && meta && searchParams.has('schema')}
 							<Pagination
 								{links}
 								{meta}
