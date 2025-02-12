@@ -96,17 +96,6 @@
 		}
 	});
 
-	$effect(() => {
-		if (searchParams.has('tags_filter')) {
-			tagsFilterChecked = searchParams.get('tags_filter') === 'or';
-		}
-		if (searchParams.has('tags_exact')) {
-			tagsExactChecked = searchParams.get('tags_exact') === 'true';
-		}
-		searchParamsObj.tags_filter = tagsFilterChecked ? 'or' : 'and';
-		searchParamsObj.tags_exact = tagsExactChecked ? 'true' : 'false';
-	});
-
 	async function performSearch(): Promise<void> {
 		isLoading = true;
 
@@ -347,12 +336,34 @@
 					<option value="500" selected={searchParamsObj.page_size === '500'}>500</option>
 				</select>
 				<div class="flex-auto">
-					<input type="checkbox" bind:checked={tagsFilterChecked} name="tags_filter" class="mr-2" />
+					<input
+						type="checkbox"
+						bind:checked={tagsFilterChecked}
+						name="tags_filter"
+						class="mr-2"
+						onchange={(event) => {
+							const target = event.target as HTMLInputElement;
+							if (!target) return;
+							tagsFilterChecked = target.checked;
+							searchParamsObj.tags_filter = tagsFilterChecked ? 'or' : 'and';
+						}}
+					/>
 					all tags
 				</div>
 				<div class="flex-auto">
-					<input type="checkbox" bind:checked={tagsExactChecked} name="tags_exact" class="mr-2" /> exact
-					matches only
+					<input
+						type="checkbox"
+						bind:checked={tagsExactChecked}
+						name="tags_exact"
+						class="mr-2"
+						onchange={(event) => {
+							const target = event.target as HTMLInputElement;
+							if (!target) return;
+							tagsExactChecked = target.checked;
+							searchParamsObj.tags_exact = tagsExactChecked ? 'true' : 'false';
+						}}
+					/>
+					exact matches only
 				</div>
 			</div>
 			<button
@@ -548,7 +559,7 @@
 						</div>
 					</div>
 					<div class="my-4 text-center">
-						{#if links && meta && searchParams.has('page') && searchParams.has('page_size') && searchParams.has('schema')}
+						{#if links && meta && searchParams.has('schema')}
 							<Pagination
 								{links}
 								{meta}
