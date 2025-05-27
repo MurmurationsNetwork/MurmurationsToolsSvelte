@@ -91,8 +91,8 @@ importers:
         specifier: ^10.1.5
         version: 10.1.5(eslint@9.26.0(jiti@1.21.6))
       eslint-plugin-svelte:
-        specifier: ^3.8.1
-        version: 3.8.1(eslint@9.26.0(jiti@1.21.6))(svelte@5.28.2)
+        specifier: ^3.9.0
+        version: 3.9.0(eslint@9.26.0(jiti@1.21.6))(svelte@5.28.2)
       globals:
         specifier: ^16.1.0
         version: 16.1.0
@@ -1721,8 +1721,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-svelte@3.8.1:
-    resolution: {integrity: sha512-w6NQifz1xBIFcs4XMLYT36xukgN1xgzoPGk1nJLC1UeZ8O4CUCCSZx1tgwq3yRNkMSXMUqbMJjslFweWsDlAoA==}
+  eslint-plugin-svelte@3.9.0:
+    resolution: {integrity: sha512-nvIUNyyPGbr5922Kd1p/jXe+FfNdVPXsxLyrrXpwfSbZZEFdAYva9O/gm2lObC/wXkQo/AUmQkAihfmNJYeCjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.1 || ^9.0.0
@@ -4523,7 +4523,7 @@ snapshots:
     dependencies:
       eslint: 9.26.0(jiti@1.21.6)
 
-  eslint-plugin-svelte@3.8.1(eslint@9.26.0(jiti@1.21.6))(svelte@5.28.2):
+  eslint-plugin-svelte@3.9.0(eslint@9.26.0(jiti@1.21.6))(svelte@5.28.2):
     dependencies:
       '@eslint-community/eslint-utils': 4.7.0(eslint@9.26.0(jiti@1.21.6))
       '@jridgewell/sourcemap-codec': 1.5.0
