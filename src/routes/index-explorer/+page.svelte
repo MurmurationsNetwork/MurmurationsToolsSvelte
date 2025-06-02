@@ -119,6 +119,10 @@
 			return;
 		}
 
+		// Set the tags filter and exact checked states
+		tagsFilterChecked = searchParamsObj.tags_filter === 'and';
+		tagsExactChecked = searchParamsObj.tags_exact === 'true';
+
 		// Clear the error message
 		error = null;
 
