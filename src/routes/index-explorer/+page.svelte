@@ -345,7 +345,7 @@
 							const target = event.target as HTMLInputElement;
 							if (!target) return;
 							tagsFilterChecked = target.checked;
-							searchParamsObj.tags_filter = tagsFilterChecked ? 'or' : 'and';
+							searchParamsObj.tags_filter = tagsFilterChecked ? 'and' : 'or';
 						}}
 					/>
 					all tags
