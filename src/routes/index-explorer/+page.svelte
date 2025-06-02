@@ -78,7 +78,7 @@
 		region: '',
 		country: '',
 		status: '',
-		tags_filter: 'and',
+		tags_filter: 'or',
 		tags_exact: 'false',
 		page_size: '30',
 		page: '1'
@@ -118,6 +118,10 @@
 			isLoading = false;
 			return;
 		}
+
+		// Set the tags filter and exact checked states
+		tagsFilterChecked = searchParamsObj.tags_filter === 'and';
+		tagsExactChecked = searchParamsObj.tags_exact === 'true';
 
 		// Clear the error message
 		error = null;
@@ -345,7 +349,7 @@
 							const target = event.target as HTMLInputElement;
 							if (!target) return;
 							tagsFilterChecked = target.checked;
-							searchParamsObj.tags_filter = tagsFilterChecked ? 'or' : 'and';
+							searchParamsObj.tags_filter = tagsFilterChecked ? 'and' : 'or';
 						}}
 					/>
 					all tags
