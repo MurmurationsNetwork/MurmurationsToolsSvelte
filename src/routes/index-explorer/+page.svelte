@@ -78,7 +78,7 @@
 		region: '',
 		country: '',
 		status: '',
-		tags_filter: 'and',
+		tags_filter: 'or',
 		tags_exact: 'false',
 		page_size: '30',
 		page: '1'
