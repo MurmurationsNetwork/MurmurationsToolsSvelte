@@ -15,8 +15,8 @@ importers:
         specifier: ^2.2.2
         version: 2.2.2
       '@tanstack/svelte-query':
-        specifier: ^5.76.0
-        version: 5.77.2(svelte@5.33.14)
+        specifier: ^5.80.6
+        version: 5.80.6(svelte@5.33.14)
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.2
@@ -1054,11 +1054,11 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20 || >=4.0.0-beta.1'
 
-  '@tanstack/query-core@5.77.2':
-    resolution: {integrity: sha512-1lqJwPsR6GX6nZFw06erRt518O19tWU6Q+x0fJUygl4lxHCYF2nhzBPwLKk2NPjYOrpR0K567hxPc5K++xDe9Q==}
+  '@tanstack/query-core@5.80.6':
+    resolution: {integrity: sha512-nl7YxT/TAU+VTf+e2zTkObGTyY8YZBMnbgeA1ee66lIVqzKlYursAII6z5t0e6rXgwUMJSV4dshBTNacNpZHbQ==}
 
-  '@tanstack/svelte-query@5.77.2':
-    resolution: {integrity: sha512-bMBtg5xWgK1UQvDBa3HQ0YOwhNC7TlNhWdOxgPSDCs2v4nfvXZW7BhW++bkjwbbONhXF3DEgjeWs7WWS6Xnvjg==}
+  '@tanstack/svelte-query@5.80.6':
+    resolution: {integrity: sha512-ULExzbybuLbk8xeSn04ST615ikYCHGa6n8KhelNFRGIBx1b+smDkqw9pGmN+uNGD+3z2wXjnKmtFVaRp3sbDNA==}
     peerDependencies:
       svelte: ^3.54.0 || ^4.0.0 || ^5.0.0
 
@@ -3610,11 +3610,11 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.17
 
-  '@tanstack/query-core@5.77.2': {}
+  '@tanstack/query-core@5.80.6': {}
 
-  '@tanstack/svelte-query@5.77.2(svelte@5.33.14)':
+  '@tanstack/svelte-query@5.80.6(svelte@5.33.14)':
     dependencies:
-      '@tanstack/query-core': 5.77.2
+      '@tanstack/query-core': 5.80.6
       svelte: 5.33.14
 
   '@tootallnate/once@1.1.2':

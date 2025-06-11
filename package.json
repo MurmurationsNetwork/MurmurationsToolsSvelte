@@ -28,7 +28,7 @@
 	"dependencies": {
 		"@floating-ui/dom": "1.7.0",
 		"@paralleldrive/cuid2": "^2.2.2",
-		"@tanstack/svelte-query": "^5.76.0",
+		"@tanstack/svelte-query": "^5.80.6",
 		"bcryptjs": "^3.0.2",
 		"drizzle-orm": "^0.43.1",
 		"highlight.js": "11.11.1",
