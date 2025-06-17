@@ -71,6 +71,6 @@
 		"vite": "^6.3.5",
 		"vite-plugin-tailwind-purgecss": "0.3.5",
 		"vitest": "^3.2.3",
-		"wrangler": "^4.7.1"
+		"wrangler": "^4.20.0"
 	}
 }
