@@ -218,7 +218,7 @@
 	<div class="mb-4 sm:flex sm:items-center">
 		<div class="text-gray-900 sm:flex-auto dark:text-gray-50">
 			<p>
-				{' '}
+				&nbsp;
 				<a
 					class="text-primary-500"
 					target="_blank"
@@ -395,7 +395,7 @@
 		<div class="text-gray-900 sm:flex-auto dark:text-gray-50">
 			<p class="text-sm">
 				When searching for tags, select <em>all tags</em> so only nodes with all of the tags entered
-				are shown. Select{' '}
+				are shown. Select&nbsp;
 				<em>exact matches only</em> so that spelling variations are not shown.
 			</p>
 		</div>
