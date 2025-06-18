@@ -28,7 +28,8 @@ export default [
 		},
 		rules: {
 			'svelte/no-at-html-tags': 'off',
-			'svelte/no-unused-svelte-ignore': 'off'
+			'svelte/no-unused-svelte-ignore': 'off',
+			'svelte/require-each-key': 'off'
 		}
 	},
 	{
