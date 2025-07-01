@@ -50,13 +50,13 @@ importers:
         version: 0.4.1(tailwindcss@3.4.17)
       '@sveltejs/adapter-auto':
         specifier: ^6.0.1
-        version: 6.0.1(@sveltejs/kit@2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))
+        version: 6.0.1(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))
       '@sveltejs/adapter-cloudflare':
         specifier: ^7.0.4
-        version: 7.0.4(@sveltejs/kit@2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(wrangler@4.20.2(@cloudflare/workers-types@4.20250618.0))
+        version: 7.0.4(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(wrangler@4.20.2(@cloudflare/workers-types@4.20250618.0))
       '@sveltejs/kit':
-        specifier: ^2.22.0
-        version: 2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0))
+        specifier: ^2.22.2
+        version: 2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0))
       '@sveltejs/vite-plugin-svelte':
         specifier: ^5.1.0
         version: 5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0))
@@ -847,6 +847,9 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
 
+  '@jridgewell/sourcemap-codec@1.5.3':
+    resolution: {integrity: sha512-AiR5uKpFxP3PjO4R19kQGIMwxyRyPuXmKEEy301V1C0+1rVjS94EZQXf1QKZYN8Q0YM+estSPhmx5JwNftv6nw==}
+
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
@@ -1010,8 +1013,8 @@ packages:
       '@sveltejs/kit': ^2.0.0
       wrangler: ^4.0.0
 
-  '@sveltejs/kit@2.22.0':
-    resolution: {integrity: sha512-DJm0UxVgzXq+1MUfiJK4Ridk7oIQsIets6JwHiEl97sI6nXScfXe+BeqNhzB7jQIVBb3BM51U4hNk8qQxRXBAA==}
+  '@sveltejs/kit@2.22.2':
+    resolution: {integrity: sha512-2MvEpSYabUrsJAoq5qCOBGAlkICjfjunrnLcx3YAk2XV7TvAIhomlKsAgR4H/4uns5rAfYmj7Wet5KRtc8dPIg==}
     engines: {node: '>=18.13'}
     hasBin: true
     peerDependencies:
@@ -3003,7 +3006,7 @@ snapshots:
   '@jridgewell/gen-mapping@0.3.8':
     dependencies:
       '@jridgewell/set-array': 1.2.1
-      '@jridgewell/sourcemap-codec': 1.5.0
+      '@jridgewell/sourcemap-codec': 1.5.3
       '@jridgewell/trace-mapping': 0.3.25
 
   '@jridgewell/resolve-uri@3.1.2': {}
@@ -3011,6 +3014,8 @@ snapshots:
   '@jridgewell/set-array@1.2.1': {}
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
+
+  '@jridgewell/sourcemap-codec@1.5.3': {}
 
   '@jridgewell/trace-mapping@0.3.25':
     dependencies:
@@ -3020,7 +3025,7 @@ snapshots:
   '@jridgewell/trace-mapping@0.3.9':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.5.0
+      '@jridgewell/sourcemap-codec': 1.5.3
 
   '@noble/hashes@1.8.0': {}
 
@@ -3122,18 +3127,18 @@ snapshots:
     dependencies:
       acorn: 8.15.0
 
-  '@sveltejs/adapter-auto@6.0.1(@sveltejs/kit@2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))':
+  '@sveltejs/adapter-auto@6.0.1(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))':
     dependencies:
-      '@sveltejs/kit': 2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0))
+      '@sveltejs/kit': 2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0))
 
-  '@sveltejs/adapter-cloudflare@7.0.4(@sveltejs/kit@2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(wrangler@4.20.2(@cloudflare/workers-types@4.20250618.0))':
+  '@sveltejs/adapter-cloudflare@7.0.4(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(wrangler@4.20.2(@cloudflare/workers-types@4.20250618.0))':
     dependencies:
       '@cloudflare/workers-types': 4.20250618.0
-      '@sveltejs/kit': 2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0))
+      '@sveltejs/kit': 2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0))
       worktop: 0.8.0-next.18
       wrangler: 4.20.2(@cloudflare/workers-types@4.20250618.0)
 
-  '@sveltejs/kit@2.22.0(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0))':
+  '@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0))':
     dependencies:
       '@sveltejs/acorn-typescript': 1.0.5(acorn@8.15.0)
       '@sveltejs/vite-plugin-svelte': 5.1.0(svelte@5.34.5)(vite@6.3.5(@types/node@24.0.3)(jiti@1.21.7)(yaml@2.8.0))
@@ -3974,7 +3979,7 @@ snapshots:
 
   magic-string@0.30.17:
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.0
+      '@jridgewell/sourcemap-codec': 1.5.3
 
   mdn-data@2.0.30: {}
 
