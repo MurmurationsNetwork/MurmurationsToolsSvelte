@@ -10,6 +10,7 @@
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import DynamicForm from './DynamicForm.svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	interface Props {
 		schemasSelected: string[];
@@ -75,7 +76,7 @@
 			const formDataObject: Record<string, string | string[]> = {};
 
 			// Find all the fields that have multiple select
-			const multipleSelects: Set<string> = new Set();
+			const multipleSelects: Set<string> = new SvelteSet();
 			const selects = target.querySelectorAll('select[multiple]');
 			selects.forEach((select) => {
 				const selectElement = select as HTMLSelectElement;

@@ -4,6 +4,7 @@
 	import SortableColumn from './SortableColumn.svelte';
 	import Pagination from './Pagination.svelte';
 	import { pushState } from '$app/navigation';
+	import { SvelteURLSearchParams } from 'svelte/reactivity';
 
 	// Fetch the list of schemas and countries
 	interface PageData {
@@ -154,7 +155,7 @@
 	async function handleSearch(event: Event): Promise<void> {
 		event.preventDefault();
 		isLoading = true;
-		searchParams = new URLSearchParams();
+		searchParams = new SvelteURLSearchParams();
 
 		for (const [key, value] of Object.entries(searchParamsObj)) {
 			if (value) {
