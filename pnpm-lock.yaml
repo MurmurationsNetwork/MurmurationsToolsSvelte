@@ -15,8 +15,8 @@ importers:
         specifier: ^2.2.2
         version: 2.2.2
       '@tanstack/svelte-query':
-        specifier: ^5.87.4
-        version: 5.87.4(svelte@5.38.6)
+        specifier: ^6.0.0
+        version: 6.0.0(svelte@5.38.6)
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.2
@@ -1236,13 +1236,13 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20 || >=4.0.0-beta.1'
 
-  '@tanstack/query-core@5.87.4':
-    resolution: {integrity: sha512-uNsg6zMxraEPDVO2Bn+F3/ctHi+Zsk+MMpcN8h6P7ozqD088F6mFY5TfGM7zuyIrL7HKpDyu6QHfLWiDxh3cuw==}
+  '@tanstack/query-core@5.90.2':
+    resolution: {integrity: sha512-k/TcR3YalnzibscALLwxeiLUub6jN5EDLwKDiO7q5f4ICEoptJ+n9+7vcEFy5/x/i6Q+Lb/tXrsKCggf5uQJXQ==}
 
-  '@tanstack/svelte-query@5.87.4':
-    resolution: {integrity: sha512-HIo3Rr/2M8q7mOJqOIWb0tQHwLkKJ12SjDji4E2+YyMGHtzGvg+7wLqQqUqFvaitloLeYkXI0skP05Z95ciLMQ==}
+  '@tanstack/svelte-query@6.0.0':
+    resolution: {integrity: sha512-CeG4fidH4O5w3r64qWVZnx8m508BYElZL0D7x3PBhxC6bGrNYstsWQZiquOOI/ie3eAqoefg7+cscDsObu5eGQ==}
     peerDependencies:
-      svelte: ^3.54.0 || ^4.0.0 || ^5.0.0
+      svelte: ^5.25.0
 
   '@types/chai@5.2.2':
     resolution: {integrity: sha512-8kB30R7Hwqf40JPiKhVzodJs2Qc1ZJ5zuT3uzw5Hq/dhNCl3G3l83jfpdI1e20BP348+fV7VIL/+FxaXkqBmWg==}
@@ -3501,11 +3501,11 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.17
 
-  '@tanstack/query-core@5.87.4': {}
+  '@tanstack/query-core@5.90.2': {}
 
-  '@tanstack/svelte-query@5.87.4(svelte@5.38.6)':
+  '@tanstack/svelte-query@6.0.0(svelte@5.38.6)':
     dependencies:
-      '@tanstack/query-core': 5.87.4
+      '@tanstack/query-core': 5.90.2
       svelte: 5.38.6
 
   '@types/chai@5.2.2':
