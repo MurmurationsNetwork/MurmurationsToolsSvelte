@@ -38,7 +38,7 @@
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20250902.0",
 		"@eslint/js": "^9.35.0",
-		"@playwright/test": "^1.55.0",
+		"@playwright/test": "^1.56.1",
 		"@skeletonlabs/skeleton": "2.11.0",
 		"@skeletonlabs/tw-plugin": "0.4.1",
 		"@sveltejs/adapter-auto": "^6.1.0",
