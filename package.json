@@ -29,7 +29,7 @@
 		"@floating-ui/dom": "1.7.4",
 		"@paralleldrive/cuid2": "^2.2.2",
 		"@tanstack/svelte-query": "^6.0.3",
-		"bcryptjs": "^3.0.2",
+		"bcryptjs": "^3.0.3",
 		"drizzle-orm": "^0.44.6",
 		"highlight.js": "11.11.1",
 		"svelte-awesome": "^3.3.5",
